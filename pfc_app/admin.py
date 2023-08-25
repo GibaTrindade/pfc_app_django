@@ -1,24 +1,30 @@
 from django.contrib import admin
 from .models import Curso
-from .models import Participante
-from .models import CH_Valida
+from .models import User
+from .models import Inscricao
 
-class CH_ValidaInline(admin.TabularInline):
-    model = CH_Valida
+class InscricaoInline(admin.TabularInline):
+    model = Inscricao
     extra = 0
 
 class CursoAdmin(admin.ModelAdmin):
-    inlines = [ CH_ValidaInline ]
+    inlines = [ InscricaoInline ]
     list_display = ('nome_curso', 'data_inicio', 'data_termino', 'vagas', 'status')
     fields = ['nome_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'competencia', ('data_inicio', 'data_termino'), 
-               'inst_certificadora', 'inst_promotora', 'gestor', 'status']
+               'inst_certificadora', 'inst_promotora', 'coordenador', 'status']
     class Meta:
         model = Curso
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'nome', 'cpf', 'email')
+
+class IncricaoAdmin(admin.ModelAdmin):
+    list_display = ('curso', 'participante', 'condicao_na_acao', 'ch_valida', 'status')
+
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
-admin.site.register(Participante)
-admin.site.register(CH_Valida)
+admin.site.register(User, UserAdmin)
+admin.site.register(Inscricao, IncricaoAdmin)
 
 admin.site.site_header = 'PFC'
