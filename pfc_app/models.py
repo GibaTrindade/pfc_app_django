@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from django.conf import settings
 from django.utils import timezone
@@ -56,7 +58,7 @@ class Curso(models.Model):
 class Inscricao(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     participante = models.ForeignKey(User, on_delete=models.CASCADE)
-    ch_valida = models.IntegerField()
+    ch_valida = models.IntegerField(blank=True, null=True)
     condicao_na_acao = models.CharField(max_length=400, blank=False, null=False)
     status = models.CharField(max_length=40)
     conluido = models.BooleanField(default=False)
@@ -66,4 +68,7 @@ class Inscricao(models.Model):
 
     def __str__(self):
         return f'Curso: {self.curso.nome_curso} >> Participante: {self.participante.nome}'
-    
+
+@receiver(pre_save, sender=Inscricao)
+def calcular_carga_horaria(sender, instance, **kwargs):
+    instance.ch_valida = instance.curso.ch_curso
