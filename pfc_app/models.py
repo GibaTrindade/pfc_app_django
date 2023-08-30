@@ -26,6 +26,19 @@ class User(AbstractUser):
         return self.nome
 
 
+class StatusCurso(models.Model):
+    nome = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.nome
+
+class StatusInscricao(models.Model):
+    nome = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.nome
+    
+
 class Curso(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
@@ -45,7 +58,7 @@ class Curso(models.Model):
     #gestor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     coordenador = models.ForeignKey(User, on_delete=models.CASCADE)
     #history = HistoricalRecords()
-    status = models.CharField(max_length=40, default='PENDENTE')
+    status = models.ForeignKey(StatusCurso, on_delete=models.PROTECT)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -56,11 +69,15 @@ class Curso(models.Model):
     
 
 class Inscricao(models.Model):
+    CONDICAO_ACAO_CHOICES = [
+        ('DISCENTE', 'DISCENTE'),
+        ('DOCENTE', 'DOCENTE'),
+    ]
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     participante = models.ForeignKey(User, on_delete=models.CASCADE)
     ch_valida = models.IntegerField(blank=True, null=True)
-    condicao_na_acao = models.CharField(max_length=400, blank=False, null=False)
-    status = models.CharField(max_length=40)
+    condicao_na_acao = models.CharField(max_length=400, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
+    status = models.ForeignKey(StatusInscricao, on_delete=models.PROTECT)
     conluido = models.BooleanField(default=False)
 
     class Meta:
