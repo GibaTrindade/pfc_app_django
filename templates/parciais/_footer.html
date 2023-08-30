@@ -1,0 +1,24 @@
+{% load bootstrap5 %}
+
+<!--_footer.html-->
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container navbar-dark pt-4 mt-5">
+        <div class="row">
+            <div class="col">
+                <p class="text-left">Powered by Django</p>
+            </div>
+            <div class="col">
+                <p class="text-right">Made By Giba Trindade</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!--/_footer.html-->
+{% bootstrap_javascript %}
+<script>
+        function deleteFunction(e) {
+            if(!confirm("Tem certeza que deseja excluir esse item?")){
+                e.preventDefault();
+            }
+        }
+</script>
