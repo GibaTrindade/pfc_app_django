@@ -1,0 +1,6 @@
+FAZER LOAD DO SEED A PARTIR DE UM SEED FILE EM JSON
+    python manage.py loaddata <file>
+
+CRIAR SEED FILE A PARTIR DOS DADOS QUE JÁ EXISTEM 
+    py manage.py dumpdata pfc_app --indent 4 > seed/0009_Admin.json
+
