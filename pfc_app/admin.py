@@ -13,6 +13,12 @@ class CursoAdmin(admin.ModelAdmin):
     fields = ['nome_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'competencia', ('data_inicio', 'data_termino'), 
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status']
+    
+    def has_change_permission(self, request, obj=None):
+        if obj is not None and obj.coordenador != request.user:
+            return False
+        return True
+    
     class Meta:
         model = Curso
 
