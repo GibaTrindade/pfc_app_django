@@ -15,15 +15,8 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
-            <ul>
-                {% for x in cursos %}
-                  <li><h5>{{ x.nome_curso }} - {{ x.data_termino }}</h5></li>
-                {% endfor %}
-              </ul>
-{% block content %}
-{% endblock %}
-
-
+            {% block content %}
+            {% endblock %}
         </div>
     </div>
 </div>

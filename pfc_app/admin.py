@@ -9,7 +9,8 @@ class InscricaoInline(admin.TabularInline):
     extra = 1
     fields = ['curso', 'participante', 'condicao_na_acao', 'status']
     list_display = ('curso', 'participante', 'ch_valida', 'condicao_na_acao', 'status')
-    
+    ordering = ['-participante__nome']
+
 
 class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
@@ -19,10 +20,10 @@ class CursoAdmin(admin.ModelAdmin):
                'categoria', 'competencia', ('data_inicio', 'data_termino'), 
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status']
     list_filter = ('nome_curso', 'data_inicio', 'data_termino', )
-    
+
     def numero_inscritos(self, obj):
         users_aprovados = obj.inscricao_set.filter(
-            Q(status=1) & Q(condicao_na_acao="DISCENTE")
+            Q(status__nome="APROVADA") & Q(condicao_na_acao="DISCENTE")
         )
         return users_aprovados.count()
     numero_inscritos.short_description = 'Número de Inscritos'

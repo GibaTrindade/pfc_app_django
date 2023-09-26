@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <ul>
+        {% for x in cursos %}
+            <li><h5>{{ x.nome_curso }} - {{ x.data_termino }}</h5></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

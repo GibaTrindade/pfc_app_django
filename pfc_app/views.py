@@ -7,8 +7,8 @@ from .models import Curso
 
 def cursos(request):
   lista_cursos = Curso.objects.all().values()
-  template = loader.get_template('base.html')
+  #template = loader.get_template('base.html')
   context = {
     'cursos': lista_cursos,
   }
-  return HttpResponse(template.render(context, request))
+  return render(request, 'pfc_app/lista_cursos.html' ,context)
