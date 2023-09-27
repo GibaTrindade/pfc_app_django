@@ -15,15 +15,16 @@ class InscricaoInline(admin.TabularInline):
 class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
 
-    list_display = ('nome_curso', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status')
+    list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status')
     fields = ['nome_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'competencia', ('data_inicio', 'data_termino'), 
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status']
     list_filter = ('nome_curso', 'data_inicio', 'data_termino', )
+    list_editable = ('status', )
 
     def numero_inscritos(self, obj):
         users_aprovados = obj.inscricao_set.filter(
-            Q(status__nome="APROVADA") & Q(condicao_na_acao="DISCENTE")
+            ~Q(status__nome="CANCELADA") & Q(condicao_na_acao="DISCENTE")
         )
         return users_aprovados.count()
     numero_inscritos.short_description = 'Número de Inscritos'
@@ -48,8 +49,9 @@ class CustomUserAdmin(UserAdmin):
     )
 
 class InscricaoAdmin(admin.ModelAdmin):
-    list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status')
+    list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status', 'concluido', )
     list_filter = ('status', 'curso__nome_curso', 'condicao_na_acao',)
+    list_editable = ('condicao_na_acao', 'status', 'concluido',)
     def participante_username(self, obj):
         return obj.participante.username if obj.participante else 'N/A'
     participante_username.short_description = 'Username'

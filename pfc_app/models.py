@@ -24,6 +24,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.nome
+    
+    def save(self, *args, **kwargs):
+        self.nome = self.nome.upper()
+        self.first_name = self.first_name.upper()
+        self.last_name = self.last_name.upper()
+        super(User, self).save(*args, **kwargs)
 
 
 class StatusCurso(models.Model):
@@ -37,6 +43,9 @@ class StatusInscricao(models.Model):
     
     def __str__(self):
         return self.nome
+    
+    class Meta:
+        verbose_name_plural = "status inscrições"
     
 
 class Curso(models.Model):
@@ -78,10 +87,11 @@ class Inscricao(models.Model):
     ch_valida = models.IntegerField(blank=True, null=True)
     condicao_na_acao = models.CharField(max_length=400, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
     status = models.ForeignKey(StatusInscricao, on_delete=models.PROTECT)
-    conluido = models.BooleanField(default=False)
+    concluido = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "inscrições"
+        unique_together = ('curso', 'participante')
 
     def __str__(self):
         return f'Curso: {self.curso.nome_curso} >> Participante: {self.participante.nome}'

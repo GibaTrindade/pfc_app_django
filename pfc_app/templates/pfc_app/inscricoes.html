@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="d-flex p-2 justify-content-center mb-5"><h1>MINHAS INSCRIÇÕES</h1></div>
+    <div class="table-responsive">
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">NOME DO CURSO</th>
+            <th scope="col">CARGA HORÁRIA</th>
+            <th scope="col">CONCLUÍDO</th>
+            <th scope="col">STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for inscricao in inscricoes %}
+                <tr>
+                    <th scope="row">{{ inscricao.id }}</th>
+                    <td>{{ inscricao.curso.nome_curso }}</td>
+                    <td>{{ inscricao.ch_valida }}</td>
+                    {% if  inscricao.concluido %}
+                        <td>SIM</td>
+                    {% else %}
+                        <td>NÃO</td>
+                    {% endif %}
+                    <td>{{ inscricao.status }}</td>                    
+                </tr>
+            {% empty %}
+                <p>Você não tem inscrições.</p>
+            {% endfor %}
+          
+        </tbody>
+      </table>
+    </div>
+
+{% endblock %}
+
