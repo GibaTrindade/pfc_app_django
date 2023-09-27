@@ -7,7 +7,7 @@ from django.db.models import Count, Q, Sum
 from datetime import date
 
 # Create your views here.
-
+@login_required
 def cursos(request):
   lista_cursos = Curso.objects.all()
   data_atual = date.today()

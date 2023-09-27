@@ -39,12 +39,12 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'nome', 'cpf', 'email')
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password', 'first_name', 'last_name', 'cpf', 'nome', 'lotacao', 'role')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'cpf', 'nome', 'lotacao', 'role', 'is_staff', 'is_active')}
+            'fields': ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'cpf', 'nome', 'lotacao', 'role', 'is_staff', 'is_active', 'groups', )}
         ),
     )
 

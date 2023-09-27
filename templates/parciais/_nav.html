@@ -12,7 +12,7 @@
 
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">| {{user.username}}: {{user.role}} |</a>
+                    <a class="nav-link" href="#">| {{user.get_username}}: {{user.role}} |</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'lista_cursos' %}">| Cursos |</a>
