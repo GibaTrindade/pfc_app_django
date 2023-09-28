@@ -82,6 +82,7 @@ def inscrever(request, curso_id):
     # Compara com o número de vagas
     # Caso seja maior ou igual redireciona
     if inscricoes_validas >= curso.vagas:
+        print(inscricoes_validas)
         # O curso está lotado
         try:
           inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_fila)
@@ -94,7 +95,7 @@ def inscrever(request, curso_id):
         except IntegrityError:
           print("INTEGRITY ERROR 1")
           messages.error(request, 'Você já está inscrito')
-          return redirect('lista_cursos')
+          return redirect('detail_curso', pk=curso_id)
     
     try:
       inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_pendente)
@@ -110,7 +111,7 @@ def inscrever(request, curso_id):
     except IntegrityError:
        print("INTEGRITY ERROR")
        messages.error(request, 'Você já está inscrito')
-       return redirect('inscricao_existente')
+       return redirect('detail_curso', pk=curso_id)
     
 def sucesso_inscricao(request):
     return render(request, 'pfc_app/sucesso_inscricao.html')
