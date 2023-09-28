@@ -17,7 +17,7 @@ class CursoAdmin(admin.ModelAdmin):
 
     list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status')
     fields = ['nome_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
-               'categoria', 'competencia', ('data_inicio', 'data_termino'), 
+               'categoria', 'competencia', 'descricao', ('data_inicio', 'data_termino'), 
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status']
     list_filter = ('nome_curso', 'data_inicio', 'data_termino', )
     list_editable = ('status', )
@@ -38,13 +38,22 @@ class CustomUserAdmin(UserAdmin):
     model = User
     list_display = ('username', 'nome', 'cpf', 'email', 'is_externo', )
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password', 'first_name', 'last_name', 'cpf', 'nome', 'lotacao', 'role', 'is_externo', )}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups')}),
+        ('Geral', {'fields': ('username', 'email', 'password', 'first_name', 'last_name', 
+                           'cpf', 'nome', 'telefone', 'lotacao', 'lotacao_especifica', 'lotacao_especifica_2',
+                           'classificacao_lotacao', 'cargo', 'nome_cargo', 'categoria', 'grupo_ocupacional',
+                           'origem', 'simbologia', 'tipo_atuacao',
+                           'role', 'is_externo', 'avatar', )}),
+        ('Permissões', {'fields': ('is_staff', 'is_active', 'groups')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'cpf', 'nome', 'lotacao', 'role', 'is_staff', 'is_active', 'is_externo',  'groups', )}
+            'fields': ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 
+                       'cpf', 'nome', 'telefone', 'lotacao', 'lotacao_especifica', 'lotacao_especifica_2',
+                       'classificacao_lotacao', 'cargo', 'nome_cargo', 'categoria', 'grupo_ocupacional', 
+                       'origem', 'simbologia', 'tipo_atuacao',
+                       'role', 'is_staff', 'is_active', 'is_externo', 
+                       'avatar', 'groups', )}
         ),
     )
 

@@ -20,7 +20,7 @@ def cursos(request):
                              ~Q(inscricao__status__nome='CANCELADA') &
                              ~Q(inscricao__status__nome='EM FILA')
                              )
-    ).order_by('data_inicio').all()#.filter(data_inicio__gt=data_atual)
+    ).order_by('data_inicio').all().filter(data_inicio__gt=data_atual)
   #template = loader.get_template('base.html')
   context = {
     'cursos': cursos_com_inscricoes,
@@ -63,6 +63,23 @@ def inscricoes(request):
 class CursoDetailView(DetailView):
    # model_detail.html
    model = Curso
+
+   def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Recupere o usuário docente relacionado ao curso atual
+        curso = self.get_object()
+        usuario_docente = None
+
+        # Verifique se há uma inscrição do tipo 'DOCENTE' relacionada a este curso
+        inscricoes_docentes = Inscricao.objects.filter(curso=curso, condicao_na_acao='DOCENTE')
+
+        usuarios_docentes = [inscricao.participante for inscricao in inscricoes_docentes]
+
+        # Adicione o usuário docente ao contexto
+        context['usuarios_docentes'] = usuarios_docentes
+
+        return context
 
 
 @login_required

@@ -6,12 +6,12 @@
 <div class="container">
     <div class="row">
         <div class="col-xl-2 col-sm-12">
-            <div class="row d-flex justify-content-center align-items-center h-50">
-                    foto 1
-            </div>
-            <div class="row d-flex justify-content-center align-items-center h-50">
-                    foto 2
-            </div>
+            {% for usuario_docente in usuarios_docentes %}
+                <div class="row d-flex justify-content-center align-items-center h-50 p-3">
+                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" alt="Avatar" class="h-100">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
+                </div>
+            {% endfor %}
+            
         </div>
         <div class="col">
             <div class="row d-flex justify-content-center align-items-center">
@@ -20,6 +20,11 @@
                 <p>Início: {{curso.data_inicio}}</p>
                 <p>Término: {{curso.data_termino}}</p>
             </div>
+            {% for usuario_docente in usuarios_docentes %}
+                <div class="row d-flex justify-content-center align-items-center">
+                <p>Instrutor-{{ forloop.counter }}: {{usuario_docente.nome}}</p>
+            </div>
+            {% endfor %}
             <div class="row d-flex justify-content-center align-items-center">
                 <div class="col-xl-6 col-sm-12">
                     <a href="/inscrever/{{curso.id}}/" class="btn btn-success">INSCREVER-SE</a>

@@ -1,8 +1,9 @@
 from django.db import models
+import os
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-
+import base64
 from django.conf import settings
 from django.utils import timezone
 
@@ -11,13 +12,27 @@ from django.utils import timezone
 class User(AbstractUser):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
-    cpf = models.CharField(max_length=11, blank=False, null=False)
+    cpf = models.CharField(max_length=11, blank=False, null=False, unique=True)
     nome = models.CharField(max_length=400, blank=False, null=False)
-    email = models.EmailField(default='a@b.com', null=False, blank=False)
-    lotacao = models.CharField(max_length=400, blank=False, null=False)
+    email = models.EmailField(default='a@b.com', null=False, blank=False, unique=True)
+    telefone = models.CharField(max_length=40, blank=True, null=True)
+    cargo = models.CharField(max_length=400, blank=True, null=True)
+    nome_cargo = models.CharField(max_length=400, blank=True, null=True)
+    categoria = models.CharField(max_length=400, blank=True, null=True)
+    grupo_ocupacional = models.CharField(max_length=400, blank=True, null=True)
+    origem = models.CharField(max_length=400, blank=True, null=True)
+    simbologia = models.CharField(max_length=400, blank=True, null=True)
+    tipo_atuacao = models.CharField(max_length=400, blank=True, null=True)
+    lotacao = models.CharField(max_length=400, blank=True, null=True)
+    lotacao_especifica = models.CharField(max_length=400, blank=True, null=True)
+    lotacao_especifica_2 = models.CharField(max_length=400, blank=True, null=True)
+    classificacao_lotacao = models.CharField(max_length=400, blank=True, null=True)
+
     is_ativo = models.BooleanField(default=True)
     role = models.CharField(max_length=40, default="USER")
     is_externo = models.BooleanField(default=False)
+    avatar = models.ImageField(null=True, blank=True)
+    avatar_base64 = models.TextField(blank=True, null=True)
     
     def publish(self):
         self.published_date = timezone.now()
@@ -30,7 +45,22 @@ class User(AbstractUser):
         self.nome = self.nome.upper()
         self.first_name = self.first_name.upper()
         self.last_name = self.last_name.upper()
+        if self.avatar:
+            # Leia a imagem em bytes
+            image_data = self.avatar.read()
+            # Converta a imagem em base64
+            base64_data = base64.b64encode(image_data).decode('utf-8')
+            # Salve a imagem em base64 no campo avatar_base64
+            self.avatar_base64 = base64_data
+
+        self.avatar = None
         super(User, self).save(*args, **kwargs)
+
+        if self.avatar:
+            os.remove(self.avatar.path)
+
+            # Defina o campo avatar como vazio para garantir que o arquivo não seja salvo novamente
+            
 
 
 class StatusCurso(models.Model):
@@ -59,6 +89,7 @@ class Curso(models.Model):
     vagas = models.IntegerField(blank=False, null=False)
     categoria = models.CharField(max_length=400, default='')
     competencia = models.CharField(max_length=400, default='')
+    descricao = models.TextField(max_length=4000, default='')
     data_inicio = models.DateField(blank=False, null=False)
     data_termino = models.DateField(blank=True, null=True)
     inst_certificadora = models.CharField(max_length=400, blank=False, null=False)
