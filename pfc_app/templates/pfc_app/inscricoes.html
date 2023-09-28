@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include 'parciais/_messages.html' %}
     <div class="d-flex p-2 justify-content-center mb-5"><h1>MINHAS INSCRIÇÕES</h1></div>
     <div class="table-responsive">
     <table class="table">
@@ -8,9 +9,10 @@
           <tr>
             <th scope="col">ID</th>
             <th scope="col">NOME DO CURSO</th>
+            <th scope="col">STATUS DO CURSO</th>
             <th scope="col">CARGA HORÁRIA</th>
             <th scope="col">CONCLUÍDO</th>
-            <th scope="col">STATUS</th>
+            <th scope="col">STATUS DA INSCRIÇÃO</th>
           </tr>
         </thead>
         <tbody>
@@ -18,6 +20,7 @@
                 <tr>
                     <th scope="row">{{ inscricao.id }}</th>
                     <td>{{ inscricao.curso.nome_curso }}</td>
+                    <td>{{ inscricao.curso.status.nome }}</td>
                     <td>{{ inscricao.ch_valida }}</td>
                     {% if  inscricao.concluido %}
                         <td>SIM</td>

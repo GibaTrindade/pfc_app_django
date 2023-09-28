@@ -17,6 +17,7 @@ class User(AbstractUser):
     lotacao = models.CharField(max_length=400, blank=False, null=False)
     is_ativo = models.BooleanField(default=True)
     role = models.CharField(max_length=40, default="USER")
+    is_externo = models.BooleanField(default=False)
     
     def publish(self):
         self.published_date = timezone.now()

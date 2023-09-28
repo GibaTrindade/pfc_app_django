@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include 'parciais/_messages.html' %}
 <div class="d-flex p-2 justify-content-center mb-5"><h1>ESCOLHA UM CURSO</h1></div>
 <div class="table-responsive">
 <table class="table table-hover">
@@ -29,11 +30,10 @@
                 <td>{{ curso.data_termino }}</td>
                 <td class="text-center">{{ curso.status }}</td>
                 {% if curso.num_inscricoes >= curso.vagas %}
-                    <td class="text-center"><button type="button" class="btn btn-warning">ENTRAR NA FILA</button></td>
+                    <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a></td>
                 {% else %}
-                    <td class="text-center"><button type="button" class="btn btn-success">INSCREVER</button></td>
-                {% endif %}
-                
+                    <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-success">INSCREVER</a></td>
+                {% endif %}                
             </tr>
         {% endfor %}
       

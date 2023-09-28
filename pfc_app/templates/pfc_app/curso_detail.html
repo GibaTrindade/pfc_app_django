@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'parciais/_messages.html' %}
+<div class="d-flex p-2 justify-content-center mb-5"><h1>Curso: {{curso}}</h1></div>
+<div class="container">
+    <div class="row">
+        <div class="col-xl-2 col-sm-12">
+            <div class="row d-flex justify-content-center align-items-center h-50">
+                    foto 1
+            </div>
+            <div class="row d-flex justify-content-center align-items-center h-50">
+                    foto 2
+            </div>
+        </div>
+        <div class="col">
+            <div class="row d-flex justify-content-center align-items-center">
+                <p>Carga Horária: {{curso.ch_curso}} horas</p>
+                <p>Vagas: {{curso.vagas}}</p>
+                <p>Início: {{curso.data_inicio}}</p>
+                <p>Término: {{curso.data_termino}}</p>
+            </div>
+            <div class="row d-flex justify-content-center align-items-center">
+                <div class="col-xl-6 col-sm-12">
+                    <a href="/inscrever/{{curso.id}}/" class="btn btn-success">INSCREVER-SE</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
