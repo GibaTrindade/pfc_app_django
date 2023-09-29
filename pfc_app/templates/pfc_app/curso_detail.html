@@ -5,10 +5,10 @@
 <div class="d-flex p-2 justify-content-center mb-5"><h1>Curso: {{curso}}</h1></div>
 <div class="container">
     <div class="row">
-        <div class="col-xl-2 col-sm-12">
+        <div class="col-md-2 col-sm-12">
             {% for usuario_docente in usuarios_docentes %}
-                <div class="row d-flex justify-content-center align-items-center h-50 p-3">
-                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" alt="Avatar" class="h-100">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
+                <div class="row d-flex justify-content-center align-items-center p-3">
+                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" alt="Avatar" class="img-thumbnail">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
                 </div>
             {% endfor %}
             
