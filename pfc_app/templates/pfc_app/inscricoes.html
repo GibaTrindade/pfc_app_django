@@ -32,7 +32,14 @@
                     {% if  inscricao.curso.periodo_avaliativo %}
                         <td>AVALIAR</td> 
                     {% else %}
+                        {% if  inscricao.status.nome == "APROVADA" or inscricao.status.nome == "PENDENTE" %}
+                            {% if  inscricao.curso.status.nome == "A INICIAR" or inscricao.curso.status.nome == "INICIADO" %}
+                                <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRÇÃO</a></td>
+                            {% endif %}
+                        {% else %}
                         <td>AGUARDAR AVALIAÇÃO</td> 
+                        {% endif %}
+                        
                     {% endif %}
                                      
                 </tr>

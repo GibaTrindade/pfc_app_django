@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao
 from .forms import AvaliacaoForm 
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef
 from datetime import date
 from django.views.generic import DetailView
 
@@ -19,10 +19,15 @@ def cursos(request):
         num_inscricoes=Count('inscricao', 
                              filter=~Q(inscricao__condicao_na_acao='DOCENTE') & 
                              ~Q(inscricao__status__nome='CANCELADA') &
-                             ~Q(inscricao__status__nome='EM FILA')
-                             )
+                             ~Q(inscricao__status__nome='EM FILA') 
+                             ),
+        usuario_inscrito=Exists(
+           Inscricao.objects.filter(participante=request.user, curso=OuterRef('pk'))
+            
+        )
     ).order_by('data_inicio').all().filter(data_inicio__gt=data_atual)
   #template = loader.get_template('base.html')
+  #cursos_nao_inscrito = cursos_com_inscricoes.exclude(inscricao__participante=request.user)
   context = {
     'cursos': cursos_com_inscricoes,
   }
@@ -84,6 +89,26 @@ class CursoDetailView(DetailView):
 
 
 @login_required
+def cancelar_inscricao(request, inscricao_id):
+    try:
+      inscricao = Inscricao.objects.get(pk=inscricao_id)
+    except:
+       messages.error(request, 'Inscrição não existe!')
+       return render(request, 'pfc_app/inscricoes.html')
+    
+    if request.user == inscricao.participante:
+       status_cancelado = StatusInscricao.objects.get(nome='CANCELADA')
+       inscricao.status = status_cancelado
+       inscricao.save()
+       messages.success(request, 'Inscrição cancelada')
+       return render(request, 'pfc_app/inscricoes.html')
+    else:
+       messages.error(request, 'Você não está inscrito nesse curso!')
+       return render(request, 'pfc_app/inscricoes.html')
+    
+    #return render(request, 'pfc_app/inscricoes.html', context)
+
+@login_required
 def inscrever(request, curso_id):
     curso = Curso.objects.get(pk=curso_id)
     status_id_pendente = StatusInscricao.objects.get(nome='PENDENTE')
@@ -109,7 +134,7 @@ def inscrever(request, curso_id):
             return render(request, 'pfc_app/curso_lotado.html')
           else:
             messages.error(request, 'Você já está inscrito')
-            return redirect('inscricao_existente')
+            return redirect('lista_cursos')
         except IntegrityError:
           print("INTEGRITY ERROR 1")
           messages.error(request, 'Você já está inscrito')
@@ -125,7 +150,7 @@ def inscrever(request, curso_id):
       else:
           # A inscrição já existe
           messages.error(request, 'Você já está inscrito')
-          return redirect('inscricao_existente')
+          return redirect('lista_cursos')
     except IntegrityError:
        print("INTEGRITY ERROR")
        messages.error(request, 'Você já está inscrito')

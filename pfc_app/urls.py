@@ -10,5 +10,6 @@ urlpatterns = [
     path('inscricao_existente/', views.inscricao_existente, name='inscricao_existente'),
     path('inscrever/<int:curso_id>/', views.inscrever, name='inscrever_curso'),
     path('avaliacao/<int:curso_id>/', views.avaliacao, name='avaliacao'),
+    path('inscricao_cancelar/<int:inscricao_id>/', views.cancelar_inscricao, name='cancelar_inscricao'),
 
 ]

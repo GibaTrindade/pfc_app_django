@@ -29,13 +29,20 @@
                 <td>{{ curso.data_inicio }}</td>
                 <td>{{ curso.data_termino }}</td>
                 <td class="text-center">{{ curso.status }}</td>
+                {% if curso.usuario_inscrito %}
+                  <td class="text-center">INSCRITO</td>
+                {% else %}
                 {% if curso.status.nome == "A INICIAR" %}
-                  {% if curso.num_inscricoes >= curso.vagas %}
-                        <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a></td>
-                  {% else %}
-                      <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-success">INSCREVER</a></td>
-                  {% endif %}      
-                {% endif %}            
+                  
+                    {% if curso.num_inscricoes >= curso.vagas %}
+                          <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a></td>
+                    {% else %}
+                        <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-success">INSCREVER</a></td>
+                    {% endif %}   
+                  
+                     
+                {% endif %}      
+                {% endif %}      
             </tr>
         {% endfor %}
       
