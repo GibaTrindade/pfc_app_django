@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
-from .models import Curso, Inscricao, StatusInscricao
+from .models import Curso, Inscricao, StatusInscricao, Avaliacao
+from .forms import AvaliacaoForm 
 from django.db.models import Count, Q, Sum
 from datetime import date
 from django.views.generic import DetailView
@@ -135,3 +136,49 @@ def sucesso_inscricao(request):
 
 def inscricao_existente(request):
     return render(request, 'pfc_app/inscricao_existente.html')
+
+@login_required
+def avaliacao(request, curso_id):
+    # Checa se o curso existe
+    try:
+      curso = Curso.objects.get(pk=curso_id)
+    except:
+       messages.error(request, f"Curso não encontrado!")
+       return redirect('lista_cursos')
+    
+    # Se existe, checa se o status está como "FINALIZADO"
+    if curso.status.nome != "FINALIZADO":
+       messages.error(request, f"Curso não finalizado!")
+       return redirect('lista_cursos')
+    
+    try:
+       inscricao = Inscricao.objects.get(participante=request.user, curso=curso)
+    except:
+       messages.error(request, f"Você não está inscrito neste curso!")
+       return redirect('lista_cursos')
+    
+    if request.method == 'POST':
+        form = AvaliacaoForm(request.POST)
+        if form.is_valid():
+            # Faça o que for necessário com os dados da avaliação, como salvá-los no banco de dados
+            usuario = request.user
+            
+            avaliacao = form.save(commit=False)
+            avaliacao.participante = usuario
+            
+            avaliacao.curso = curso
+            #form.save()
+            avaliacao.save()
+            # Redirecione para uma página de sucesso ou outra ação apropriada
+            messages.success(request, 'Avaliação Realizada!')
+            return redirect('lista_cursos')
+        messages.error(request, form.errors)
+            #return render(request, 'sucesso.html')
+       #else:
+           #messages.error(request, 'Nenhum item pode ficar em branco')
+           #return render(request, 'pfc_app/avaliacao.html', {'form': form})
+
+    else:
+        form = AvaliacaoForm()
+
+    return render(request, 'pfc_app/avaliacao.html', {'form': form, 'curso':curso})

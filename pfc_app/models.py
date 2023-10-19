@@ -1,4 +1,5 @@
 from django.db import models
+from django import forms
 import os
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import pre_save
@@ -95,11 +96,13 @@ class Curso(models.Model):
     inst_certificadora = models.CharField(max_length=400, blank=False, null=False)
     inst_promotora = models.CharField(max_length=400, blank=False, null=False)
     participantes = models.ManyToManyField(User, through='Inscricao', related_name='curso_participante')
+    avaliacoes = models.ManyToManyField(User, through='Avaliacao', related_name='curso_avaliacao')
     #acao = models.ForeignKey(Acao, on_delete=models.CASCADE)
     #gestor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     coordenador = models.ForeignKey(User, on_delete=models.CASCADE)
     #history = HistoricalRecords()
     status = models.ForeignKey(StatusCurso, on_delete=models.PROTECT)
+    periodo_avaliativo = models.BooleanField(default=False)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -131,3 +134,15 @@ class Inscricao(models.Model):
 @receiver(pre_save, sender=Inscricao)
 def calcular_carga_horaria(sender, instance, **kwargs):
     instance.ch_valida = instance.curso.ch_curso
+
+
+notas=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'))
+
+class Avaliacao(models.Model):
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    participante = models.ForeignKey(User, on_delete=models.CASCADE)
+    nota_atributo1 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
+    nota_atributo2 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
+    nota_atributo3 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
+    nota_atributo4 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
+    nota_atributo5 = models.IntegerField(choices=notas, default=None, blank=False, null=False)

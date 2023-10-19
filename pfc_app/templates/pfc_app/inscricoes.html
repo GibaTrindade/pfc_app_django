@@ -13,6 +13,7 @@
             <th scope="col">CARGA HORÁRIA</th>
             <th scope="col">CONCLUÍDO</th>
             <th scope="col">STATUS DA INSCRIÇÃO</th>
+            <th scope="col">AVALIAR</th>
           </tr>
         </thead>
         <tbody>
@@ -27,7 +28,13 @@
                     {% else %}
                         <td>NÃO</td>
                     {% endif %}
-                    <td>{{ inscricao.status }}</td>                    
+                    <td>{{ inscricao.status }}</td>  
+                    {% if  inscricao.curso.periodo_avaliativo %}
+                        <td>AVALIAR</td> 
+                    {% else %}
+                        <td>AGUARDAR AVALIAÇÃO</td> 
+                    {% endif %}
+                                     
                 </tr>
             {% empty %}
                 <p>Você não tem inscrições.</p>
