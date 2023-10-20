@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db.models import Q
 from django.contrib.auth.admin import UserAdmin
-from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao
+from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao, StatusValidacao, Avaliacao, Validacao_CH
+from .forms import AvaliacaoForm 
 
 
 class InscricaoInline(admin.TabularInline):
@@ -65,11 +66,18 @@ class InscricaoAdmin(admin.ModelAdmin):
         return obj.participante.username if obj.participante else 'N/A'
     participante_username.short_description = 'Username'
 
+class AvaliacaoAdmin(admin.ModelAdmin):
+    form = AvaliacaoForm
+
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Inscricao, InscricaoAdmin)
 admin.site.register(StatusCurso)
 admin.site.register(StatusInscricao)
+admin.site.register(StatusValidacao)
+admin.site.register(Avaliacao)
+admin.site.register(Validacao_CH)
+
 
 admin.site.site_header = 'PFC'

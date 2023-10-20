@@ -1,16 +1,43 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
-from .models import Curso, Inscricao, StatusInscricao, Avaliacao
+from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH
 from .forms import AvaliacaoForm 
 from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef
 from datetime import date
 from django.views.generic import DetailView
 
 # Create your views here.
+
+def login(request):
+    if request.method != 'POST':
+        return render(request, 'pfc_app/login.html')
+
+    usuario = request.POST.get('usuario')
+    senha = request.POST.get('senha')
+
+    user = auth.authenticate(username=usuario, password=senha)
+
+    if not user:
+        messages.error(request, 'Usuário ou senha inválidos!')
+        return render(request, 'pfc_app/login.html')
+    else:
+        auth.login(request, user)
+        messages.success(request, 'Seja bem vindo!')
+        return redirect('lista_cursos')
+
+    return render(request, 'pfc_app/login.html')
+
+def logout(request):
+    auth.logout(request)
+    return redirect('login')
+
+
+
+
 @login_required
 def cursos(request):
   lista_cursos = Curso.objects.all()
@@ -207,3 +234,15 @@ def avaliacao(request, curso_id):
         form = AvaliacaoForm()
 
     return render(request, 'pfc_app/avaliacao.html', {'form': form, 'curso':curso})
+
+
+def enviar_pdf(request):
+    if request.method == 'POST':
+        arquivo_pdf = request.FILES['arquivo_pdf']
+        avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf)
+        avaliacao.save()
+        # Redirecionar ou fazer algo após o envio bem-sucedido
+        messages.success(request, 'Arquivo enviado com sucesso!')
+        return redirect('enviar_pdf')
+
+    return render(request, 'pfc_app/enviar_pdf.html')

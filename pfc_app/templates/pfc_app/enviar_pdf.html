@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'parciais/_messages.html' %}
+
+<h1>Enviar PDF para Análise</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="arquivo_pdf" accept=".pdf" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+{% endblock %}

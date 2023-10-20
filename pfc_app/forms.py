@@ -1,5 +1,6 @@
 from django import forms
 from .models import Avaliacao  # Certifique-se de importar o modelo Avaliacao
+from django.forms import FileInput
 
 
 CHOICES=[('1','1'),
@@ -29,3 +30,4 @@ class AvaliacaoForm(forms.ModelForm):
         # Personalize os widgets para usar classes do Bootstrap
         #for field_name, field in self.fields.items():
          #   field.widget.attrs['class'] = 'form-control'
+

@@ -146,3 +146,37 @@ class Avaliacao(models.Model):
     nota_atributo3 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
     nota_atributo4 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
     nota_atributo5 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
+    
+    def __str__(self):
+        return self.curso.nome_curso + ' > '+ self.participante.username
+    
+    class Meta:
+        verbose_name_plural = "avaliações"
+
+def user_directory_path(instance, filename):
+    # O "instance" é a instância do modelo Avaliacao e "filename" é o nome do arquivo original
+    # Este exemplo adiciona o nome de usuário ao caminho de destino
+    return f'uploads/{instance.usuario.username}/{filename}'
+
+class StatusValidacao(models.Model):
+    nome = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.nome
+    
+    class Meta:
+        verbose_name_plural = "status validações"
+
+class Validacao_CH(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    arquivo_pdf = models.FileField(upload_to=user_directory_path)
+    enviado_em = models.DateTimeField(auto_now_add=True)
+    ch_solicitada = models.IntegerField(blank=True, null=True)
+    ch_confirmada = models.IntegerField(blank=True, null=True)
+    status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=1)
+
+    def __str__(self):
+        return self.usuario.username
+
+    class Meta:
+        verbose_name_plural = "validações de CH"
