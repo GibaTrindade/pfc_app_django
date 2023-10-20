@@ -14,6 +14,7 @@
             <th scope="col">CONCLUÍDO</th>
             <th scope="col">STATUS DA INSCRIÇÃO</th>
             <th scope="col">AVALIAR</th>
+
           </tr>
         </thead>
         <tbody>
@@ -29,12 +30,17 @@
                         <td>NÃO</td>
                     {% endif %}
                     <td>{{ inscricao.status }}</td>  
+                    curso_avaliado
                     {% if  inscricao.curso.periodo_avaliativo %}
-                        <td>AVALIAR</td> 
+                        {% if  inscricao.curso_avaliado %}
+                            <td class="text-center"><a href="#" class="btn btn-secondary">CURSO AVALIADO</a></td>
+                        {% else %}
+                            <td class="text-center"><a href="/avaliacao/{{ inscricao.curso.id }}" class="btn btn-primary">AVALIAR CURSO</a></td>
+                        {% endif %}
                     {% else %}
                         {% if  inscricao.status.nome == "APROVADA" or inscricao.status.nome == "PENDENTE" %}
                             {% if  inscricao.curso.status.nome == "A INICIAR" or inscricao.curso.status.nome == "INICIADO" %}
-                                <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRÇÃO</a></td>
+                                <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRIÇÃO</a></td>
                             {% endif %}
                         {% else %}
                         <td>AGUARDAR AVALIAÇÃO</td> 

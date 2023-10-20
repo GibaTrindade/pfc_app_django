@@ -1,21 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 calss="mt-3 mb-3">LOGIN</h1>
-<form method="POST" action="{% url 'login' %}">
+<div class="row">
+  <div class="col"></div>
+  <div class="col-5">
+<form method="POST" action="{% url 'login' %}" class="form-signin">
     {% include 'parciais/_messages.html' %}
     {% csrf_token %}
 
-    <div class="form-group">
-    <label>Usuário</label>
-    <input type="text" name="usuario" value="{{ request.POST.usuario }}" class="form-control" placeholder="Digite seu usuário">
-  </div>
-    <div class="form-group">
-    <label>Senha</label>
-    <input type="password" name="senha" class="form-control" placeholder="Digite sua senha">
-  </div>
+    
+      <h1 class="h3 mb-3 font-weight-normal">Entrar</h1>
+      <label for="usuario" class="sr-only">Usuário</label>
+      <input type="text" name="usuario" id="usuario" class="form-control" placeholder="username" required autofocus>
+      <label for="senha" class="sr-only">Senha</label>
+      <input type="password" name="senha" id="senha" class="form-control" placeholder="Password" required>
+      
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Entrar</button>
+     
 
-  <button type="submit" class="btn btn-primary">Entrar</button>
+
 </form>
-
+</div>
+<div class="col"></div>
+</div>
 {% endblock %}
+

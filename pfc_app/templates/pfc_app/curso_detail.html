@@ -13,25 +13,29 @@
             {% endfor %}
             
         </div>
-        <div class="col">
+        <div class="col-md-5">
             <div class="row d-flex justify-content-center align-items-center">
-                <p>Carga Horária: {{curso.ch_curso}} horas</p>
-                <p>Vagas: {{curso.vagas}}</p>
-                <p>Início: {{curso.data_inicio}}</p>
-                <p>Término: {{curso.data_termino}}</p>
+                <p><strong>Carga Horária:</strong> {{curso.ch_curso}} horas</p>
+                <p><strong>Vagas:</strong> {{curso.vagas}}</p>
+                <p><strong>Início:</strong> {{curso.data_inicio}}</p>
+                <p><strong>Término:</strong> {{curso.data_termino}}</p>
             </div>
             {% for usuario_docente in usuarios_docentes %}
                 <div class="row d-flex justify-content-center align-items-center">
-                <p>Instrutor-{{ forloop.counter }}: {{usuario_docente.nome}}</p>
-            </div>
+                    <p><strong>Instrutor-{{ forloop.counter }}</strong>: {{usuario_docente.nome}}</p>
+                </div>
             {% endfor %}
+        </div>
+            <div class="col-md-5">
+                <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
+            </div>
             <div class="row d-flex justify-content-center align-items-center">
                 <div class="col-xl-6 col-sm-12">
                     <a href="/inscrever/{{curso.id}}/" class="btn btn-success">INSCREVER-SE</a>
                 </div>
             </div>
             
-        </div>
+        
     </div>
 </div>
 {% endblock %}

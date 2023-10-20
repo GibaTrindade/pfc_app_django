@@ -69,6 +69,11 @@ class InscricaoAdmin(admin.ModelAdmin):
 class AvaliacaoAdmin(admin.ModelAdmin):
     form = AvaliacaoForm
 
+class Validacao_CHAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_confirmada', 'status',)
+    list_editable = ('ch_confirmada', 'status',)
+    list_filter = ('usuario', 'status',)
+
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(User, CustomUserAdmin)
@@ -77,7 +82,7 @@ admin.site.register(StatusCurso)
 admin.site.register(StatusInscricao)
 admin.site.register(StatusValidacao)
 admin.site.register(Avaliacao)
-admin.site.register(Validacao_CH)
+admin.site.register(Validacao_CH, Validacao_CHAdmin)
 
 
 admin.site.site_header = 'PFC'

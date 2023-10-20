@@ -4,7 +4,7 @@ from django.contrib import messages, auth
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
-from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH
+from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao
 from .forms import AvaliacaoForm 
 from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef
 from datetime import date
@@ -67,14 +67,17 @@ def carga_horaria(request):
   inscricoes_do_usuario = Inscricao.objects.filter(
      ~Q(status__nome='CANCELADA'),
      ~Q(status__nome='EM FILA'),
-     Q(curso__status__nome='CONCLUÍDO'),
+     Q(curso__status__nome='FINALIZADO'),
+     Q(concluido=True),
      participante=request.user
      
      )
     
   # Calcula a soma da carga horária das inscrições do usuário
-  carga_horaria_total = inscricoes_do_usuario.aggregate(Sum('ch_valida'))['ch_valida__sum'] or 0
-  
+  satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+  carga_horaria_pfc = inscricoes_do_usuario.aggregate(Sum('ch_valida'))['ch_valida__sum'] or 0
+  validacoes_ch = Validacao_CH.objects.filter(usuario=request.user, status=satus_validacao).aggregate(Sum('ch_confirmada'))['ch_confirmada__sum'] or 0
+  carga_horaria_total = carga_horaria_pfc + validacoes_ch
   context = {
       'carga_horaria_total': carga_horaria_total,
   }
@@ -84,7 +87,14 @@ def carga_horaria(request):
 
 @login_required
 def inscricoes(request):
-    inscricoes_do_usuario = Inscricao.objects.filter(participante=request.user)
+    #inscricoes_do_usuario = Inscricao.objects.filter(participante=request.user)
+
+    inscricoes_do_usuario = Inscricao.objects.annotate(
+        curso_avaliado=Exists(
+           Avaliacao.objects.filter(participante=request.user, curso=OuterRef('curso'))
+            
+        )
+    ).filter(participante=request.user)
     
     context = {
         'inscricoes': inscricoes_do_usuario,
@@ -214,7 +224,14 @@ def avaliacao(request, curso_id):
         if form.is_valid():
             # Faça o que for necessário com os dados da avaliação, como salvá-los no banco de dados
             usuario = request.user
+            ja_avaliado=Avaliacao.objects.filter(participante=usuario, curso=curso)
             
+            if ja_avaliado:
+                messages.error(request, f"Avaliação já realizada!")
+                return redirect('inscricoes')
+            
+
+
             avaliacao = form.save(commit=False)
             avaliacao.participante = usuario
             
@@ -223,7 +240,7 @@ def avaliacao(request, curso_id):
             avaliacao.save()
             # Redirecione para uma página de sucesso ou outra ação apropriada
             messages.success(request, 'Avaliação Realizada!')
-            return redirect('lista_cursos')
+            return redirect('inscricoes')
         messages.error(request, form.errors)
             #return render(request, 'sucesso.html')
        #else:
