@@ -22,7 +22,7 @@
         {% for curso in cursos %}
             <tr>
                 <th scope="row" class="text-center">{{ curso.id }}</th>
-                <td>{{ curso.nome_curso }}</td>
+                <td><a href="/curso_detail/{{ curso.id }}?from_get=0">{{ curso.nome_curso }}</a></td>
                 <td class="text-center">{{ curso.ch_curso }}</td>
                 <td class="text-center">{{ curso.vagas }}</td>
                 <td class="text-center">{{ curso.num_inscricoes }}</td>
