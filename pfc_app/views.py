@@ -45,6 +45,7 @@ def logout(request):
 
 @login_required
 def cursos(request):
+    
   lista_cursos = Curso.objects.all()
   data_atual = date.today()
   cursos_com_inscricoes = Curso.objects.annotate(
@@ -111,9 +112,14 @@ def inscricoes(request):
 class CursoDetailView(DetailView):
    # model_detail.html
    model = Curso
+   
 
    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        try:
+          read_only = self.request.GET['from_get']
+        except:
+          read_only=1
         
         # Recupere o usuário docente relacionado ao curso atual
         curso = self.get_object()
@@ -126,7 +132,8 @@ class CursoDetailView(DetailView):
 
         # Adicione o usuário docente ao contexto
         context['usuarios_docentes'] = usuarios_docentes
-
+        context['read_only'] = read_only
+        print(read_only)
         return context
 
 

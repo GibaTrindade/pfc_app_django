@@ -31,7 +31,9 @@
             </div>
             <div class="row d-flex justify-content-center align-items-center">
                 <div class="col-xl-6 col-sm-12">
-                    <a href="/inscrever/{{curso.id}}/" class="btn btn-success">INSCREVER-SE</a>
+                    {% if read_only != "0" %}
+                        <a href="/inscrever/{{curso.id}}/" class="btn btn-success">INSCREVER-SE</a>
+                    {% endif %}
                 </div>
             </div>
             
