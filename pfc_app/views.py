@@ -4,11 +4,16 @@ from django.contrib import messages, auth
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
-from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao
+from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao, User
 from .forms import AvaliacaoForm 
 from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef
 from datetime import date
 from django.views.generic import DetailView
+import os
+import zipfile
+from django.http import HttpResponse
+from django.shortcuts import get_list_or_404
+from reportlab.pdfgen import canvas
 
 # Create your views here.
 
@@ -263,3 +268,49 @@ def enviar_pdf(request):
         return redirect('enviar_pdf')
 
     return render(request, 'pfc_app/enviar_pdf.html')
+
+
+def download_all_pdfs(request):
+    return render(request, 'pfc_app/download_all_pdfs.html')
+
+
+def generate_all_pdfs(request):
+    users = get_list_or_404(User)
+
+    output_folder = "pdf_output"  # Pasta onde os PDFs temporários serão salvos
+    zip_filename = "all_pdfs.zip"
+
+    # Crie a pasta de saída se ela não existir
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Crie o arquivo ZIP
+    with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for user in users:
+            pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
+            # Crie o PDF usando ReportLab
+            p = canvas.Canvas(pdf_filename)
+            p.drawString(100, 750, f'Nome do Usuário: {user.username}')
+            # Adicione mais informações conforme necessário
+
+            p.showPage()
+            p.save()
+
+            # Adicione o PDF ao arquivo ZIP
+            zipf.write(pdf_filename, os.path.basename(pdf_filename))
+
+    # Configure a resposta HTTP para o arquivo ZIP
+    response = HttpResponse(content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+
+    # Abra o arquivo ZIP e envie seu conteúdo como resposta
+    with open(zip_filename, 'rb') as zip_file:
+        response.write(zip_file.read())
+
+    # Exclua os PDFs temporários e o arquivo ZIP após o envio
+    for user in users:
+        pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
+        os.remove(pdf_filename)
+    os.remove(zip_filename)
+
+    return response

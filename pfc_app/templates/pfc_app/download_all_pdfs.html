@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'parciais/_messages.html' %}
+
+<h1>Download de Todos os PDFs</h1>
+    <a href="{% url 'generate_all_pdfs' %}" class="btn btn-primary">Baixar Todos os PDFs</a>
+
+{% endblock %}
