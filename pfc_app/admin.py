@@ -18,7 +18,7 @@ class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
 
     list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status', 'periodo_avaliativo',)
-    fields = ['nome_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
+    fields = ['nome_curso', 'ementa_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'competencia', 'descricao', ('data_inicio', 'data_termino'), 
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status', 'periodo_avaliativo',]
     list_filter = ('nome_curso', 'data_inicio', 'data_termino', 'periodo_avaliativo',)
@@ -71,8 +71,8 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     form = AvaliacaoForm
 
 class Validacao_CHAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_confirmada', 'status',)
-    list_editable = ('ch_confirmada', 'status',)
+    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_solicitada', 'ch_confirmada', 'status',)
+    list_editable = ('ch_solicitada', 'ch_confirmada', 'status',)
     list_filter = ('usuario', 'status',)
 
 # Register your models here.

@@ -19,6 +19,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from io import BytesIO
 from reportlab.lib.units import inch
+from validate_docbr import CPF
 
 # Create your views here.
 
@@ -278,7 +279,14 @@ def avaliacao(request, curso_id):
 def enviar_pdf(request):
     if request.method == 'POST':
         arquivo_pdf = request.FILES['arquivo_pdf']
-        avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf)
+        nome_curso = request.POST['nome_curso']
+        ch_solicitada = request.POST['ch_solicitada']
+        try:
+           ch_solicitada = int(ch_solicitada)
+        except:
+            messages.error(request, 'O campo carga horária precisa ser númerico!')
+            return redirect('enviar_pdf')
+        avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, nome_curso=nome_curso, ch_solicitada=ch_solicitada)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')
@@ -299,11 +307,9 @@ def generate_all_pdfs(request, curso_id):
        messages.error(request, f"Curso não encontrado!")
        return redirect('lista_cursos')
     
-    certificado = Certificado.objects.get(resumo='conclusao')
-    texto_certificado = certificado.descricao
+    certificado = Certificado.objects.get(codigo='conclusao')
+    #texto_certificado = certificado.texto
     users = get_list_or_404(User)
-
-    
 
     output_folder = "pdf_output"  # Pasta onde os PDFs temporários serão salvos
     zip_filename = "all_pdfs.zip"
@@ -315,7 +321,7 @@ def generate_all_pdfs(request, curso_id):
     # Crie o arquivo ZIP
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for user in users:
-            texto_certificado = certificado.descricao
+            texto_certificado = certificado.texto
             data_inicio = str(curso.data_inicio)
             data_termino = str(curso.data_termino)
             # Converte a string para um objeto datetime
@@ -325,15 +331,27 @@ def generate_all_pdfs(request, curso_id):
             data_inicio_formatada_str = data_inicio_formatada.strftime("%d/%m/%Y")
             data_termino_formatada_str = data_termino_formatada.strftime("%d/%m/%Y")
 
+            try:
+                
+                cpf = CPF()
+                # Validar CPF
+                if not cpf.validate(user.cpf):
+                    messages.error(request, f'CPF de {user.nome} está errado! ({user.cpf})')
+                    return redirect('lista_cursos')
+                
+                # Formata o CPF no formato "000.000.000-00"
+                cpf_formatado = f"{user.cpf[:3]}.{user.cpf[3:6]}.{user.cpf[6:9]}-{user.cpf[9:]}"
+            except:
+                messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
+                return redirect('lista_cursos')
+
             tag_mapping = {
                 "[nome_completo]": user.nome,
-                "[cpf]": user.cpf,
+                "[cpf]": cpf_formatado,
                 "[nome_curso]": curso.nome_curso,
                 "[data_inicio]": data_inicio_formatada_str,
                 "[data_termino]": data_termino_formatada_str,
                 "[curso_carga_horaria]": curso.ch_curso,
-
-                # Adicione mais tags e valores conforme necessário
             }
     
     # Substitua as tags pelo valor correspondente no texto
@@ -341,7 +359,7 @@ def generate_all_pdfs(request, curso_id):
                 texto_certificado = texto_certificado.replace(tag, str(value))
 
             texto_customizado = texto_certificado
-            pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
+            pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
             # Crie o PDF usando ReportLab
 
             pdf_buffer = BytesIO()
@@ -353,19 +371,13 @@ def generate_all_pdfs(request, curso_id):
             style.fontName = "Helvetica"
             style.fontSize = 12
             style.alignment = 1
-            
-            # Estilos para o Header
-            # styleH = styles["Normal"]
-            # styleH.fontName = "Helvetica"
-            # styleH.fontSize = 36
-            # styleH.alignment = 0
 
             style_header = ParagraphStyle(name='Grande', parent=styles["Normal"], fontSize=36, alignment = 0)
             style_IG = ParagraphStyle(name='Medio', parent=styles["Normal"], fontSize=24, alignment = 0)
 
-            p_header = Paragraph("CERTIFICADO", style_header)
-            p_ig = Paragraph("O Instituto de Gestão Pública de Pernambuco", style_IG)
-            p_ig2 = Paragraph("Governador Eduardo Campos", style_IG)
+            p_header = Paragraph(certificado.cabecalho, style_header)
+            p_ig = Paragraph(certificado.subcabecalho1, style_IG)
+            p_ig2 = Paragraph(certificado.subcabecalho2, style_IG)
             
             p = Paragraph(texto_customizado, style)
             spacerHeader = Spacer(1, 40)
@@ -377,7 +389,6 @@ def generate_all_pdfs(request, curso_id):
 
             # Adicione a lista de elementos ao PDF
             pdf.build(elements)
-
 
             # Retorne o PDF como resposta HTTP
             pdf_buffer.seek(0)
@@ -397,10 +408,6 @@ def generate_all_pdfs(request, curso_id):
     with open(zip_filename, 'rb') as zip_file:
         response.write(zip_file.read())
 
-    # Exclua os PDFs temporários e o arquivo ZIP após o envio
-    # for user in users:
-    #     pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
-    #     os.remove(pdf_filename)
     os.remove(zip_filename)
 
     return response

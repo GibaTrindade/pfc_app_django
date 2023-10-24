@@ -3,9 +3,18 @@
 {% block content %}
 {% include 'parciais/_messages.html' %}
 
-<h1>Enviar PDF para Análise</h1>
+<div class="d-flex p-2 justify-content-center mb-5"><h1>ENVIAR CERTIFICADO PARA ANÁLISE</h1></div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        
+        <div class="col-md-3 form-floating mb-3">
+            <input type="input" class="form-control" name="nome_curso" id="nome_curso_id" required>
+            <label for="nome_curso_id" >Nome do Curso Para Validação</label>
+        </div>
+        <div class="col-md-3 form-floating mb-3">
+            <input type="input" class="form-control" name="ch_solicitada" id="ch_solicitada_id" required>
+            <label for="ch_solicitada_id" >Carga Horária Solicitada</label>
+        </div>
         <input type="file" name="arquivo_pdf" accept=".pdf" required>
         <button type="submit">Enviar</button>
     </form>

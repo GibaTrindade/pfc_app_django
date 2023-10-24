@@ -84,6 +84,7 @@ class Curso(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     nome_curso =  models.CharField(max_length=400, blank=False, null=False)
+    ementa_curso =  models.TextField(max_length=4000, blank=False, null=False)
     modalidade = models.CharField(max_length=400, blank=False, null=False)
     tipo_reconhecimento = models.CharField(max_length=400, blank=True, null=True)
     ch_curso = models.IntegerField(blank=False, null=False)
@@ -171,6 +172,7 @@ class Validacao_CH(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     arquivo_pdf = models.FileField(upload_to=user_directory_path)
     enviado_em = models.DateTimeField(auto_now_add=True)
+    nome_curso = models.CharField(max_length=100, default='')
     ch_solicitada = models.IntegerField(blank=True, null=True)
     ch_confirmada = models.IntegerField(blank=True, null=True)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=1)
@@ -183,11 +185,14 @@ class Validacao_CH(models.Model):
 
 
 class Certificado(models.Model):
-    resumo = models.CharField(max_length=40, default='')
-    descricao = models.TextField(max_length=4000, default='')
+    codigo = models.CharField(max_length=40, default='')
+    cabecalho = models.CharField(max_length=100, default='')
+    subcabecalho1 = models.CharField(max_length=100, default='')
+    subcabecalho2 = models.CharField(max_length=100, default='')
+    texto = models.TextField(max_length=4000, default='')
 
     def __str__(self):
-        return self.resumo
+        return self.codigo
 
     class Meta:
         verbose_name_plural = "certificados"

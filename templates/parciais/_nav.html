@@ -11,9 +11,11 @@
             <ul class="navbar-nav ml-auto">
 
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="#">| {{user.get_username}}: {{user.role}} |</a>
-                </li>
+                    {% if user.role == "ADMIN" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/">| Admin |</a>
+                        </li>
+                    {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'lista_cursos' %}">| Cursos |</a>
                 </li>

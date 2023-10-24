@@ -30,7 +30,6 @@
                         <td>NÃO</td>
                     {% endif %}
                     <td>{{ inscricao.status }}</td>  
-                    curso_avaliado
                     {% if  inscricao.curso.periodo_avaliativo %}
                         {% if  inscricao.curso_avaliado %}
                             <td class="text-center"><a href="#" class="btn btn-secondary">CURSO AVALIADO</a></td>
@@ -43,7 +42,7 @@
                                 <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRIÇÃO</a></td>
                             {% endif %}
                         {% else %}
-                        <td>AGUARDAR AVALIAÇÃO</td> 
+                        <td>-</td> 
                         {% endif %}
                         
                     {% endif %}

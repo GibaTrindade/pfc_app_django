@@ -28,12 +28,15 @@
         </div>
             <div class="col-md-5">
                 <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Ver Ementa
+                </button>
             </div>
             <div class="row d-flex justify-content-center align-items-center">
                 <div class="col-md-2 col-sm-12 mb-2"></div>
                 <div class="col-xl-5 col-sm-12 mb-2">
                     {% if read_only != "0" %}
-                        <a href="/inscrever/{{curso.id}}/" class="btn btn-success">INSCREVER-SE</a>
+                        <a href="/inscrever/{{curso.id}}/" class="btn btn-success ">INSCREVER-SE</a>
                     {% endif %}
                 </div>
                 <div class="col-xl-5 col-sm-12 mb-2">
@@ -46,4 +49,21 @@
         
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Ementa do Curso</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {{curso.ementa_curso | safe}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
