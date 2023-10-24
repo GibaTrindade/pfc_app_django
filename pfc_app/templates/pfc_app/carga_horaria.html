@@ -19,13 +19,16 @@
             
         </div>
         <div class="col-3 form-floating mb-3">
-            <button type="submit" class="btn btn-primary">Filtrar por Término do Curso</button>
+            <button type="submit" class="btn btn-primary btn-lg">Filtrar por Término do Curso</button>
         </div>
     </form>
     <div class="card">
         <h4 class="card-header">Minha Carga Horária</h4>
         <div class="card-body">
-        <h5 class="card-title">Carga Horária Atual: {{ carga_horaria_total }} horas </h5>
+        <h5 class="card-title">Carga Horária PFC: {{ carga_horaria_pfc }} horas </h5>
+        <h5 class="card-title">Carga Horária Validada: {{ carga_horaria_validada }} horas </h5>
+        <hr>
+        <h5 class="card-title">Carga Horária Total: {{ carga_horaria_total }} horas </h5>
         </div>
     </div>
 {% endblock %}

@@ -100,7 +100,7 @@ class Curso(models.Model):
     avaliacoes = models.ManyToManyField(User, through='Avaliacao', related_name='curso_avaliacao')
     #acao = models.ForeignKey(Acao, on_delete=models.CASCADE)
     #gestor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    coordenador = models.ForeignKey(User, on_delete=models.CASCADE)
+    coordenador = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     #history = HistoricalRecords()
     status = models.ForeignKey(StatusCurso, on_delete=models.PROTECT)
     periodo_avaliativo = models.BooleanField(default=False)
@@ -169,7 +169,7 @@ class StatusValidacao(models.Model):
         verbose_name_plural = "status validações"
 
 class Validacao_CH(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     arquivo_pdf = models.FileField(upload_to=user_directory_path)
     enviado_em = models.DateTimeField(auto_now_add=True)
     nome_curso = models.CharField(max_length=100, default='')

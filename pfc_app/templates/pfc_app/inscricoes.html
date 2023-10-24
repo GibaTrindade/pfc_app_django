@@ -14,6 +14,7 @@
             <th scope="col">CONCLUÍDO</th>
             <th scope="col">STATUS DA INSCRIÇÃO</th>
             <th scope="col">AVALIAR</th>
+            <th scope="col">CERTIFICADO</th>
 
           </tr>
         </thead>
@@ -40,13 +41,17 @@
                         {% if  inscricao.status.nome == "APROVADA" or inscricao.status.nome == "PENDENTE" %}
                             {% if  inscricao.curso.status.nome == "A INICIAR" or inscricao.curso.status.nome == "INICIADO" %}
                                 <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRIÇÃO</a></td>
+                            {% else %}
+                                <td>-</td>
                             {% endif %}
                         {% else %}
                         <td>-</td> 
                         {% endif %}
                         
                     {% endif %}
-                                     
+                    {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
+                        <td class="text-center"><a href="/generate_single_pdf/{{ inscricao.id }}" class="btn btn-primary">BAIXAR CERTIFICADO</a></td>
+                    {% endif %}
                 </tr>
             {% empty %}
                 <p>Você não tem inscrições.</p>

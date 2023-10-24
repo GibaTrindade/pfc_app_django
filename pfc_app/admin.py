@@ -45,7 +45,7 @@ class CustomUserAdmin(UserAdmin):
                            'classificacao_lotacao', 'cargo', 'nome_cargo', 'categoria', 'grupo_ocupacional',
                            'origem', 'simbologia', 'tipo_atuacao',
                            'role', 'is_externo', 'avatar', )}),
-        ('Permissões', {'fields': ('is_staff', 'is_active', 'groups')}),
+        ('Permissões', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups')}),
     )
     add_fieldsets = (
         (None, {
@@ -54,7 +54,7 @@ class CustomUserAdmin(UserAdmin):
                        'cpf', 'nome', 'telefone', 'lotacao', 'lotacao_especifica', 'lotacao_especifica_2',
                        'classificacao_lotacao', 'cargo', 'nome_cargo', 'categoria', 'grupo_ocupacional', 
                        'origem', 'simbologia', 'tipo_atuacao',
-                       'role', 'is_staff', 'is_active', 'is_externo', 
+                       'role', 'is_staff', 'is_active', 'is_superuser', 'is_externo', 
                        'avatar', 'groups', )}
         ),
     )
