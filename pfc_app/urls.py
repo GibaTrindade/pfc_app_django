@@ -18,7 +18,7 @@ urlpatterns = [
     path('inscricao_cancelar/<int:inscricao_id>/', views.cancelar_inscricao, name='cancelar_inscricao'),
     path('enviar_pdf/', views.enviar_pdf, name='enviar_pdf'),
     path('download_all_pdfs/', views.download_all_pdfs, name='download_all_pdfs'),
-    path('generate_all_pdfs/', views.generate_all_pdfs, name='generate_all_pdfs'),
+    path('generate_all_pdfs/<int:curso_id>/', views.generate_all_pdfs, name='generate_all_pdfs'),
 
 ]
 

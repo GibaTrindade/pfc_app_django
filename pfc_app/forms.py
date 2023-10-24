@@ -31,3 +31,6 @@ class AvaliacaoForm(forms.ModelForm):
         #for field_name, field in self.fields.items():
          #   field.widget.attrs['class'] = 'form-control'
 
+class DateFilterForm(forms.Form):
+    data_inicio = forms.DateField(label='Data de Início', required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+    data_fim = forms.DateField(label='Data de Fim', required=False, widget=forms.TextInput(attrs={'type': 'date'}))

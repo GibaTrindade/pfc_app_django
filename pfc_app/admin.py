@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db.models import Q
 from django.contrib.auth.admin import UserAdmin
-from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao, StatusValidacao, Avaliacao, Validacao_CH
+from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao, \
+                    StatusValidacao, Avaliacao, Validacao_CH,Certificado
 from .forms import AvaliacaoForm 
 
 
@@ -83,6 +84,7 @@ admin.site.register(StatusInscricao)
 admin.site.register(StatusValidacao)
 admin.site.register(Avaliacao)
 admin.site.register(Validacao_CH, Validacao_CHAdmin)
+admin.site.register(Certificado)
 
 
 admin.site.site_header = 'PFC'

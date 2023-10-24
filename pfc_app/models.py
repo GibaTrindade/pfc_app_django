@@ -180,3 +180,14 @@ class Validacao_CH(models.Model):
 
     class Meta:
         verbose_name_plural = "validações de CH"
+
+
+class Certificado(models.Model):
+    resumo = models.CharField(max_length=40, default='')
+    descricao = models.TextField(max_length=4000, default='')
+
+    def __str__(self):
+        return self.resumo
+
+    class Meta:
+        verbose_name_plural = "certificados"

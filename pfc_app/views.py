@@ -4,16 +4,21 @@ from django.contrib import messages, auth
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
-from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao, User
-from .forms import AvaliacaoForm 
+from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao, User, Certificado
+from .forms import AvaliacaoForm, DateFilterForm
 from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef
-from datetime import date
+from datetime import date, datetime
 from django.views.generic import DetailView
 import os
 import zipfile
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4, letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from io import BytesIO
+from reportlab.lib.units import inch
 
 # Create your views here.
 
@@ -45,7 +50,6 @@ def logout(request):
 
 @login_required
 def cursos(request):
-    
   lista_cursos = Curso.objects.all()
   data_atual = date.today()
   cursos_com_inscricoes = Curso.objects.annotate(
@@ -70,6 +74,7 @@ def cursos(request):
 
 @login_required
 def carga_horaria(request):
+  form = DateFilterForm(request.GET)
   inscricoes_do_usuario = Inscricao.objects.filter(
      ~Q(status__nome='CANCELADA'),
      ~Q(status__nome='EM FILA'),
@@ -78,14 +83,25 @@ def carga_horaria(request):
      participante=request.user
      
      )
+  
+  if form.is_valid():
+        data_inicio = form.cleaned_data['data_inicio']
+        data_fim = form.cleaned_data['data_fim']
+        
+        if data_inicio:
+            inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__gte=data_inicio)
+        if data_fim:
+            inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__lte=data_fim)
     
   # Calcula a soma da carga horária das inscrições do usuário
   satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
   carga_horaria_pfc = inscricoes_do_usuario.aggregate(Sum('ch_valida'))['ch_valida__sum'] or 0
   validacoes_ch = Validacao_CH.objects.filter(usuario=request.user, status=satus_validacao).aggregate(Sum('ch_confirmada'))['ch_confirmada__sum'] or 0
   carga_horaria_total = carga_horaria_pfc + validacoes_ch
+
   context = {
       'carga_horaria_total': carga_horaria_total,
+      'form': form,
   }
 
   return render(request, 'pfc_app/carga_horaria.html' ,context)
@@ -112,14 +128,9 @@ def inscricoes(request):
 class CursoDetailView(DetailView):
    # model_detail.html
    model = Curso
-   
 
    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-          read_only = self.request.GET['from_get']
-        except:
-          read_only=1
         
         # Recupere o usuário docente relacionado ao curso atual
         curso = self.get_object()
@@ -132,8 +143,7 @@ class CursoDetailView(DetailView):
 
         # Adicione o usuário docente ao contexto
         context['usuarios_docentes'] = usuarios_docentes
-        context['read_only'] = read_only
-        print(read_only)
+
         return context
 
 
@@ -281,8 +291,19 @@ def download_all_pdfs(request):
     return render(request, 'pfc_app/download_all_pdfs.html')
 
 
-def generate_all_pdfs(request):
+
+def generate_all_pdfs(request, curso_id):
+    try:
+      curso = Curso.objects.get(pk=curso_id)
+    except:
+       messages.error(request, f"Curso não encontrado!")
+       return redirect('lista_cursos')
+    
+    certificado = Certificado.objects.get(resumo='conclusao')
+    texto_certificado = certificado.descricao
     users = get_list_or_404(User)
+
+    
 
     output_folder = "pdf_output"  # Pasta onde os PDFs temporários serão salvos
     zip_filename = "all_pdfs.zip"
@@ -294,17 +315,79 @@ def generate_all_pdfs(request):
     # Crie o arquivo ZIP
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for user in users:
+            texto_certificado = certificado.descricao
+            data_inicio = str(curso.data_inicio)
+            data_termino = str(curso.data_termino)
+            # Converte a string para um objeto datetime
+            data_inicio_formatada = datetime.strptime(data_inicio, "%Y-%m-%d")
+            data_termino_formatada = datetime.strptime(data_termino, "%Y-%m-%d")
+            # Formata a data no formato "DD/MM/YYYY"
+            data_inicio_formatada_str = data_inicio_formatada.strftime("%d/%m/%Y")
+            data_termino_formatada_str = data_termino_formatada.strftime("%d/%m/%Y")
+
+            tag_mapping = {
+                "[nome_completo]": user.nome,
+                "[cpf]": user.cpf,
+                "[nome_curso]": curso.nome_curso,
+                "[data_inicio]": data_inicio_formatada_str,
+                "[data_termino]": data_termino_formatada_str,
+                "[curso_carga_horaria]": curso.ch_curso,
+
+                # Adicione mais tags e valores conforme necessário
+            }
+    
+    # Substitua as tags pelo valor correspondente no texto
+            for tag, value in tag_mapping.items():
+                texto_certificado = texto_certificado.replace(tag, str(value))
+
+            texto_customizado = texto_certificado
             pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
             # Crie o PDF usando ReportLab
-            p = canvas.Canvas(pdf_filename)
-            p.drawString(100, 750, f'Nome do Usuário: {user.username}')
-            # Adicione mais informações conforme necessário
 
-            p.showPage()
-            p.save()
+            pdf_buffer = BytesIO()
+            pdf = SimpleDocTemplate(pdf_buffer, pagesize=landscape(A4), leftMargin=0.5*inch, rightMargin=3*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
+
+            # Estilos para o texto
+            styles = getSampleStyleSheet()
+            style = styles["Normal"]
+            style.fontName = "Helvetica"
+            style.fontSize = 12
+            style.alignment = 1
+            
+            # Estilos para o Header
+            # styleH = styles["Normal"]
+            # styleH.fontName = "Helvetica"
+            # styleH.fontSize = 36
+            # styleH.alignment = 0
+
+            style_header = ParagraphStyle(name='Grande', parent=styles["Normal"], fontSize=36, alignment = 0)
+            style_IG = ParagraphStyle(name='Medio', parent=styles["Normal"], fontSize=24, alignment = 0)
+
+            p_header = Paragraph("CERTIFICADO", style_header)
+            p_ig = Paragraph("O Instituto de Gestão Pública de Pernambuco", style_IG)
+            p_ig2 = Paragraph("Governador Eduardo Campos", style_IG)
+            
+            p = Paragraph(texto_customizado, style)
+            spacerHeader = Spacer(1, 40)
+            spacerMin = Spacer(1, 10)
+            spacer = Spacer(1, 100)  # Ajuste o tamanho conforme necessário
+
+            # Lista de elementos para construir o PDF
+            elements = [p_header, spacerHeader, p_ig, spacerMin,p_ig2, spacer, p]
+
+            # Adicione a lista de elementos ao PDF
+            pdf.build(elements)
+
+
+            # Retorne o PDF como resposta HTTP
+            pdf_buffer.seek(0)
 
             # Adicione o PDF ao arquivo ZIP
+            with open(pdf_filename, 'wb') as pdf_file:
+                pdf_file.write(pdf_buffer.read())
+            
             zipf.write(pdf_filename, os.path.basename(pdf_filename))
+            os.remove(pdf_filename)
 
     # Configure a resposta HTTP para o arquivo ZIP
     response = HttpResponse(content_type='application/zip')
@@ -315,9 +398,9 @@ def generate_all_pdfs(request):
         response.write(zip_file.read())
 
     # Exclua os PDFs temporários e o arquivo ZIP após o envio
-    for user in users:
-        pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
-        os.remove(pdf_filename)
+    # for user in users:
+    #     pdf_filename = os.path.join(output_folder, f"{user.username}.pdf")
+    #     os.remove(pdf_filename)
     os.remove(zip_filename)
 
     return response
