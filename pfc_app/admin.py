@@ -4,6 +4,8 @@ from django.contrib.auth.admin import UserAdmin
 from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao, \
                     StatusValidacao, Avaliacao, Validacao_CH,Certificado
 from .forms import AvaliacaoForm 
+from django.utils.html import format_html
+from django.urls import reverse
 
 
 class InscricaoInline(admin.TabularInline):
@@ -17,7 +19,7 @@ class InscricaoInline(admin.TabularInline):
 class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
 
-    list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status', 'periodo_avaliativo',)
+    list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status', 'periodo_avaliativo','gerar_certificados',)
     fields = ['nome_curso', 'ementa_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'competencia', 'descricao', ('data_inicio', 'data_termino'), 
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status', 'periodo_avaliativo',]
@@ -30,6 +32,11 @@ class CursoAdmin(admin.ModelAdmin):
         )
         return users_aprovados.count()
     numero_inscritos.short_description = 'Número de Inscritos'
+
+    def gerar_certificados(self, obj):
+        return format_html('<a href="{}">Gerar Certificados</a>', reverse('generate_all_pdfs', args=[obj.id]))
+
+
 
     class Meta:
         model = Curso
@@ -60,12 +67,15 @@ class CustomUserAdmin(UserAdmin):
     )
 
 class InscricaoAdmin(admin.ModelAdmin):
-    list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status', 'concluido', )
+    list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status', 'concluido', 'gerar_certificado', )
     list_filter = ('status', 'curso__nome_curso', 'condicao_na_acao',)
     list_editable = ('condicao_na_acao', 'status', 'concluido',)
     def participante_username(self, obj):
         return obj.participante.username if obj.participante else 'N/A'
     participante_username.short_description = 'Username'
+
+    def gerar_certificado(self, obj):
+        return format_html('<a href="{}">Gerar Certificado</a>', reverse('generate_single_pdf', args=[obj.id]))
 
 class AvaliacaoAdmin(admin.ModelAdmin):
     form = AvaliacaoForm

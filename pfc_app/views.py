@@ -302,15 +302,6 @@ def enviar_pdf(request):
 def download_all_pdfs(request):
     return render(request, 'pfc_app/download_all_pdfs.html')
 
-def add_background(canvas, doc):
-    # Caminho relativo para a imagem dentro do diretório 'static'
-    imagem_relative_path = 'Certificado-FUNDO.png'
-
-    # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
-    imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
-
-    # Desenhe a imagem como fundo
-    canvas.drawImage(imagem_path, 0, 0, width=doc.width, height=doc.height, preserveAspectRatio=True, mask='auto')
 
 def generate_all_pdfs(request, curso_id):
     try:
@@ -334,6 +325,13 @@ def generate_all_pdfs(request, curso_id):
     # Crie o arquivo ZIP
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for user in users:
+            # Verifica o status da incrição do usuário, 
+            # se não estiver concluída pula esse usuário.
+            try:
+                inscricao = Inscricao.objects.get(participante=user, curso=curso, concluido=True)
+            except:
+                continue
+            
             texto_certificado = certificado.texto
             data_inicio = str(curso.data_inicio)
             data_termino = str(curso.data_termino)
@@ -375,8 +373,6 @@ def generate_all_pdfs(request, curso_id):
             pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
             # Crie o PDF usando ReportLab
 
-            #pdf_buffer = BytesIO()
-            #pdf = SimpleDocTemplate(pdf_buffer, pagesize=landscape(A4), leftMargin=0.5*inch, rightMargin=3*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
             style_body = ParagraphStyle('body',
                                         fontName = 'Helvetica',
                                         fontSize=13,
@@ -499,40 +495,50 @@ def generate_single_pdf(request, inscricao_id):
         pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
         # Crie o PDF usando ReportLab
 
-        pdf_buffer = BytesIO()
-        pdf = SimpleDocTemplate(pdf_buffer, pagesize=landscape(A4), leftMargin=0.5*inch, rightMargin=3*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
+        pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
+            # Crie o PDF usando ReportLab
 
-        # Estilos para o texto
-        styles = getSampleStyleSheet()
-        style = styles["Normal"]
-        style.fontName = "Helvetica"
-        style.fontSize = 12
-        style.alignment = 1
-
-        style_header = ParagraphStyle(name='Grande', parent=styles["Normal"], fontSize=36, alignment = 0)
-        style_IG = ParagraphStyle(name='Medio', parent=styles["Normal"], fontSize=24, alignment = 0)
-
-        p_header = Paragraph(certificado.cabecalho, style_header)
-        p_ig = Paragraph(certificado.subcabecalho1, style_IG)
-        p_ig2 = Paragraph(certificado.subcabecalho2, style_IG)
+        style_body = ParagraphStyle('body',
+                                    fontName = 'Helvetica',
+                                    fontSize=13,
+                                    leading=17,
+                                    alignment=TA_JUSTIFY)
+        style_title = ParagraphStyle('title',
+                                    fontName = 'Helvetica',
+                                    fontSize=36)
+        style_subtitle = ParagraphStyle('subtitle',
+                                    fontName = 'Helvetica',
+                                    fontSize=24)
         
-        p = Paragraph(texto_customizado, style)
-        spacerHeader = Spacer(1, 40)
-        spacerMin = Spacer(1, 10)
-        spacer = Spacer(1, 100)  # Ajuste o tamanho conforme necessário
+        width, height = landscape(A4)
+        c = canvas.Canvas(pdf_filename, pagesize=landscape(A4))
+        p_title=Paragraph(certificado.cabecalho, style_title)
+        p_subtitle=Paragraph(certificado.subcabecalho1, style_subtitle)
+        p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
+        p1=Paragraph(texto_customizado, style_body)
+            # Caminho relativo para a imagem dentro do diretório 'static'
+        imagem_relative_path = 'Certificado-FUNDO.png'
+        assinatura_relative_path = 'assinatura.jpg'
 
-        # Lista de elementos para construir o PDF
-        elements = [p_header, spacerHeader, p_ig, spacerMin,p_ig2, spacer, p]
+        # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
+        imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
+        assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
 
-        # Adicione a lista de elementos ao PDF
-        pdf.build(elements)
 
-        # Retorne o PDF como resposta HTTP
-        pdf_buffer.seek(0)
 
-        # Adicione o PDF ao arquivo ZIP
-        with open(pdf_filename, 'wb') as pdf_file:
-            pdf_file.write(pdf_buffer.read())
+
+        # Desenhe a imagem como fundo
+        c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
+        c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        p_title.wrapOn(c, 500, 100)
+        p_title.drawOn(c, width-800, height-100)
+        p_subtitle.wrapOn(c, 500, 100)
+        p_subtitle.drawOn(c, width-800, height-165)
+        p_subtitle2.wrapOn(c, 500, 100)
+        p_subtitle2.drawOn(c, width-800, height-190)
+        p1.wrapOn(c, 500, 100)
+        p1.drawOn(c, width-800, height-300)
+        c.save()
         
         zipf.write(pdf_filename, os.path.basename(pdf_filename))
         os.remove(pdf_filename)
