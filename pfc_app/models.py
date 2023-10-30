@@ -175,6 +175,7 @@ class Validacao_CH(models.Model):
     nome_curso = models.CharField(max_length=100, default='')
     ch_solicitada = models.IntegerField(blank=True, null=True)
     ch_confirmada = models.IntegerField(blank=True, null=True)
+    data_termino_curso = models.DateField(blank=False, null=False)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=1)
 
     def __str__(self):

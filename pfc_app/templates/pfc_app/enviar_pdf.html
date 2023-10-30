@@ -7,16 +7,25 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
-        <div class="col-md-3 form-floating mb-3">
+        <div class="col-md-4 form-floating mb-3">
             <input type="input" class="form-control" name="nome_curso" id="nome_curso_id" required>
             <label for="nome_curso_id" >Nome do Curso Para Validação</label>
         </div>
-        <div class="col-md-3 form-floating mb-3">
+        <div class="col-md-4 form-floating mb-3">
             <input type="input" class="form-control" name="ch_solicitada" id="ch_solicitada_id" required>
             <label for="ch_solicitada_id" >Carga Horária Solicitada</label>
         </div>
-        <input type="file" name="arquivo_pdf" accept=".pdf" required>
-        <button type="submit">Enviar</button>
+        <div class="col-md-4 form-floating mb-3">
+            <input type="date" class="form-control" name="data_termino"  id="id_data_termino" required>
+            <label for="id_data_termino" >Data de Término do Curso</label>
+        </div>
+        <div class="input-group input-group-lg mb-3 mr-3 mt-3">
+            <div class="col-md-4 col-9 input-group-lg">
+                <input type="file" class="form-control" id="inputGroupFile02" name="arquivo_pdf" accept=".pdf" title="Escolha um Arquivo" required>
+            </div>
+            <button class="input-group-text" for="inputGroupFile02" type="submit">Enviar</button>
+            
+        </div>
     </form>
 
 {% endblock %}

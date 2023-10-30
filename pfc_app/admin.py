@@ -81,8 +81,8 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     form = AvaliacaoForm
 
 class Validacao_CHAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_solicitada', 'ch_confirmada', 'status',)
-    list_editable = ('ch_solicitada', 'ch_confirmada', 'status',)
+    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)
+    list_editable = ('ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)
     list_filter = ('usuario', 'status',)
 
 # Register your models here.

@@ -9,26 +9,41 @@
         
         <div class="col-md-3 form-floating mb-3">
             
-            <input type="date" class="form-control" name="data_inicio"  id="id_data_inicio">
+            <input type="date" class="form-control" name="data_inicio"  id="id_data_inicio" value="{{ values.data_inicio }}">
             <label for="id_data_inicio" >De</label>
         </div>
         <div class="col-md-3 col-md-3 form-floating mb-3">
             
-            <input type="date" class="form-control" name="data_fim"  id="id_data_inicio">
+            <input type="date" class="form-control" name="data_fim"  id="id_data_fim" value="{{ values.data_fim }}">
             <label for="{{ form.data_fim.id_for_label }}" >Até</label>
             
         </div>
-        <div class="col-3 form-floating mb-3">
+        <div class="col-md-3 form-floating mb-3">
             <button type="submit" class="btn btn-primary btn-lg">Filtrar por Término do Curso</button>
         </div>
     </form>
-    <div class="card">
-        <h4 class="card-header">Minha Carga Horária</h4>
-        <div class="card-body">
-        <h5 class="card-title">Carga Horária PFC: {{ carga_horaria_pfc }} horas </h5>
-        <h5 class="card-title">Carga Horária Validada: {{ carga_horaria_validada }} horas </h5>
-        <hr>
-        <h5 class="card-title">Carga Horária Total: {{ carga_horaria_total }} horas </h5>
+    <div class="row">
+        <div class="col-sm-6 mb-3 mr-3 mt-3">
+            <div class="card">
+                <h4 class="card-header">Minha Carga Horária</h4>
+                <div class="card-body">
+                <h5 class="card-title">Carga Horária PFC: {{ carga_horaria_pfc }} horas </h5>
+                <h5 class="card-title">Carga Horária Validada: {{ carga_horaria_validada }} horas </h5>
+                <hr>
+                <h5 class="card-title">Carga Horária Total: {{ carga_horaria_total }} horas </h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 mb-3 mr-3 mt-3">
+            <div class="card">
+                <h4 class="card-header">Períodos Padrão</h4>
+                <div class="card-body">
+                <h5 class="card-title">Carga Horária PFC: {{ carga_horaria_pfc }} horas </h5>
+                <h5 class="card-title">Carga Horária Validada: {{ carga_horaria_validada }} horas </h5>
+                <hr>
+                <h5 class="card-title">Carga Horária Total: {{ carga_horaria_total }} horas </h5>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

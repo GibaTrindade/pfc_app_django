@@ -3,51 +3,75 @@
 {% block content %}
 {% include 'parciais/_messages.html' %}
 <div class="d-flex p-2 justify-content-center mb-5"><h1>ESCOLHA UM CURSO</h1></div>
-<div class="table-responsive">
-<table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col" class="text-center">ID</th>
-        <th scope="col" class="text-center">NOME DO CURSO</th>
-        <th scope="col" class="text-center">CARGA HORÁRIA</th>
-        <th scope="col" class="text-center">VAGAS</th>
-        <th scope="col" class="text-center">INSCRITOS</th>
-        <th scope="col" class="text-center">DATA DO INÍCIO</th>
-        <th scope="col" class="text-center">DATA DO TÉRMINO</th>
-        <th scope="col" class="text-center">STATUS</th>
-        <th scope="col" class="text-center">-</th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for curso in cursos %}
-            <tr>
-                <th scope="row" class="text-center">{{ curso.id }}</th>
-                <td><a href="/curso_detail/{{ curso.id }}?from_get=0">{{ curso.nome_curso }}</a></td>
-                <td class="text-center">{{ curso.ch_curso }}</td>
-                <td class="text-center">{{ curso.vagas }}</td>
-                <td class="text-center">{{ curso.num_inscricoes }}</td>
-                <td>{{ curso.data_inicio }}</td>
-                <td>{{ curso.data_termino }}</td>
-                <td class="text-center">{{ curso.status }}</td>
-                {% if curso.usuario_inscrito %}
-                  <td class="text-center">INSCRITO</td>
-                {% else %}
-                {% if curso.status.nome == "A INICIAR" %}
-                  
-                    {% if curso.num_inscricoes >= curso.vagas %}
-                          <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a></td>
-                    {% else %}
-                        <td class="text-center"><a href="/curso_detail/{{ curso.id }}" class="btn btn-success">INSCREVER</a></td>
-                    {% endif %}   
-                  
-                     
-                {% endif %}      
-                {% endif %}      
-            </tr>
-        {% endfor %}
-      
-    </tbody>
-  </table>
+<div class="row">
+{% for curso in cursos %}
+<div class="col-sm-4">
+<div class="card border-secondary mb-3 mt-3">
+
+
+  <div class="card-header text-black text-center">
+    <strong>
+      <a href="{% url 'detail_curso' curso.id %}">{{ curso.nome_curso.upper }}</a>
+    </strong>
+  </div>
+
+
+  <div class="card-body">
+      <h6 class="card-title">
+          INFORMAÇÕES DO CURSO:
+      </h6>
+      <p class="card-text">
+          <small class="text-muted"><strong>Vagas:</strong> {{curso.vagas}}</small>
+      </p>
+      <p class="card-text">
+        <small class="text-muted"><strong>Inscritos:</strong> {{curso.num_inscricoes}}</small>
+      </p>
+      <p class="card-text">
+        <small class="text-muted"><strong>Carga Horária:</strong> {{curso.ch_curso}}</small>
+      </p>
+      <p class="card-text">
+        <small class="text-muted"><strong>Início:</strong> {{curso.data_inicio}}</small>
+      </p>
+      <p class="card-text">
+        <small class="text-muted"><strong>Término:</strong> {{curso.data_termino}}</small>
+      </p>
+      <div class="btn-toolbar justify-content-between">
+          <div class="text-left mr-2">
+            {% if curso.usuario_inscrito %}
+            <a href="#" class="btn btn-secondary position-relative">
+              <i class="fa-solid fa-circle-check"></i>  INSCRITO
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{curso.num_inscricoes}}/{{curso.vagas}}
+                <span class="visually-hidden">unread messages</span>
+              </span>
+            </a>
+          {% else %}
+          {% if curso.status.nome == "A INICIAR" %}
+            
+              {% if curso.num_inscricoes >= curso.vagas %}
+                    <a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a>
+              {% else %}
+                    <a href="/curso_detail/{{ curso.id }}" class="btn btn-success position-relative">
+                      <i class="fa-solid fa-pen-to-square"></i>  INSCREVER
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{curso.num_inscricoes}}/{{curso.vagas}}
+                        <span class="visually-hidden">unread messages</span>
+                      </span>
+                    </a>
+              {% endif %}   
+            
+               
+          {% endif %}      
+          {% endif %}      
+          </div>
+          <div class="text-right">
+            <a href="#" class="btn btn-secondary"><i class="fa-solid fa-star"></i>  STATUS: {{ curso.status }}</a>
+          </div>
+      </div>
+  </div>
+</div>
+</div>
+{% endfor %}
 </div>
 
 {% endblock %}

@@ -86,20 +86,39 @@ def carga_horaria(request):
      participante=request.user
      
      )
+  satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+  validacoes = Validacao_CH.objects.filter(usuario=request.user, status=satus_validacao)
   
+  data_hoje = datetime.now()
+  
+  # Verificar se a data atual é anterior a "01/03" do ano atual
+  if data_hoje.month < 3:
+       ano_atual = data_hoje.year - 1
+  else:
+       ano_atual = data_hoje.year
+  
+  data_hoje = data_hoje.strftime("%Y-%m-%d")
+
   if form.is_valid():
         data_inicio = form.cleaned_data['data_inicio']
         data_fim = form.cleaned_data['data_fim']
         
         if data_inicio:
             inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__gte=data_inicio)
+            validacoes = validacoes.filter(data_termino_curso__gte=data_inicio)
+        else:# Se data_inicio não estiver preenchida filtra com a data 01/03/{ano_atual}
+            inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__gte=f'{ano_atual}-03-01')
+            validacoes = validacoes.filter(data_termino_curso__gte=f'{ano_atual}-03-01')
         if data_fim:
             inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__lte=data_fim)
+            validacoes = validacoes.filter(data_termino_curso__lte=data_fim)
+        else:
+            inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__lte=data_hoje)
+            validacoes = validacoes.filter(data_termino_curso__lte=data_hoje)
     
   # Calcula a soma da carga horária das inscrições do usuário
-  satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
   carga_horaria_pfc = inscricoes_do_usuario.aggregate(Sum('ch_valida'))['ch_valida__sum'] or 0
-  validacoes_ch = Validacao_CH.objects.filter(usuario=request.user, status=satus_validacao).aggregate(Sum('ch_confirmada'))['ch_confirmada__sum'] or 0
+  validacoes_ch = validacoes.aggregate(Sum('ch_confirmada'))['ch_confirmada__sum'] or 0
   carga_horaria_total = carga_horaria_pfc + validacoes_ch
 
   context = {
@@ -107,6 +126,7 @@ def carga_horaria(request):
       'carga_horaria_validada': validacoes_ch,
       'carga_horaria_total': carga_horaria_total,
       'form': form,
+      'values': request.GET if request.GET else {'data_inicio': f'{ano_atual}-03-01', 'data_fim': data_hoje},
   }
 
   return render(request, 'pfc_app/carga_horaria.html' ,context)
@@ -285,12 +305,15 @@ def enviar_pdf(request):
         arquivo_pdf = request.FILES['arquivo_pdf']
         nome_curso = request.POST['nome_curso']
         ch_solicitada = request.POST['ch_solicitada']
+        data_termino = request.POST['data_termino']
         try:
            ch_solicitada = int(ch_solicitada)
         except:
             messages.error(request, 'O campo carga horária precisa ser númerico!')
             return redirect('enviar_pdf')
-        avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, nome_curso=nome_curso, ch_solicitada=ch_solicitada)
+        avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, 
+                                 nome_curso=nome_curso, ch_solicitada=ch_solicitada, 
+                                 data_termino_curso=data_termino)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')

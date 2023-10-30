@@ -2,13 +2,21 @@
 
 {% block content %}
 {% include 'parciais/_messages.html' %}
-<div class="d-flex p-2 justify-content-center mb-5"><h1>Curso: {{curso}}</h1></div>
-<div class="container">
-    <div class="row">
+<div class="d-flex p-2 justify-content-center mb-5">
+    <h1>Curso: {{curso}}</h1>
+</div>
+
+    <div class="row mb-2">
         <div class="col-md-2 col-sm-12">
             {% for usuario_docente in usuarios_docentes %}
-                <div class="row d-flex justify-content-center align-items-center p-3">
-                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" alt="Avatar" class="img-thumbnail">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
+                <div class="row d-flex justify-content-center align-items-center p-3 ">
+                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" border-radius="50" alt="Avatar" class="img-thumbnail border border-success">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
+                    
+                        <div class="d-flex justify-content-center align-items-center">
+                            <strong>Instrutor {{ forloop.counter }} </strong>
+                        </div>
+                    
+                    
                 </div>
             {% endfor %}
             
@@ -29,26 +37,26 @@
             <div class="col-md-5">
                 <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
                 <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                    Ver Ementa
+                    Ver Ementa <i class="fa-solid fa-user-chef"></i>
                 </button>
             </div>
-            <div class="row d-flex justify-content-center align-items-center">
-                <div class="col-md-2 col-sm-12 mb-2"></div>
-                <div class="col-xl-5 col-sm-12 mb-2">
+        </div>
+            <div class="row d-flex justify-content-center align-items-center mb-2">
+                <div class="col-md-2 col-sm-12 "></div>
+                <div class="col-md-5 col-sm-12 ">
                     {% if read_only != "0" %}
-                        <a href="/inscrever/{{curso.id}}/" class="btn btn-success ">INSCREVER-SE</a>
+                        <a href="/inscrever/{{curso.id}}/" class="btn btn-success "></i>INSCREVER-SE</a>
                     {% endif %}
                 </div>
-                <div class="col-xl-5 col-sm-12 mb-2">
-                    {% if user.role == "ADMIN" %}
-                        <a href="/generate_all_pdfs/{{curso.id}}/" class="btn btn-success">GERAR CERTIFICADOS</a>
-                    {% endif %}
+                
+                <div class="col-md-5 col-sm-12 ">
+                    
                 </div>
             </div>
             
         
-    </div>
-</div>
+    
+
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
