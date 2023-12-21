@@ -26,12 +26,12 @@ class User(AbstractUser):
     tipo_atuacao = models.CharField(max_length=400, blank=True, null=True)
     lotacao = models.CharField(max_length=400, blank=True, null=True)
     lotacao_especifica = models.CharField(max_length=400, blank=True, null=True)
-    lotacao_especifica_2 = models.CharField(max_length=400, blank=True, null=True)
+    lotacao_especifica_2 = models.CharField(max_length=400, blank=True, null=True, verbose_name = ("Lotação sigla"))
     classificacao_lotacao = models.CharField(max_length=400, blank=True, null=True)
 
     is_ativo = models.BooleanField(default=True)
     role = models.CharField(max_length=40, default="USER")
-    is_externo = models.BooleanField(default=False)
+    is_externo = models.BooleanField(default=False, verbose_name = ("É externo"))
     avatar = models.ImageField(null=True, blank=True)
     avatar_base64 = models.TextField(blank=True, null=True)
     
@@ -104,6 +104,7 @@ class Curso(models.Model):
     #history = HistoricalRecords()
     status = models.ForeignKey(StatusCurso, on_delete=models.PROTECT)
     periodo_avaliativo = models.BooleanField(default=False)
+    eh_evento = models.BooleanField(default=False, verbose_name = ("É evento"))
 
     def publish(self):
         self.published_date = timezone.now()
@@ -185,6 +186,8 @@ class Validacao_CH(models.Model):
     ch_confirmada = models.IntegerField(blank=True, null=True)
     data_termino_curso = models.DateField(blank=False, null=False)
     data_inicio_curso = models.DateField(blank=False, null=False)
+    ementa = models.TextField(default='', blank=False, null=False)
+    agenda_pfc = models.BooleanField(default=False, blank=False, null=False)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=status_validacao.id)
     #analisado_em = models.DateTimeField(auto_now_add=True)
 

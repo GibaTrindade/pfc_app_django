@@ -6,28 +6,29 @@
 <div class="row">
 {% for curso in cursos %}
 <div class="col-sm-4">
-<div class="card border-secondary mb-3 mt-3 shadow position-relative">
+<div class="card border-secondary mb-3 mt-3 shadow position-relative" style="height: 300px;">
   {% if curso.num_inscricoes >= curso.vagas %}
     <span class="position-absolute top-0 end-0 badge bg-danger p-2">Lotado</span>
   {% endif %}
 
-  <div class="card-body">
-      <h6 class="card-title">
-          <strong>{{ curso.nome_curso.upper }}</strong>
-      </h6>
-      <p class="card-text">
-        <i class="bi bi-pencil-square"></i>
-        <small class="text-muted"><strong>Descrição: </strong> {{curso.descricao}}</small>
-      </p>
-      <p class="card-text">
-        <i class="bi bi-journal-bookmark"></i>
-        <small class="text-muted"><strong>Carga Horária:</strong> {{curso.ch_curso}}h</small>
-      </p>
-      <p class="card-text">
-        <i class="bi bi-calendar-check"></i>
-        <small class="text-muted"><strong>Início:</strong> {{curso.data_inicio}}</small>
-      </p>
+  <div class="card-body justify-content-between d-flex flex-column">
       
+        <h6 class="card-title">
+            <strong>{{ curso.nome_curso.upper }}</strong>
+        </h6>
+        <p class="card-text">
+          <i class="bi bi-pencil-square"></i>
+          <small class="text-muted"><strong>Descrição: </strong> {{curso.descricao}}</small>
+        </p>
+        <p class="card-text">
+          <i class="bi bi-journal-bookmark"></i>
+          <small class="text-muted"><strong>Carga Horária:</strong> {{curso.ch_curso}}h</small>
+        </p>
+        <p class="card-text">
+          <i class="bi bi-calendar-check"></i>
+          <small class="text-muted"><strong>Início:</strong> {{curso.data_inicio}}</small>
+        </p>
+    
       <div class="btn-toolbar justify-content-between">
           <div class="text-left mr-2">
             {% if curso.usuario_inscrito %}

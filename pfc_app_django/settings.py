@@ -156,3 +156,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ncdseplag@gmail.com'
 EMAIL_HOST_PASSWORD = 'jworzvpvvsguxzfu'
 DEFAULT_FROM_EMAIL = 'ncdseplag@gmail.com'
+
+
+
+JAZZMIN_SETTINGS = {
+    "login_logo": "pfc_app/logos/PFC1-400x174.png",
+    "welcome_sign": "Bem-vindo",
+    "site_icon": "pfc_app/logos/IG.png",
+    "site_logo": "pfc_app/logos/IG.png",
+    
+}

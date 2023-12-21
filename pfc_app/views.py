@@ -204,6 +204,7 @@ def cancelar_inscricao(request, inscricao_id):
 @login_required
 def inscrever(request, curso_id):
     curso = Curso.objects.get(pk=curso_id)
+    status_id_aprovada = StatusInscricao.objects.get(nome='APROVADA')
     status_id_pendente = StatusInscricao.objects.get(nome='PENDENTE')
     status_id_fila = StatusInscricao.objects.get(nome='EM FILA')
     
@@ -234,8 +235,11 @@ def inscrever(request, curso_id):
           return redirect('detail_curso', pk=curso_id)
     
     try:
-      inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_pendente)
-      
+      if curso.eh_evento:
+          inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_aprovada)
+      else:
+          inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_pendente)
+
       if criada:
           # A inscrição foi criada com sucesso
           messages.success(request, 'Inscrição realizada!')
@@ -318,6 +322,13 @@ def enviar_pdf(request):
         data_inicio = request.POST['data_inicio']
         data_termino = request.POST['data_termino']
         instituicao_promotora = request.POST['instituicao_promotora']
+        ementa = request.POST['ementa']
+        try:
+            agenda_pfc_check = request.POST['agenda_pfc']
+            agenda_pfc = True
+        except:
+            agenda_pfc = False
+      
         try:
            ch_solicitada = int(ch_solicitada)
         except:
@@ -326,7 +337,8 @@ def enviar_pdf(request):
         avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, 
                                  nome_curso=nome_curso, ch_solicitada=ch_solicitada, 
                                  data_termino_curso=data_termino, data_inicio_curso = data_inicio,
-                                 instituicao_promotora=instituicao_promotora)
+                                 instituicao_promotora=instituicao_promotora, ementa=ementa, 
+                                 agenda_pfc=agenda_pfc)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')
@@ -610,12 +622,16 @@ def generate_all_reconhecimento(request, validacao_id):
     try:
       validacao = Validacao_CH.objects.get(pk=validacao_id)
     except:
-       messages.error(request, f"Validaão não encontrada!")
+       messages.error(request, f"Validação não encontrada!")
        return redirect('lista_cursos')
     
+    try:
+        requerimento = validacao.requerimento_ch.do_requerimento
+    except:
+        messages.error(request, f'Erro ao gerar reconhecimento')
+        # Redireciona para a página de lista do modelo Validacao no app pfc_app
+        return redirect(reverse('admin:pfc_app_validacao_ch_changelist'))
 
-    requerimento = validacao.requerimento_ch.do_requerimento
-    print()
     #texto_certificado = certificado.texto
     user = validacao.usuario
 
