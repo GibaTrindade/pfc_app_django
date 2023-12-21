@@ -147,3 +147,12 @@ MESSAGE_TAGS = {
     constants.SUCCESS: 'alert-success',
     constants.INFO: 'alert-info',
 }
+
+# Configurações de E-mail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ncdseplag@gmail.com'
+EMAIL_HOST_PASSWORD = 'jworzvpvvsguxzfu'
+DEFAULT_FROM_EMAIL = 'ncdseplag@gmail.com'

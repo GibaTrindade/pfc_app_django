@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
+from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -20,6 +21,8 @@ urlpatterns = [
     path('download_all_pdfs/', views.download_all_pdfs, name='download_all_pdfs'),
     path('generate_all_pdfs/<int:curso_id>/', views.generate_all_pdfs, name='generate_all_pdfs'),
     path('generate_single_pdf/<int:inscricao_id>/', views.generate_single_pdf, name='generate_single_pdf'),
+    path('reset-password/', views.reset_password_request, name='reset_password_request'),
+    path('change-password/', views.change_password, name='change_password'),
     path('generate_reconhecimento/<int:validacao_id>/', views.generate_all_reconhecimento, name='generate_reconhecimento'),
 ]
 

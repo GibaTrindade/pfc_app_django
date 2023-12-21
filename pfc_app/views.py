@@ -2,6 +2,15 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.urls import reverse
+import random
+import string
+from django.utils.encoding import force_bytes
+from django.contrib.auth import update_session_auth_hash
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
@@ -230,6 +239,7 @@ def inscrever(request, curso_id):
       if criada:
           # A inscrição foi criada com sucesso
           messages.success(request, 'Inscrição realizada!')
+          #send_mail('Teste', f'Follow this link to reset your password: ihaa', 'g.trindade@gmail.com', [request.user.email])
           return redirect('lista_cursos')
       else:
           # A inscrição já existe
@@ -594,6 +604,8 @@ def generate_single_pdf(request, inscricao_id):
 
     return response
 
+
+
 def generate_all_reconhecimento(request, validacao_id):
     try:
       validacao = Validacao_CH.objects.get(pk=validacao_id)
@@ -721,3 +733,50 @@ def generate_all_reconhecimento(request, validacao_id):
     os.remove(zip_filename)
 
     return response
+
+
+def reset_password_request(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            #user = form.get_users(request.POST['email']).first()
+            users = form.get_users(request.POST['email'])
+            user = next(users, None) 
+            if user:
+                senha_aleatoria = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+                try:
+                    user.set_password(senha_aleatoria)
+                    user.save()
+                except:
+                    messages.error(request, 'Erro no BD inesperado, entre em contato com o IG!')
+                    return redirect('reset_password_request')
+                
+                try:
+                    send_mail('Senha Nova - AppPFC', f'Sua nova senha é: {senha_aleatoria}', 'ncdseplag@gmail.com', [user.email])
+                except:
+                    user.set_password("12345678")
+                    user.save()
+                    messages.error(request, 'Erro no envio de email. Sua nova senha é: 12345678')
+                    return redirect('lista_cursos')
+            else:
+                messages.error(request, 'Email não encontrado em nosso sistema!')
+                return redirect('reset_password_request')
+
+            messages.success(request, 'Email enviado com sua nova senha. Aproveite!')
+            return redirect('lista_cursos')
+    else:
+        form = PasswordResetForm()
+    return render(request, 'pfc_app/reset_password_request.html', {'form': form})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Senha alterada com sucesso!')
+            return redirect('lista_cursos')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'pfc_app/change_password.html', {'form': form})
