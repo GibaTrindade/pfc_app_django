@@ -169,14 +169,24 @@ class StatusValidacao(models.Model):
         verbose_name_plural = "status validações"
 
 class Validacao_CH(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    try:
+        status_validacao = StatusValidacao.objects.get(nome="PENDENTE")
+    except:
+        status_validacao = StatusValidacao.objects.create(nome="PENDENTE")
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requerente_validacao')
     arquivo_pdf = models.FileField(upload_to=user_directory_path)
     enviado_em = models.DateTimeField(auto_now_add=True)
     nome_curso = models.CharField(max_length=100, default='')
+    instituicao_promotora = models.CharField(max_length=200, default='')
+    requerimento_ch  = models.ForeignKey("RequerimentoCH", on_delete=models.SET_NULL, blank=True, null=True)
+    responsavel_analise = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='responsavel_validacao')
     ch_solicitada = models.IntegerField(blank=True, null=True)
     ch_confirmada = models.IntegerField(blank=True, null=True)
     data_termino_curso = models.DateField(blank=False, null=False)
-    status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=1)
+    data_inicio_curso = models.DateField(blank=False, null=False)
+    status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=status_validacao.id)
+    #analisado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.usuario.username
@@ -184,6 +194,19 @@ class Validacao_CH(models.Model):
     class Meta:
         verbose_name_plural = "validações de CH"
 
+
+class RequerimentoCH(models.Model):
+    codigo = models.CharField(max_length=40, default='')
+    do_requerimento = models.TextField(max_length=2000, default='')
+    da_fundamentacao = models.TextField(max_length=1000, default='')
+    da_conclusao = models.TextField(max_length=1000, default='')
+    rodape = models.TextField(max_length=400, default='')
+
+    def __str__(self):
+        return self.codigo
+
+    class Meta:
+        verbose_name_plural = "requerimentos"
 
 class Certificado(models.Model):
     codigo = models.CharField(max_length=40, default='')

@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.db.models import Q
 from django.contrib.auth.admin import UserAdmin
 from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao, \
-                    StatusValidacao, Avaliacao, Validacao_CH,Certificado
+                    StatusValidacao, Avaliacao, Validacao_CH,Certificado, \
+                    RequerimentoCH
 from .forms import AvaliacaoForm 
 from django.utils.html import format_html
 from django.urls import reverse
@@ -81,9 +82,15 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     form = AvaliacaoForm
 
 class Validacao_CHAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)
+    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_solicitada', 
+                    'ch_confirmada', 'data_termino_curso', 'status',
+                    'gerar_reconhecimento_ch',)
     list_editable = ('ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)
     list_filter = ('usuario', 'status',)
+
+    def gerar_reconhecimento_ch(self, obj):
+        return format_html('<a href="{}">Gerar Reconhecimento</a>', reverse('generate_reconhecimento', args=[obj.id]))
+
 
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
@@ -95,6 +102,7 @@ admin.site.register(StatusValidacao)
 admin.site.register(Avaliacao)
 admin.site.register(Validacao_CH, Validacao_CHAdmin)
 admin.site.register(Certificado)
+admin.site.register(RequerimentoCH)
 
 
 admin.site.site_header = 'PFC'

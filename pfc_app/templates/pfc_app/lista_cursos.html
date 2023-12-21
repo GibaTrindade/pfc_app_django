@@ -6,35 +6,28 @@
 <div class="row">
 {% for curso in cursos %}
 <div class="col-sm-4">
-<div class="card border-secondary mb-3 mt-3">
-
-
-  <div class="card-header text-black text-center">
-    <strong>
-      <a href="{% url 'detail_curso' curso.id %}">{{ curso.nome_curso.upper }}</a>
-    </strong>
-  </div>
-
+<div class="card border-secondary mb-3 mt-3 shadow position-relative">
+  {% if curso.num_inscricoes >= curso.vagas %}
+    <span class="position-absolute top-0 end-0 badge bg-danger p-2">Lotado</span>
+  {% endif %}
 
   <div class="card-body">
       <h6 class="card-title">
-          INFORMAÇÕES DO CURSO:
+          <strong>{{ curso.nome_curso.upper }}</strong>
       </h6>
       <p class="card-text">
-          <small class="text-muted"><strong>Vagas:</strong> {{curso.vagas}}</small>
+        <i class="bi bi-pencil-square"></i>
+        <small class="text-muted"><strong>Descrição: </strong> {{curso.descricao}}</small>
       </p>
       <p class="card-text">
-        <small class="text-muted"><strong>Inscritos:</strong> {{curso.num_inscricoes}}</small>
+        <i class="bi bi-journal-bookmark"></i>
+        <small class="text-muted"><strong>Carga Horária:</strong> {{curso.ch_curso}}h</small>
       </p>
       <p class="card-text">
-        <small class="text-muted"><strong>Carga Horária:</strong> {{curso.ch_curso}}</small>
-      </p>
-      <p class="card-text">
+        <i class="bi bi-calendar-check"></i>
         <small class="text-muted"><strong>Início:</strong> {{curso.data_inicio}}</small>
       </p>
-      <p class="card-text">
-        <small class="text-muted"><strong>Término:</strong> {{curso.data_termino}}</small>
-      </p>
+      
       <div class="btn-toolbar justify-content-between">
           <div class="text-left mr-2">
             {% if curso.usuario_inscrito %}
@@ -65,7 +58,7 @@
           {% endif %}      
           </div>
           <div class="text-right">
-            <a href="#" class="btn btn-secondary"><i class="fa-solid fa-star"></i>  STATUS: {{ curso.status }}</a>
+            <a href="#" class="btn btn-outline-secondary"><i class="fa-solid fa-star"></i>  STATUS: {{ curso.status }}</a>
           </div>
       </div>
   </div>

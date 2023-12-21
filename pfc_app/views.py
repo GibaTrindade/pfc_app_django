@@ -314,7 +314,9 @@ def enviar_pdf(request):
         arquivo_pdf = request.FILES['arquivo_pdf']
         nome_curso = request.POST['nome_curso']
         ch_solicitada = request.POST['ch_solicitada']
+        data_inicio = request.POST['data_inicio']
         data_termino = request.POST['data_termino']
+        instituicao_promotora = request.POST['instituicao_promotora']
         try:
            ch_solicitada = int(ch_solicitada)
         except:
@@ -322,7 +324,8 @@ def enviar_pdf(request):
             return redirect('enviar_pdf')
         avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, 
                                  nome_curso=nome_curso, ch_solicitada=ch_solicitada, 
-                                 data_termino_curso=data_termino)
+                                 data_termino_curso=data_termino, data_inicio_curso = data_inicio,
+                                 instituicao_promotora=instituicao_promotora)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')
@@ -426,10 +429,19 @@ def generate_all_pdfs(request, curso_id):
              # Caminho relativo para a imagem dentro do diretório 'static'
             imagem_relative_path = 'Certificado-FUNDO.png'
             assinatura_relative_path = 'assinatura.jpg'
+            igpe_relative_path = 'Igpe.jpg'
+            egape_relative_path = 'Egape.jpg'
+            pfc_relative_path = 'PFC1.png'
+            seplag_relative_path = 'seplag-transp-horizontal.png'
+
 
             # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
             imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
             assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
+            igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+            egape_path = os.path.join(settings.MEDIA_ROOT, egape_relative_path)
+            pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+            seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
 
 
 
@@ -437,6 +449,10 @@ def generate_all_pdfs(request, curso_id):
             # Desenhe a imagem como fundo
             c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
             c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
+            c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+            c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+            c.drawImage(pfc_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+            c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
             p_title.wrapOn(c, 500, 100)
             p_title.drawOn(c, width-800, height-100)
             p_subtitle.wrapOn(c, 500, 100)
@@ -609,3 +625,134 @@ def reset_password_request(request):
     else:
         form = PasswordResetForm()
     return render(request, 'pfc_app/reset_password_request.html', {'form': form})
+
+
+
+def generate_all_reconhecimento(request, validacao_id):
+    try:
+      validacao = Validacao_CH.objects.get(pk=validacao_id)
+    except:
+       messages.error(request, f"Validaão não encontrada!")
+       return redirect('lista_cursos')
+    
+
+    requerimento = validacao.requerimento_ch.do_requerimento
+    print()
+    #texto_certificado = certificado.texto
+    user = validacao.usuario
+
+    output_folder = "req_output"  # Pasta onde os PDFs temporários serão salvos
+    zip_filename = "requerimento_ch.zip"
+
+    # Crie a pasta de saída se ela não existir
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Crie o arquivo ZIP
+    with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+
+        try:
+            cpf = CPF()
+            # Validar CPF
+            if not cpf.validate(user.cpf):
+                messages.error(request, f'CPF de {user.nome} está errado! ({user.cpf})')
+                return redirect('lista_cursos')
+            
+            # Formata o CPF no formato "000.000.000-00"
+            cpf_formatado = f"{user.cpf[:3]}.{user.cpf[3:6]}.{user.cpf[6:9]}-{user.cpf[9:]}"
+        except:
+            messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
+            return redirect('lista_cursos')
+
+        tag_mapping = {
+            "[cpf]": cpf_formatado,
+            "[data_envio]": validacao.enviado_em,
+            "[lotacao]": user.lotacao,
+            "[nome_curso]": validacao.nome_curso,
+            "[instituicao_promotora]": validacao.instituicao_promotora,
+            "[data_inicio]": validacao.data_inicio_curso,
+            "[data_termino]": validacao.data_termino_curso,
+            "[ch_valida]": validacao.ch_confirmada,
+        }
+
+# Substitua as tags pelo valor correspondente no texto
+        for tag, value in tag_mapping.items():
+            requerimento = requerimento.replace(tag, str(value))
+
+        texto_customizado = requerimento
+        pdf_filename = os.path.join(output_folder, f"{user.username}-requerimento.pdf")
+        # Crie o PDF usando ReportLab
+
+        style_body = ParagraphStyle('body',
+                                    fontName = 'Helvetica',
+                                    fontSize=13,
+                                    leading=17,
+                                    alignment=TA_JUSTIFY)
+        style_title = ParagraphStyle('title',
+                                    fontName = 'Helvetica',
+                                    fontSize=36)
+        style_subtitle = ParagraphStyle('subtitle',
+                                    fontName = 'Helvetica',
+                                    fontSize=24)
+        
+        width, height = A4
+        print(width)
+        print(height)
+        c = canvas.Canvas(pdf_filename, pagesize=A4)
+        p_title=Paragraph("Analise de Requerimento", style_title)
+        p_subtitle=Paragraph("Do Requerimento", style_subtitle)
+        #p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
+        p1=Paragraph(texto_customizado, style_body)
+            # Caminho relativo para a imagem dentro do diretório 'static'
+        
+        assinatura_relative_path = 'assinatura.jpg'
+        igpe_relative_path = 'Igpe.jpg'
+        egape_relative_path = 'Egape.jpg'
+        pfc_relative_path = 'PFC1.png'
+        seplag_relative_path = 'seplag-transp-horizontal.png'
+
+
+        # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
+       
+        assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
+        igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+        egape_path = os.path.join(settings.MEDIA_ROOT, egape_relative_path)
+        pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+        seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
+
+
+
+
+        # Desenhe a imagem como fundo
+        
+        c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(pfc_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        p_title.wrapOn(c, 500, 100)
+        p_title.drawOn(c, width-500, height-100)
+        p_subtitle.wrapOn(c, 500, 100)
+        p_subtitle.drawOn(c, width-800, height-165)
+        #p_subtitle2.wrapOn(c, 500, 100)
+        #p_subtitle2.drawOn(c, width-800, height-190)
+        p1.wrapOn(c, 500, 100)
+        p1.drawOn(c, width-550, height-300)
+        c.save()
+        
+        
+        zipf.write(pdf_filename, os.path.basename(pdf_filename))
+        os.remove(pdf_filename)
+
+    # Configure a resposta HTTP para o arquivo ZIP
+    response = HttpResponse(content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+
+    # Abra o arquivo ZIP e envie seu conteúdo como resposta
+    with open(zip_filename, 'rb') as zip_file:
+        response.write(zip_file.read())
+
+    os.remove(zip_filename)
+
+    return response
+
