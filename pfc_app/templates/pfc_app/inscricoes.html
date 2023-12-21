@@ -31,24 +31,30 @@
                         <td>NÃO</td>
                     {% endif %}
                     <td>{{ inscricao.status }}</td>  
-                    {% if  inscricao.curso.periodo_avaliativo %}
-                        {% if  inscricao.curso_avaliado %}
-                            <td class="text-center"><a href="#" class="btn btn-secondary">CURSO AVALIADO</a></td>
-                        {% else %}
-                            <td class="text-center"><a href="/avaliacao/{{ inscricao.curso.id }}" class="btn btn-primary">AVALIAR CURSO</a></td>
-                        {% endif %}
-                    {% else %}
-                        {% if  inscricao.status.nome == "APROVADA" or inscricao.status.nome == "PENDENTE" %}
-                            {% if  inscricao.curso.status.nome == "A INICIAR" or inscricao.curso.status.nome == "INICIADO" %}
-                                <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRIÇÃO</a></td>
+                    
+                        {% if  inscricao.curso.periodo_avaliativo %}
+                            {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
+                                {% if  inscricao.curso_avaliado %}
+                                    <td class="text-center"><a href="#" class="btn btn-secondary">CURSO AVALIADO</a></td>
+                                {% else %}
+                                    <td class="text-center"><a href="/avaliacao/{{ inscricao.curso.id }}" class="btn btn-primary">AVALIAR CURSO</a></td>
+                                {% endif %}
                             {% else %}
                                 <td>-</td>
                             {% endif %}
                         {% else %}
-                        <td>-</td> 
+                            {% if  inscricao.status.nome == "APROVADA" or inscricao.status.nome == "PENDENTE" %}
+                                {% if  inscricao.curso.status.nome == "A INICIAR" or inscricao.curso.status.nome == "INICIADO" %}
+                                    <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger">CANCELAR INSCRIÇÃO</a></td>
+                                {% else %}
+                                    <td>-</td>
+                                {% endif %}
+                            {% else %}
+                                <td>-</td> 
+                            {% endif %}
+                            
                         {% endif %}
-                        
-                    {% endif %}
+                   
                     {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
                         <td class="text-center"><a href="/generate_single_pdf/{{ inscricao.id }}" class="btn btn-primary">BAIXAR CERTIFICADO</a></td>
                     {% endif %}
