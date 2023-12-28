@@ -170,10 +170,10 @@ class StatusValidacao(models.Model):
         verbose_name_plural = "status validações"
 
 class Validacao_CH(models.Model):
-    try:
-        status_validacao = StatusValidacao.objects.get(nome="PENDENTE")
-    except:
-        status_validacao = StatusValidacao.objects.create(nome="PENDENTE")
+    # try:
+    #     status_validacao = StatusValidacao.objects.get(nome="PENDENTE")
+    # except:
+    #     status_validacao = StatusValidacao.objects.create(nome="PENDENTE")
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requerente_validacao')
     arquivo_pdf = models.FileField(upload_to=user_directory_path)
@@ -188,7 +188,7 @@ class Validacao_CH(models.Model):
     data_inicio_curso = models.DateField(blank=False, null=False)
     ementa = models.TextField(default='', blank=False, null=False)
     agenda_pfc = models.BooleanField(default=False, blank=False, null=False)
-    status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING, default=status_validacao.id)
+    status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING)#, default=status_validacao.id)
     #analisado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

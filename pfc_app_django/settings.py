@@ -79,17 +79,26 @@ WSGI_APPLICATION = 'pfc_app_django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',#'django.db.backends.sqlite3',
+#         'NAME': 'pfc_app_new',
+#         'USER': 'postgres',
+#         'PASSWORD': 'post1234',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',#'django.db.backends.sqlite3',
-        'NAME': 'pfc_app_new',
-        'USER': 'postgres',
-        'PASSWORD': 'post1234',
-        'HOST': 'localhost',
+        'NAME': 'app_pfc_prod',
+        'USER': 'seplagpfc_usr',
+        'PASSWORD': '$!!UsR&sep1aG!usr!!',
+        'HOST': '10.238.75.239',
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
