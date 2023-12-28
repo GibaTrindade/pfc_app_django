@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants
+from dotenv import load_dotenv
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,7 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(lxjklmoh#)zt67g@466!%z*!j=c4i3w^e+*iiv^!04^p55yt4'
+load_dotenv()
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -92,11 +94,11 @@ WSGI_APPLICATION = 'pfc_app_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',#'django.db.backends.sqlite3',
-        'NAME': 'app_pfc_prod',
-        'USER': 'seplagpfc_usr',
-        'PASSWORD': '$!!UsR&sep1aG!usr!!',
-        'HOST': '10.238.75.239',
-        'PORT': '5432',
+        'NAME': os.getenv('DJANGO_DATABASE_NAME'),
+        'USER': os.getenv('DJANGO_DATABASE_USER'),
+        'PASSWORD': os.getenv('DJANGO_DATABASE_PW'),
+        'HOST': os.getenv('DJANGO_DATABASE_HOST'),
+        'PORT': os.getenv('DJANGO_DATABASE_PORT'),
     }
 }
 
