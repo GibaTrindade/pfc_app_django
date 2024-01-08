@@ -340,6 +340,7 @@ def avaliacao(request, curso_id):
 
 def enviar_pdf(request):
     if request.method == 'POST':
+        status_validacao = StatusValidacao.objects.get(nome="PENDENTE")
         arquivo_pdf = request.FILES['arquivo_pdf']
         nome_curso = request.POST['nome_curso']
         ch_solicitada = request.POST['ch_solicitada']
@@ -362,7 +363,7 @@ def enviar_pdf(request):
                                  nome_curso=nome_curso, ch_solicitada=ch_solicitada, 
                                  data_termino_curso=data_termino, data_inicio_curso = data_inicio,
                                  instituicao_promotora=instituicao_promotora, ementa=ementa, 
-                                 agenda_pfc=agenda_pfc)
+                                 agenda_pfc=agenda_pfc, status=status_validacao)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')
