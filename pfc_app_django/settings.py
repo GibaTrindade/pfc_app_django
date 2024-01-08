@@ -28,8 +28,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+CSRF_TRUSTED_ORIGINS = ['https://*.seplag.pe.gov.br', 'https://*.127.0.0.1']
 ALLOWED_HOSTS = ['*']
+CSRF_COOKIE_SECURE = False
 
 
 # Application definition

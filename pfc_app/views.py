@@ -16,7 +16,10 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao, User, Certificado
 from .forms import AvaliacaoForm, DateFilterForm
-from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef
+from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef, Value
+from django.db.models.functions import Concat
+from django.contrib.postgres.aggregates import StringAgg
+from django.contrib.postgres.expressions import ArraySubquery
 from datetime import date, datetime
 from django.views.generic import DetailView
 import os
@@ -64,6 +67,17 @@ def logout(request):
 def cursos(request):
   lista_cursos = Curso.objects.all()
   data_atual = date.today()
+  subquery = ArraySubquery(
+    Inscricao.objects.filter(curso=OuterRef('pk'))
+        .exclude(condicao_na_acao='DOCENTE')
+        .exclude(status__nome='CANCELADA')
+        .exclude(status__nome='EM FILA')
+        .order_by('participante__nome')
+        .values('curso')
+        .annotate(nomes_concatenados=StringAgg('participante__nome', delimiter=', '))
+        .values('nomes_concatenados')
+)
+  
   cursos_com_inscricoes = Curso.objects.annotate(
         num_inscricoes=Count('inscricao', 
                              filter=~Q(inscricao__condicao_na_acao='DOCENTE') & 
@@ -72,11 +86,21 @@ def cursos(request):
                              ),
         usuario_inscrito=Exists(
            Inscricao.objects.filter(participante=request.user, curso=OuterRef('pk'))
-            
-        )
+                                ),
+        lista_inscritos = subquery
+        
     ).order_by('data_inicio').all().filter(data_inicio__gt=data_atual)
   #template = loader.get_template('base.html')
   #cursos_nao_inscrito = cursos_com_inscricoes.exclude(inscricao__participante=request.user)
+  #lista_inscritos=Inscricao.objects.filter(curso=OuterRef('pk'))
+                        # .exclude(condicao_na_acao='DOCENTE')
+                        # .exclude(status__nome='CANCELADA')
+                        # .exclude(status__nome='EM FILA')
+                        # .annotate(nome_com_virgula=Concat('participante__nome', Value(', ')))
+                        # .values('nome_com_virgula')
+                        # .order_by('participante__nome')
+                        # .distinct('participante__nome')
+                        # .values_list('participante__nome', flat=True)                  
   context = {
     'cursos': cursos_com_inscricoes,
   }

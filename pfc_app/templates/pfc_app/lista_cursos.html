@@ -32,7 +32,7 @@
       <div class="btn-toolbar justify-content-between">
           <div class="text-left mr-2">
             {% if curso.usuario_inscrito %}
-            <a href="#" class="btn btn-secondary position-relative">
+            <a href="#" class="btn btn-secondary position-relative" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
               <i class="fa-solid fa-circle-check"></i>  INSCRITO
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 {{curso.num_inscricoes}}/{{curso.vagas}}
@@ -65,7 +65,29 @@
   </div>
 </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Lista de Inscritos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for participante in curso.lista_inscritos %}
+            <p>{{participante}}</p>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endfor %}
 </div>
+
+
 
 {% endblock %}
