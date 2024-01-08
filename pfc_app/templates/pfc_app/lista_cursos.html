@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mathfilters %}
 
 {% block content %}
 {% include 'parciais/_messages.html' %}
@@ -14,7 +15,7 @@
   <div class="card-body justify-content-between d-flex flex-column">
       
         <h6 class="card-title">
-            <strong>{{ curso.nome_curso.upper }}</strong>
+            <a href="{% url 'detail_curso' curso.id %}" class="text-dark"><strong>{{ curso.nome_curso.upper }}</strong></a>
         </h6>
         <p class="card-text">
           <i class="bi bi-pencil-square"></i>
@@ -34,10 +35,14 @@
             {% if curso.usuario_inscrito %}
             <a href="#" class="btn btn-secondary position-relative" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
               <i class="fa-solid fa-circle-check"></i>  INSCRITO
+              {% with numerator=curso.num_inscricoes denominator=curso.vagas %}
+              {% if numerator|div:denominator > 0.5 %}
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 {{curso.num_inscricoes}}/{{curso.vagas}}
                 <span class="visually-hidden">unread messages</span>
               </span>
+              {% endif %}
+              {% endwith %}
             </a>
           {% else %}
           {% if curso.status.nome == "A INICIAR" %}
@@ -47,10 +52,14 @@
               {% else %}
                     <a href="/curso_detail/{{ curso.id }}" class="btn btn-success position-relative">
                       <i class="fa-solid fa-pen-to-square"></i>  INSCREVER
-                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{curso.num_inscricoes}}/{{curso.vagas}}
-                        <span class="visually-hidden">unread messages</span>
-                      </span>
+                        {% with numerator=curso.num_inscricoes denominator=curso.vagas %}
+                        {% if numerator|div:denominator > 0.5 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                          {{curso.num_inscricoes}}/{{curso.vagas}}
+                          <span class="visually-hidden">unread messages</span>
+                        </span>
+                        {% endif %}
+                        {% endwith %}
                     </a>
               {% endif %}   
             

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'pfc_app',
     'bootstrap5',
     'django_static_fontawesome',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
