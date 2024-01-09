@@ -14,7 +14,7 @@
 
   <div class="card-body justify-content-between d-flex flex-column">
       
-        <h6 class="card-title">
+        <h6 class="card-title mb-3">
             <a href="{% url 'detail_curso' curso.id %}" class="text-dark"><strong>{{ curso.nome_curso.upper }}</strong></a>
         </h6>
         <p class="card-text">
@@ -72,7 +72,9 @@
           {% endif %}      
           </div>
           <div class="text-right">
-            <a href="#" class="btn btn-outline-primary">EMENTA</a>
+            <button type="button" class="btn btn-outline-primary btn-md" data-bs-toggle="modal" data-bs-target="#ementa">
+                    EMENTA <i class="fa-solid fa-user-chef"></i>
+                </button>
           </div>
       </div>
   </div>
@@ -80,7 +82,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
@@ -91,6 +93,24 @@
           {% for participante in curso.lista_inscritos %}
             <p>{{participante}}</p>
           {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+<div class="modal fade" id="ementa" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ementaLabel">Ementa do Curso</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {{curso.ementa_curso | safe}}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>

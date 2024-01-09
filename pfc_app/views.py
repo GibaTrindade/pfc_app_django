@@ -51,7 +51,7 @@ def login(request):
         return render(request, 'pfc_app/login.html')
     else:
         auth.login(request, user)
-        messages.success(request, 'Seja bem vindo!')
+        messages.success(request, f'Oi, {user.nome.split(" ")[0].capitalize()}!')
         return redirect('lista_cursos')
 
     return render(request, 'pfc_app/login.html')
