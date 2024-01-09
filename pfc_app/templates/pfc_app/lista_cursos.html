@@ -29,6 +29,10 @@
           <i class="bi bi-calendar-check"></i>
           <small class="text-muted"><strong>Início:</strong> {{curso.data_inicio}}</small>
         </p>
+        <p class="card-text">
+          <i class="bi bi-hourglass-split"></i>
+          <small class="text-muted"><strong>Status:</strong> {{curso.status}}</small>
+        </p>
     
       <div class="btn-toolbar justify-content-between">
           <div class="text-left mr-2">
@@ -50,7 +54,7 @@
               {% if curso.num_inscricoes >= curso.vagas %}
                     <a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a>
               {% else %}
-                    <a href="/curso_detail/{{ curso.id }}" class="btn btn-success position-relative">
+                    <a href="/curso_detail/{{ curso.id }}" class="btn btn-primary position-relative">
                       <i class="fa-solid fa-pen-to-square"></i>  INSCREVER
                         {% with numerator=curso.num_inscricoes denominator=curso.vagas %}
                         {% if numerator|div:denominator > 0.5 %}
@@ -68,7 +72,7 @@
           {% endif %}      
           </div>
           <div class="text-right">
-            <a href="#" class="btn btn-outline-secondary"><i class="bi bi-hourglass-split"></i>  STATUS: {{ curso.status }}</a>
+            <a href="#" class="btn btn-outline-primary">EMENTA</a>
           </div>
       </div>
   </div>
