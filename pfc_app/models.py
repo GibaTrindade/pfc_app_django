@@ -81,6 +81,19 @@ class StatusInscricao(models.Model):
     
 
 class Curso(models.Model):
+    TURNO_CHOICES = [
+        ('MANHA', 'MANHÃ'),
+        ('TARDE', 'TARDE'),
+        ('NOITE', 'NOITE'),
+    ]
+    TURMA_CHOICES = [
+        ('TURMA1', 'TURMA 1'),
+        ('TURMA2', 'TURMA 2'),
+        ('TURMA3', 'TURMA 3'),
+        ('TURMA4', 'TURMA 4'),
+        ('TURMA5', 'TURMA 5'),
+    ]
+
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     nome_curso =  models.CharField(max_length=400, blank=False, null=False)
@@ -94,6 +107,8 @@ class Curso(models.Model):
     descricao = models.TextField(max_length=4000, default='')
     data_inicio = models.DateField(blank=False, null=False)
     data_termino = models.DateField(blank=True, null=True)
+    turno = models.CharField(max_length=10, choices=TURNO_CHOICES, default="TARDE")
+    turma = models.CharField(max_length=10, choices=TURMA_CHOICES, default="TURMA1")
     inst_certificadora = models.CharField(max_length=400, blank=False, null=False)
     inst_promotora = models.CharField(max_length=400, blank=False, null=False)
     participantes = models.ManyToManyField(User, through='Inscricao', related_name='curso_participante')
