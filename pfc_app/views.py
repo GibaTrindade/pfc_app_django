@@ -119,9 +119,17 @@ def carga_horaria(request):
      participante=request.user
      
      )
-  satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+  try:
+    satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+  except:
+    novo_status = StatusValidacao(nome="APROVADA")
+    novo_status.save()
+    satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+
   validacoes = Validacao_CH.objects.filter(usuario=request.user, status=satus_validacao)
   
+  ## Calculo para verificar se o usuario ja está inscrito em um dado curso
+
   data_hoje = datetime.now()
   
   # Verificar se a data atual é anterior a "01/03" do ano atual
@@ -148,7 +156,9 @@ def carga_horaria(request):
         else:
             inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__lte=data_hoje)
             validacoes = validacoes.filter(data_termino_curso__lte=data_hoje)
-    
+  
+  # Distinc para que so conte 1 curso por periodo
+  inscricoes_do_usuario = inscricoes_do_usuario.values('curso__nome_curso').distinct()
   # Calcula a soma da carga horária das inscrições do usuário
   carga_horaria_pfc = inscricoes_do_usuario.aggregate(Sum('ch_valida'))['ch_valida__sum'] or 0
   validacoes_ch = validacoes.aggregate(Sum('ch_confirmada'))['ch_confirmada__sum'] or 0

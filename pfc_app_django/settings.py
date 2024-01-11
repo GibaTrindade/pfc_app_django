@@ -182,4 +182,11 @@ JAZZMIN_SETTINGS = {
     "site_icon": "pfc_app/logos/IG.png",
     "site_logo": "pfc_app/logos/IG.png",
     
+    "custom_links": {
+        "pfc_app": [{
+            "name": "PFC App", 
+            "url": "lista_cursos", 
+        }]
+    },
+    
 }
