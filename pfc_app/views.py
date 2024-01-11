@@ -228,7 +228,7 @@ def cancelar_inscricao(request, inscricao_id):
        inscricao.status = status_cancelado
        inscricao.save()
        messages.success(request, 'Inscrição cancelada')
-       return render(request, 'pfc_app/inscricoes.html')
+       return redirect('inscricoes')
     else:
        messages.error(request, 'Você não está inscrito nesse curso!')
        return render(request, 'pfc_app/inscricoes.html')

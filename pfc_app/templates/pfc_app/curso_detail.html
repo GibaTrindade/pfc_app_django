@@ -5,12 +5,12 @@
 <div class="d-flex p-2 justify-content-center mb-5">
     <h1>Curso: {{curso}}</h1>
 </div>
-
-    <div class="row mb-2">
-        <div class="col-md-2 col-sm-12">
+    <div class="row">
+        
             {% for usuario_docente in usuarios_docentes %}
-                <div class="row d-flex justify-content-center align-items-center p-3 ">
-                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" border-radius="50" alt="Avatar" class="img-thumbnail border border-success">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
+                <div class="col-md-2 col-sm-12 d-flex justify-content-center align-items-center">
+                    <div class="row d-inline-flex justify-content-center align-items-center p-3 ">
+                    <img src="data:image/png;base64,{{ usuario_docente.avatar_base64 }}" border-radius="100px" alt="Avatar" class="img-thumbnail border border-success" style="height: 150px; width: auto; object-fit: cover; border-radius: 10%;">  <!-- Substitua 'nome' pelo campo desejado do usuário -->
                     
                         <div class="d-flex justify-content-center align-items-center">
                             <strong>Instrutor {{ forloop.counter }} </strong>
@@ -18,10 +18,20 @@
                     
                     
                 </div>
-            {% endfor %}
             
         </div>
-        <div class="col-md-5">
+            {% endfor %}
+            <div class="col-md-2"></div>
+            <div class="col-md-6">
+                <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Ver Ementa <i class="fa-solid fa-user-chef"></i>
+                </button>
+            </div>
+    </div>
+    <div class="row mb-2">
+        
+        <div class="col-md-6">
             <div class="row d-flex justify-content-center align-items-center">
                 <p><strong>Carga Horária:</strong> {{curso.ch_curso}} horas</p>
                 <p><strong>Vagas:</strong> {{curso.vagas}}</p>
@@ -33,26 +43,17 @@
                     <p><strong>Instrutor-{{ forloop.counter }}</strong>: {{usuario_docente.nome}}</p>
                 </div>
             {% endfor %}
-        </div>
-            <div class="col-md-5">
-                <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
-                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                    Ver Ementa <i class="fa-solid fa-user-chef"></i>
-                </button>
-            </div>
-        </div>
-            <div class="row d-flex justify-content-center align-items-center mb-2">
-                <div class="col-md-2 col-sm-12 "></div>
-                <div class="col-md-5 col-sm-12 ">
-                    {% if read_only != "0" %}
+            <div class="row d-flex justify-content-center align-items-center">
+                     {% if read_only != "0" %}
                         <a href="/inscrever/{{curso.id}}/" class="btn btn-success "></i>INSCREVER-SE</a>
                     {% endif %}
-                </div>
-                
-                <div class="col-md-5 col-sm-12 ">
-                    
-                </div>
             </div>
+        </div>
+            <div class="col-md-6">
+                
+            </div>
+        </div>
+            
             
         
     

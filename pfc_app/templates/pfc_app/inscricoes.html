@@ -45,7 +45,29 @@
                         {% else %}
                             {% if  inscricao.status.nome == "APROVADA" or inscricao.status.nome == "PENDENTE" %}
                                 {% if  inscricao.curso.status.nome == "A INICIAR" or inscricao.curso.status.nome == "INICIADO" %}
-                                    <td class="text-center"><a href="/inscricao_cancelar/{{ inscricao.id }}" class="btn btn-danger"><i class="bi bi-x-circle"></i> INSCRIÇÃO</a></td>
+                                    <td class="text-center"><button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelar{{ forloop.counter }}"><i class="bi bi-x-circle"></i> INSCRIÇÃO</button></td>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="cancelar{{ forloop.counter }}" data-bs-backdrop="true" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="cancelarLabel">Deseja cancelar a inscrição?</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p>Caso você mude de ideia terá que falar com os administradores.</p>
+                                            <p></p>
+                                            <p></p>
+                                            <p>Tem certeza?</p>
+                                            <p><a href="{% url 'cancelar_inscricao' inscricao.id %}" class="btn btn-danger">CANCELAR INSCRIÇÃO</a></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                
                                 {% else %}
                                     <td>-</td>
                                 {% endif %}
@@ -58,9 +80,11 @@
                     {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
                         <td class="text-center"><a href="{% url 'generate_all_pdfs' curso_id=inscricao.curso.id unico=1 %}" class="btn btn-primary">BAIXAR CERTIFICADO</a></td>
                     {% endif %}
+                    
                 </tr>
             {% empty %}
                 <p>Você não tem inscrições.</p>
+                  
             {% endfor %}
           
         </tbody>

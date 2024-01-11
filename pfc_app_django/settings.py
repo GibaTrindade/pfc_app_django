@@ -182,11 +182,14 @@ JAZZMIN_SETTINGS = {
     "site_icon": "pfc_app/logos/IG.png",
     "site_logo": "pfc_app/logos/IG.png",
     
-    "custom_links": {
-        "pfc_app": [{
-            "name": "PFC App", 
-            "url": "lista_cursos", 
-        }]
-    },
+    "topmenu_links": [
+
+        # Url that gets reversed (Permissions can be added)
+        {"name": "Área do Usuário",  "url": "lista_cursos"},
+
+        # App with dropdown menu to all its models pages (Permissions checked against models)
+        {"app": "pfc_app"},
+    ],
+    
     
 }
