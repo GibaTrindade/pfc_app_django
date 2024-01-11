@@ -56,7 +56,7 @@
                         {% endif %}
                    
                     {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
-                        <td class="text-center"><a href="/generate_single_pdf/{{ inscricao.id }}" class="btn btn-primary">BAIXAR CERTIFICADO</a></td>
+                        <td class="text-center"><a href="{% url 'generate_all_pdfs' curso_id=inscricao.curso.id unico=1 %}" class="btn btn-primary">BAIXAR CERTIFICADO</a></td>
                     {% endif %}
                 </tr>
             {% empty %}

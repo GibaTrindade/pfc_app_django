@@ -386,7 +386,7 @@ def download_all_pdfs(request):
     return render(request, 'pfc_app/download_all_pdfs.html')
 
 
-def generate_all_pdfs(request, curso_id):
+def generate_all_pdfs(request, curso_id, unico=0):
     try:
       curso = Curso.objects.get(pk=curso_id)
     except:
@@ -396,14 +396,18 @@ def generate_all_pdfs(request, curso_id):
 
     certificado = Certificado.objects.get(codigo='conclusao')
     #texto_certificado = certificado.texto
-    users = curso.participantes.all()
+    if unico:
+        users=[]
+        users.append(request.user)
+    else:
+        users = curso.participantes.all()
 
-    output_folder = "pdf_output"  # Pasta onde os PDFs temporários serão salvos
+    #output_folder = "pdf_output"  # Pasta onde os PDFs temporários serão salvos
     zip_filename = "all_pdfs.zip"
 
     # Crie a pasta de saída se ela não existir
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+    #if not os.path.exists(output_folder):
+    #    os.makedirs(output_folder)
 
     # Crie o arquivo ZIP
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -415,101 +419,102 @@ def generate_all_pdfs(request, curso_id):
             except:
                 continue
             
-            texto_certificado = certificado.texto
-            data_inicio = str(curso.data_inicio)
-            data_termino = str(curso.data_termino)
-            # Converte a string para um objeto datetime
-            data_inicio_formatada = datetime.strptime(data_inicio, "%Y-%m-%d")
-            data_termino_formatada = datetime.strptime(data_termino, "%Y-%m-%d")
-            # Formata a data no formato "DD/MM/YYYY"
-            data_inicio_formatada_str = data_inicio_formatada.strftime("%d/%m/%Y")
-            data_termino_formatada_str = data_termino_formatada.strftime("%d/%m/%Y")
+            pdf_filename = generate_single_pdf(request, inscricao.id)
+    #         texto_certificado = certificado.texto
+    #         data_inicio = str(curso.data_inicio)
+    #         data_termino = str(curso.data_termino)
+    #         # Converte a string para um objeto datetime
+    #         data_inicio_formatada = datetime.strptime(data_inicio, "%Y-%m-%d")
+    #         data_termino_formatada = datetime.strptime(data_termino, "%Y-%m-%d")
+    #         # Formata a data no formato "DD/MM/YYYY"
+    #         data_inicio_formatada_str = data_inicio_formatada.strftime("%d/%m/%Y")
+    #         data_termino_formatada_str = data_termino_formatada.strftime("%d/%m/%Y")
 
-            try:
+    #         try:
                 
-                cpf = CPF()
-                # Validar CPF
-                if not cpf.validate(user.cpf):
-                    messages.error(request, f'CPF de {user.nome} está errado! ({user.cpf})')
-                    return redirect('lista_cursos')
+    #             cpf = CPF()
+    #             # Validar CPF
+    #             if not cpf.validate(user.cpf):
+    #                 messages.error(request, f'CPF de {user.nome} está errado! ({user.cpf})')
+    #                 return redirect('lista_cursos')
                 
-                # Formata o CPF no formato "000.000.000-00"
-                cpf_formatado = f"{user.cpf[:3]}.{user.cpf[3:6]}.{user.cpf[6:9]}-{user.cpf[9:]}"
-            except:
-                messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
-                return redirect('lista_cursos')
+    #             # Formata o CPF no formato "000.000.000-00"
+    #             cpf_formatado = f"{user.cpf[:3]}.{user.cpf[3:6]}.{user.cpf[6:9]}-{user.cpf[9:]}"
+    #         except:
+    #             messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
+    #             return redirect('lista_cursos')
 
-            tag_mapping = {
-                "[nome_completo]": user.nome,
-                "[cpf]": cpf_formatado,
-                "[nome_curso]": curso.nome_curso,
-                "[data_inicio]": data_inicio_formatada_str,
-                "[data_termino]": data_termino_formatada_str,
-                "[curso_carga_horaria]": curso.ch_curso,
-            }
+    #         tag_mapping = {
+    #             "[nome_completo]": user.nome,
+    #             "[cpf]": cpf_formatado,
+    #             "[nome_curso]": curso.nome_curso,
+    #             "[data_inicio]": data_inicio_formatada_str,
+    #             "[data_termino]": data_termino_formatada_str,
+    #             "[curso_carga_horaria]": curso.ch_curso,
+    #         }
     
-    # Substitua as tags pelo valor correspondente no texto
-            for tag, value in tag_mapping.items():
-                texto_certificado = texto_certificado.replace(tag, str(value))
+    # # Substitua as tags pelo valor correspondente no texto
+    #         for tag, value in tag_mapping.items():
+    #             texto_certificado = texto_certificado.replace(tag, str(value))
 
-            texto_customizado = texto_certificado
-            pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
-            # Crie o PDF usando ReportLab
+    #         texto_customizado = texto_certificado
+    #         pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
+    #         # Crie o PDF usando ReportLab
 
-            style_body = ParagraphStyle('body',
-                                        fontName = 'Helvetica',
-                                        fontSize=13,
-                                        leading=17,
-                                        alignment=TA_JUSTIFY)
-            style_title = ParagraphStyle('title',
-                                        fontName = 'Helvetica',
-                                        fontSize=36)
-            style_subtitle = ParagraphStyle('subtitle',
-                                        fontName = 'Helvetica',
-                                        fontSize=24)
+    #         style_body = ParagraphStyle('body',
+    #                                     fontName = 'Helvetica',
+    #                                     fontSize=13,
+    #                                     leading=17,
+    #                                     alignment=TA_JUSTIFY)
+    #         style_title = ParagraphStyle('title',
+    #                                     fontName = 'Helvetica',
+    #                                     fontSize=36)
+    #         style_subtitle = ParagraphStyle('subtitle',
+    #                                     fontName = 'Helvetica',
+    #                                     fontSize=24)
             
-            width, height = landscape(A4)
-            c = canvas.Canvas(pdf_filename, pagesize=landscape(A4))
-            p_title=Paragraph(certificado.cabecalho, style_title)
-            p_subtitle=Paragraph(certificado.subcabecalho1, style_subtitle)
-            p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
-            p1=Paragraph(texto_customizado, style_body)
-             # Caminho relativo para a imagem dentro do diretório 'static'
-            imagem_relative_path = 'Certificado-FUNDO.png'
-            assinatura_relative_path = 'assinatura.jpg'
-            igpe_relative_path = 'Igpe.jpg'
-            egape_relative_path = 'Egape.jpg'
-            pfc_relative_path = 'PFC1.png'
-            seplag_relative_path = 'seplag-transp-horizontal.png'
+    #         width, height = landscape(A4)
+    #         c = canvas.Canvas(pdf_filename, pagesize=landscape(A4))
+    #         p_title=Paragraph(certificado.cabecalho, style_title)
+    #         p_subtitle=Paragraph(certificado.subcabecalho1, style_subtitle)
+    #         p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
+    #         p1=Paragraph(texto_customizado, style_body)
+    #          # Caminho relativo para a imagem dentro do diretório 'static'
+    #         imagem_relative_path = 'Certificado-FUNDO.png'
+    #         assinatura_relative_path = 'assinatura.jpg'
+    #         igpe_relative_path = 'Igpe.jpg'
+    #         egape_relative_path = 'Egape.jpg'
+    #         pfc_relative_path = 'PFC1.png'
+    #         seplag_relative_path = 'seplag-transp-horizontal.png'
 
 
-            # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
-            imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
-            assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
-            igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
-            egape_path = os.path.join(settings.MEDIA_ROOT, egape_relative_path)
-            pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
-            seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
+    #         # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
+    #         imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
+    #         assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
+    #         igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+    #         egape_path = os.path.join(settings.MEDIA_ROOT, egape_relative_path)
+    #         pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+    #         seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
 
 
 
 
-            # Desenhe a imagem como fundo
-            c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
-            c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
-            c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-            c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-            c.drawImage(pfc_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-            c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-            p_title.wrapOn(c, 500, 100)
-            p_title.drawOn(c, width-800, height-100)
-            p_subtitle.wrapOn(c, 500, 100)
-            p_subtitle.drawOn(c, width-800, height-165)
-            p_subtitle2.wrapOn(c, 500, 100)
-            p_subtitle2.drawOn(c, width-800, height-190)
-            p1.wrapOn(c, 500, 100)
-            p1.drawOn(c, width-800, height-300)
-            c.save()
+    #         # Desenhe a imagem como fundo
+    #         c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
+    #         c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    #         c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    #         c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    #         c.drawImage(pfc_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    #         c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    #         p_title.wrapOn(c, 500, 100)
+    #         p_title.drawOn(c, width-800, height-100)
+    #         p_subtitle.wrapOn(c, 500, 100)
+    #         p_subtitle.drawOn(c, width-800, height-165)
+    #         p_subtitle2.wrapOn(c, 500, 100)
+    #         p_subtitle2.drawOn(c, width-800, height-190)
+    #         p1.wrapOn(c, 500, 100)
+    #         p1.drawOn(c, width-800, height-300)
+    #         c.save()
            
             
             zipf.write(pdf_filename, os.path.basename(pdf_filename))
@@ -541,115 +546,127 @@ def generate_single_pdf(request, inscricao_id):
     curso = inscricao.curso
 
     output_folder = "pdf_output"  # Pasta onde os PDFs temporários serão salvos
-    zip_filename = "all_pdfs.zip"
+    #zip_filename = "all_pdfs.zip"
 
     # Crie a pasta de saída se ela não existir
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     # Crie o arquivo ZIP
-    with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    #with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
         #for user in users:
-        texto_certificado = certificado.texto
-        data_inicio = str(curso.data_inicio)
-        data_termino = str(curso.data_termino)
-        # Converte a string para um objeto datetime
-        data_inicio_formatada = datetime.strptime(data_inicio, "%Y-%m-%d")
-        data_termino_formatada = datetime.strptime(data_termino, "%Y-%m-%d")
-        # Formata a data no formato "DD/MM/YYYY"
-        data_inicio_formatada_str = data_inicio_formatada.strftime("%d/%m/%Y")
-        data_termino_formatada_str = data_termino_formatada.strftime("%d/%m/%Y")
+    texto_certificado = certificado.texto
+    data_inicio = str(curso.data_inicio)
+    data_termino = str(curso.data_termino)
+    # Converte a string para um objeto datetime
+    data_inicio_formatada = datetime.strptime(data_inicio, "%Y-%m-%d")
+    data_termino_formatada = datetime.strptime(data_termino, "%Y-%m-%d")
+    # Formata a data no formato "DD/MM/YYYY"
+    data_inicio_formatada_str = data_inicio_formatada.strftime("%d/%m/%Y")
+    data_termino_formatada_str = data_termino_formatada.strftime("%d/%m/%Y")
 
-        try:
-            
-            cpf = CPF()
-            # Validar CPF
-            if not cpf.validate(user.cpf):
-                messages.error(request, f'CPF de {user.nome} está errado! ({user.cpf})')
-                return redirect('lista_cursos')
-            
-            # Formata o CPF no formato "000.000.000-00"
-            cpf_formatado = f"{user.cpf[:3]}.{user.cpf[3:6]}.{user.cpf[6:9]}-{user.cpf[9:]}"
-        except:
-            messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
+    try:
+        
+        cpf = CPF()
+        # Validar CPF
+        if not cpf.validate(user.cpf):
+            messages.error(request, f'CPF de {user.nome} está errado! ({user.cpf})')
             return redirect('lista_cursos')
+        
+        # Formata o CPF no formato "000.000.000-00"
+        cpf_formatado = f"{user.cpf[:3]}.{user.cpf[3:6]}.{user.cpf[6:9]}-{user.cpf[9:]}"
+    except:
+        messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
+        return redirect('lista_cursos')
 
-        tag_mapping = {
-            "[nome_completo]": user.nome,
-            "[cpf]": cpf_formatado,
-            "[nome_curso]": curso.nome_curso,
-            "[data_inicio]": data_inicio_formatada_str,
-            "[data_termino]": data_termino_formatada_str,
-            "[curso_carga_horaria]": curso.ch_curso,
-        }
+    tag_mapping = {
+        "[nome_completo]": user.nome,
+        "[cpf]": cpf_formatado,
+        "[nome_curso]": curso.nome_curso,
+        "[data_inicio]": data_inicio_formatada_str,
+        "[data_termino]": data_termino_formatada_str,
+        "[curso_carga_horaria]": curso.ch_curso,
+    }
 
 # Substitua as tags pelo valor correspondente no texto
-        for tag, value in tag_mapping.items():
-            texto_certificado = texto_certificado.replace(tag, str(value))
+    for tag, value in tag_mapping.items():
+        texto_certificado = texto_certificado.replace(tag, str(value))
 
-        texto_customizado = texto_certificado
-        pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
+    texto_customizado = texto_certificado
+    pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
+    # Crie o PDF usando ReportLab
+
+    pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
         # Crie o PDF usando ReportLab
 
-        pdf_filename = os.path.join(output_folder, f"{user.username}-{curso.nome_curso}.pdf")
-            # Crie o PDF usando ReportLab
+    style_body = ParagraphStyle('body',
+                                fontName = 'Helvetica',
+                                fontSize=13,
+                                leading=17,
+                                alignment=TA_JUSTIFY)
+    style_title = ParagraphStyle('title',
+                                fontName = 'Helvetica',
+                                fontSize=36)
+    style_subtitle = ParagraphStyle('subtitle',
+                                fontName = 'Helvetica',
+                                fontSize=24)
+    
+    width, height = landscape(A4)
+    c = canvas.Canvas(pdf_filename, pagesize=landscape(A4))
+    p_title=Paragraph(certificado.cabecalho, style_title)
+    p_subtitle=Paragraph(certificado.subcabecalho1, style_subtitle)
+    p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
+    p1=Paragraph(texto_customizado, style_body)
+        # Caminho relativo para a imagem dentro do diretório 'static'
+    imagem_relative_path = 'Certificado-FUNDO.png'
+    assinatura_relative_path = 'assinatura.jpg'
+    igpe_relative_path = 'Igpe.jpg'
+    egape_relative_path = 'Egape.jpg'
+    pfc_relative_path = 'PFC1.png'
+    seplag_relative_path = 'seplag-transp-horizontal.png'
 
-        style_body = ParagraphStyle('body',
-                                    fontName = 'Helvetica',
-                                    fontSize=13,
-                                    leading=17,
-                                    alignment=TA_JUSTIFY)
-        style_title = ParagraphStyle('title',
-                                    fontName = 'Helvetica',
-                                    fontSize=36)
-        style_subtitle = ParagraphStyle('subtitle',
-                                    fontName = 'Helvetica',
-                                    fontSize=24)
+    # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
+    imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
+    assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
+    igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+    egape_path = os.path.join(settings.MEDIA_ROOT, egape_relative_path)
+    pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+    seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
+
+
+
+
+    # Desenhe a imagem como fundo
+    c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
+    c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    c.drawImage(pfc_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    c.drawImage(egape_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    p_title.wrapOn(c, 500, 100)
+    p_title.drawOn(c, width-800, height-100)
+    p_subtitle.wrapOn(c, 500, 100)
+    p_subtitle.drawOn(c, width-800, height-165)
+    p_subtitle2.wrapOn(c, 500, 100)
+    p_subtitle2.drawOn(c, width-800, height-190)
+    p1.wrapOn(c, 500, 100)
+    p1.drawOn(c, width-800, height-300)
+    c.save()
         
-        width, height = landscape(A4)
-        c = canvas.Canvas(pdf_filename, pagesize=landscape(A4))
-        p_title=Paragraph(certificado.cabecalho, style_title)
-        p_subtitle=Paragraph(certificado.subcabecalho1, style_subtitle)
-        p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
-        p1=Paragraph(texto_customizado, style_body)
-            # Caminho relativo para a imagem dentro do diretório 'static'
-        imagem_relative_path = 'Certificado-FUNDO.png'
-        assinatura_relative_path = 'assinatura.jpg'
-
-        # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
-        imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
-        assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
-
-
-
-
-        # Desenhe a imagem como fundo
-        c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
-        c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
-        p_title.wrapOn(c, 500, 100)
-        p_title.drawOn(c, width-800, height-100)
-        p_subtitle.wrapOn(c, 500, 100)
-        p_subtitle.drawOn(c, width-800, height-165)
-        p_subtitle2.wrapOn(c, 500, 100)
-        p_subtitle2.drawOn(c, width-800, height-190)
-        p1.wrapOn(c, 500, 100)
-        p1.drawOn(c, width-800, height-300)
-        c.save()
-        
-        zipf.write(pdf_filename, os.path.basename(pdf_filename))
-        os.remove(pdf_filename)
+        #zipf.write(pdf_filename, os.path.basename(pdf_filename))
+        #os.remove(pdf_filename)
 
     # Configure a resposta HTTP para o arquivo ZIP
-    response = HttpResponse(content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+    #response = HttpResponse(content_type='application/zip')
+    #response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
 
     # Abra o arquivo ZIP e envie seu conteúdo como resposta
-    with open(zip_filename, 'rb') as zip_file:
-        response.write(zip_file.read())
+    #with open(zip_filename, 'rb') as zip_file:
+    #    response.write(zip_file.read())
 
-    os.remove(zip_filename)
+    #os.remove(zip_filename)
 
-    return response
+    return pdf_filename
 
 
 

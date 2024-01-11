@@ -20,6 +20,7 @@ urlpatterns = [
     path('enviar_pdf/', views.enviar_pdf, name='enviar_pdf'),
     path('download_all_pdfs/', views.download_all_pdfs, name='download_all_pdfs'),
     path('generate_all_pdfs/<int:curso_id>/', views.generate_all_pdfs, name='generate_all_pdfs'),
+    path('generate_all_pdfs/<int:curso_id>/<int:unico>/', views.generate_all_pdfs, name='generate_all_pdfs'),
     path('generate_single_pdf/<int:inscricao_id>/', views.generate_single_pdf, name='generate_single_pdf'),
     path('reset-password/', views.reset_password_request, name='reset_password_request'),
     path('change-password/', views.change_password, name='change_password'),
