@@ -140,6 +140,7 @@ class Inscricao(models.Model):
     condicao_na_acao = models.CharField(max_length=400, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
     status = models.ForeignKey(StatusInscricao, on_delete=models.PROTECT)
     concluido = models.BooleanField(default=False)
+    inscrito_em = models.DateTimeField(auto_now_add=True)#auto_now_add=True,
 
     class Meta:
         verbose_name_plural = "inscrições"
@@ -209,7 +210,7 @@ class Validacao_CH(models.Model):
     agenda_pfc = models.BooleanField(default=False, blank=False, null=False)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING)#, default=status_validacao.id)
     condicao_na_acao = models.CharField(max_length=20, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
-    #analisado_em = models.DateTimeField(auto_now_add=True)
+    analisado_em = models.DateField(blank=False, null=False)
 
     def __str__(self):
         return self.usuario.username
@@ -223,7 +224,10 @@ class RequerimentoCH(models.Model):
     do_requerimento = models.TextField(max_length=2000, default='')
     da_fundamentacao = models.TextField(max_length=1000, default='')
     da_conclusao = models.TextField(max_length=1000, default='')
-    rodape = models.TextField(max_length=400, default='')
+    local_data = models.CharField(max_length=50, default='')
+    rodape = models.CharField(max_length=400, default='')
+    rodape2 = models.CharField(max_length=400, default='')
+    
 
     def __str__(self):
         return self.codigo
@@ -237,6 +241,7 @@ class Certificado(models.Model):
     subcabecalho1 = models.CharField(max_length=100, default='')
     subcabecalho2 = models.CharField(max_length=100, default='')
     texto = models.TextField(max_length=4000, default='')
+
 
     def __str__(self):
         return self.codigo

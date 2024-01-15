@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
+from django.utils import dateformat
 from django.urls import reverse
 import random
 import string
@@ -620,10 +621,10 @@ def generate_single_pdf(request, inscricao_id):
         # Caminho relativo para a imagem dentro do diretório 'static'
     imagem_relative_path = 'Certificado-FUNDO.png'
     assinatura_relative_path = 'assinatura.jpg'
-    igpe_relative_path = 'Igpe.jpg'
-    egape_relative_path = 'Egape.jpg'
+    igpe_relative_path = 'igpe.png'
+    egape_relative_path = 'Egape.png'
     pfc_relative_path = 'PFC1.png'
-    seplag_relative_path = 'seplag-transp-horizontal.png'
+    seplag_relative_path = 'seplagtransparente.png'
 
     # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
     imagem_path = os.path.join(settings.MEDIA_ROOT, imagem_relative_path)
@@ -638,11 +639,12 @@ def generate_single_pdf(request, inscricao_id):
 
     # Desenhe a imagem como fundo
     c.drawImage(imagem_path, 230, 0, width=width, height=height, preserveAspectRatio=True, mask='auto')
-    c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
-    c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-    c.drawImage(pfc_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-    c.drawImage(egape_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-    c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+    c.drawImage(assinatura_path, 130, 100, width=196, height=50, preserveAspectRatio=True, mask='auto')
+    c.drawImage(igpe_path, 50, 20, width=63, height=50, preserveAspectRatio=True, mask='auto')
+    c.drawImage(seplag_path, 63+50+30, 20, width=196, height=50, preserveAspectRatio=True, mask='auto')
+    c.drawImage(pfc_path, 63+30+50+196, 20, width=196, height=50, preserveAspectRatio=True, mask='auto')
+    c.drawImage(egape_path, 63+50+30+196+196, 20, width=196, height=50, preserveAspectRatio=True, mask='auto')
+    
     p_title.wrapOn(c, 500, 100)
     p_title.drawOn(c, width-800, height-100)
     p_subtitle.wrapOn(c, 500, 100)
@@ -679,6 +681,13 @@ def generate_all_reconhecimento(request, validacao_id):
     
     try:
         requerimento = validacao.requerimento_ch.do_requerimento
+        fundamentacao = validacao.requerimento_ch.da_fundamentacao
+        conclusao = validacao.requerimento_ch.da_conclusao
+        local_data = validacao.requerimento_ch.local_data
+        rodape = validacao.requerimento_ch.rodape
+        rodape2 = validacao.requerimento_ch.rodape2
+        
+        #responsavel = validacao.responsavel_analise
     except:
         messages.error(request, f'Erro ao gerar reconhecimento')
         # Redireciona para a página de lista do modelo Validacao no app pfc_app
@@ -712,43 +721,67 @@ def generate_all_reconhecimento(request, validacao_id):
 
         tag_mapping = {
             "[cpf]": cpf_formatado,
-            "[data_envio]": validacao.enviado_em,
+            "[data_envio]": validacao.enviado_em.strftime("%d/%m/%Y"),
             "[lotacao]": user.lotacao,
             "[nome_curso]": validacao.nome_curso,
             "[instituicao_promotora]": validacao.instituicao_promotora,
-            "[data_inicio]": validacao.data_inicio_curso,
-            "[data_termino]": validacao.data_termino_curso,
+            "[data_inicio]": validacao.data_inicio_curso.strftime("%d/%m/%Y"),
+            "[data_termino]": validacao.data_termino_curso.strftime("%d/%m/%Y"),
             "[ch_valida]": validacao.ch_confirmada,
+            "[data_analise]": dateformat.format(datetime.now(), 'd \d\e F \d\e Y'),
+            "[responsavel_analise]": validacao.responsavel_analise
         }
 
 # Substitua as tags pelo valor correspondente no texto
         for tag, value in tag_mapping.items():
             requerimento = requerimento.replace(tag, str(value))
+            local_data = local_data.replace(tag, str(value))
+            rodape = rodape.replace(tag, str(value))
 
-        texto_customizado = requerimento
+
+        requerimento_custom = requerimento
+        fundamentacao_custom = fundamentacao
+        conclusao_custom = conclusao
+        rodape_custom = rodape
+        local_data_custom = local_data
+        rodape2_custom = rodape2
         pdf_filename = os.path.join(output_folder, f"{user.username}-requerimento.pdf")
         # Crie o PDF usando ReportLab
 
         style_body = ParagraphStyle('body',
                                     fontName = 'Helvetica',
-                                    fontSize=13,
+                                    fontSize=12,
                                     leading=17,
                                     alignment=TA_JUSTIFY)
+        style_rodape = ParagraphStyle('rodape',
+                                    fontName = 'Helvetica',
+                                    fontSize=12,
+                                    leading=17,
+                                    alignment=TA_CENTER)
         style_title = ParagraphStyle('title',
                                     fontName = 'Helvetica',
-                                    fontSize=36)
+                                    fontSize=16,
+                                    alignment=TA_CENTER)
         style_subtitle = ParagraphStyle('subtitle',
                                     fontName = 'Helvetica',
-                                    fontSize=24)
+                                    fontSize=14)
         
         width, height = A4
         print(width)
         print(height)
         c = canvas.Canvas(pdf_filename, pagesize=A4)
-        p_title=Paragraph("Analise de Requerimento", style_title)
-        p_subtitle=Paragraph("Do Requerimento", style_subtitle)
+        p_title=Paragraph("ANÁLISE PARA RECONHECIMENTO DE CARGA HORÁRIA", style_title)
+        p_subtitle=Paragraph("I - DO REQUERIMENTO", style_subtitle)
+        p_subtitle_f=Paragraph("II - DA FUNDAMENTAÇÃO", style_subtitle)
+        p_subtitle_c=Paragraph("III - DA CONCLUSÃO", style_subtitle)
         #p_subtitle2=Paragraph(certificado.subcabecalho2, style_subtitle)
-        p1=Paragraph(texto_customizado, style_body)
+        p1=Paragraph(requerimento_custom, style_body)
+        p2=Paragraph(fundamentacao_custom, style_body)
+        p3=Paragraph(conclusao_custom, style_body)
+        p4=Paragraph(local_data_custom, style_rodape)
+        p5=Paragraph(rodape_custom, style_rodape)
+        p6=Paragraph(rodape2_custom, style_rodape)
+        
             # Caminho relativo para a imagem dentro do diretório 'static'
         
         assinatura_relative_path = 'assinatura.jpg'
@@ -771,19 +804,68 @@ def generate_all_reconhecimento(request, validacao_id):
 
         # Desenhe a imagem como fundo
         
-        c.drawImage(assinatura_path, 130, 100, width=196, height=63, preserveAspectRatio=True, mask='auto')
-        c.drawImage(igpe_path, width-850, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-        c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-        c.drawImage(pfc_path, width-450, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
-        c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(assinatura_path, 200, 80, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(igpe_path, 32 + 20, height-35, width=32, height=32, preserveAspectRatio=True, mask='auto')
+        #c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        c.drawImage(pfc_path, width-100, height-35, width=98, height=32, preserveAspectRatio=True, mask='auto')
+        #c.drawImage(seplag_path, width-250, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        off_set = height
+        espaco_entre_paragrafos = 35
+
+        # REQUERIMENTO
+        off_set = off_set - 120
+        p_subtitle.wrapOn(c, 300, 100)
+        p_subtitle.drawOn(c, width-550, off_set)
+         
+        p1.wrapOn(c, 500, 400)
+        off_set = off_set - 30 - p1.height
+        p1.drawOn(c, width-550, off_set)
+        
+        # FUNDAMENTAÇÃO
+        p_subtitle_f.wrapOn(c, 300, 100)
+        off_set = off_set - p_subtitle_f.height - espaco_entre_paragrafos
+        p_subtitle_f.drawOn(c, width-550, off_set)
+        p2.wrapOn(c, 500, 100)
+        off_set = off_set - 30 - p2.height
+        p2.drawOn(c, width-550, off_set)
+        
+        # CONCLUSÃO
+        p_subtitle_c.wrapOn(c, 300, 100)
+        off_set = off_set - p_subtitle_c.height - espaco_entre_paragrafos
+        p_subtitle_c.drawOn(c, width-550, off_set)
+        p3.wrapOn(c, 500, 100)
+        off_set = off_set - 30 - p3.height
+        p3.drawOn(c, width-550, off_set)
+        
+        # DATA
+        p4.wrapOn(c, 500, 100)
+        meio = (width/2)-(p4.width/2)
+        off_set = off_set - p4.height - espaco_entre_paragrafos
+        p4.drawOn(c, meio, off_set)
+        
+        # RODAPÉ
+        p5.wrapOn(c, 500, 100)
+        meio = (width/2)-(p5.width/2)
+        off_set = off_set - p4.height - espaco_entre_paragrafos
+        p5.drawOn(c, meio, off_set)
+
+        # RODAPÉ 2
+        p6.wrapOn(c, 500, 100)
+        meio = (width/2)-(p5.width/2)
+        off_set = off_set - p4.height - 20
+        p6.drawOn(c, meio, off_set)
+
         p_title.wrapOn(c, 500, 100)
-        p_title.drawOn(c, width-500, height-100)
-        p_subtitle.wrapOn(c, 500, 100)
-        p_subtitle.drawOn(c, width-800, height-165)
+        meio = (width/2)-(p_title.width/2)
+        p_title.drawOn(c, meio, height-50)
+        
+        
+        print(p_subtitle.height)
+        
+        
         #p_subtitle2.wrapOn(c, 500, 100)
         #p_subtitle2.drawOn(c, width-800, height-190)
-        p1.wrapOn(c, 500, 100)
-        p1.drawOn(c, width-550, height-300)
+        
         c.save()
         
         

@@ -68,7 +68,7 @@ class CustomUserAdmin(UserAdmin):
     )
 
 class InscricaoAdmin(admin.ModelAdmin):
-    list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status', 'concluido', 'gerar_certificado', )
+    list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status', 'concluido', )
     list_filter = ('status', 'curso__nome_curso', 'condicao_na_acao',)
     list_editable = ('condicao_na_acao', 'status', 'concluido',)
     def participante_username(self, obj):
@@ -82,15 +82,19 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     form = AvaliacaoForm
 
 class Validacao_CHAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'arquivo_pdf', 'enviado_em', 'ch_solicitada', 
+    list_display = ('usuario', 'get_caminho_arquivo', 'enviado_em', 'ch_solicitada', 
                     'ch_confirmada', 'data_termino_curso', 'status',
-                    'gerar_reconhecimento_ch',)
+                    'gerar_reconhecimento_ch', 'analisado_em',)
     list_editable = ('ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)
     list_filter = ('usuario', 'status',)
 
     def gerar_reconhecimento_ch(self, obj):
         return format_html('<a href="{}">Gerar Reconhecimento</a>', reverse('generate_reconhecimento', args=[obj.id]))
+    
+    def get_caminho_arquivo(self, obj):
+        return obj.arquivo_pdf.url[-30:] if obj.arquivo_pdf else ""
 
+    get_caminho_arquivo.short_description = 'Caminho do Arquivo'
 
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
