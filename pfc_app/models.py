@@ -80,6 +80,22 @@ class StatusInscricao(models.Model):
         verbose_name_plural = "status inscrições"
     
 
+class Competencia(models.Model):
+    nome = models.CharField(max_length=400, blank=False, null=False)
+
+    def __str__(self):
+        return self.nome
+    
+
+class Trilha(models.Model):
+    nome = models.CharField(max_length=400, blank=False, null=False)
+    ativa = models.BooleanField(default=True, verbose_name = ("Está ativa"))
+    competencias = models.ManyToManyField(Competencia)
+
+    def __str__(self):
+        return self.nome
+    
+
 class Curso(models.Model):
     TURNO_CHOICES = [
         ('MANHA', 'MANHÃ'),
@@ -103,7 +119,6 @@ class Curso(models.Model):
     ch_curso = models.IntegerField(blank=False, null=False)
     vagas = models.IntegerField(blank=False, null=False)
     categoria = models.CharField(max_length=400, default='')
-    competencia = models.CharField(max_length=400, default='')
     descricao = models.TextField(max_length=4000, default='')
     data_inicio = models.DateField(blank=False, null=False)
     data_termino = models.DateField(blank=True, null=True)
@@ -118,8 +133,10 @@ class Curso(models.Model):
     coordenador = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     #history = HistoricalRecords()
     status = models.ForeignKey(StatusCurso, on_delete=models.PROTECT)
+    trilha = models.ForeignKey(Trilha, on_delete=models.PROTECT, blank=True, null=True)
     periodo_avaliativo = models.BooleanField(default=False)
     eh_evento = models.BooleanField(default=False, verbose_name = ("É evento"))
+    observacao = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Observação"))
 
     def publish(self):
         self.published_date = timezone.now()

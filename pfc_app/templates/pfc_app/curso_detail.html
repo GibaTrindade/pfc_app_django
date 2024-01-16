@@ -23,7 +23,12 @@
             {% endfor %}
             <div class="col-md-2"></div>
             <div class="col-md-6">
+                <p><strong>Turno:</strong> {{curso.turno}}</p>
+                <p><strong>Trilha:</strong> {{curso.trilha}}</p>
                 <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
+                {% if curso.observacao %}
+                    <p><strong>Observação:</strong> {{curso.observacao}}</p>
+                {% endif %}
                 <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                     Ver Ementa <i class="fa-solid fa-user-chef"></i>
                 </button>

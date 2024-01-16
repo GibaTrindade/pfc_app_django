@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.contrib.auth.admin import UserAdmin
 from .models import Curso, User, Inscricao, StatusCurso, StatusInscricao, \
                     StatusValidacao, Avaliacao, Validacao_CH,Certificado, \
-                    RequerimentoCH
+                    RequerimentoCH, Competencia, Trilha
 from .forms import AvaliacaoForm 
 from django.utils.html import format_html
 from django.urls import reverse
@@ -22,8 +22,9 @@ class CursoAdmin(admin.ModelAdmin):
 
     list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status', 'periodo_avaliativo','gerar_certificados',)
     fields = ['nome_curso', 'ementa_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
-               'categoria', 'competencia', 'descricao', ('data_inicio', 'data_termino'), 'turno', 'turma',
-               'inst_certificadora', 'inst_promotora', 'coordenador', 'status', 'periodo_avaliativo', 'eh_evento',]
+               'categoria', 'trilha', 'descricao', ('data_inicio', 'data_termino'), 'turno', 'turma',
+               'inst_certificadora', 'inst_promotora', 'coordenador', 'status', 'periodo_avaliativo', 'eh_evento',
+               'observacao', ]
     list_filter = ('nome_curso', 'data_inicio', 'data_termino', 'periodo_avaliativo',)
     list_editable = ('status', 'periodo_avaliativo',)
 
@@ -107,6 +108,8 @@ admin.site.register(Avaliacao)
 admin.site.register(Validacao_CH, Validacao_CHAdmin)
 admin.site.register(Certificado)
 admin.site.register(RequerimentoCH)
+admin.site.register(Competencia)
+admin.site.register(Trilha)
 
 
 admin.site.site_header = 'PFC'

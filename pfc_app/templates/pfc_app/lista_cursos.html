@@ -3,11 +3,11 @@
 
 {% block content %}
 {% include 'parciais/_messages.html' %}
-<div class="d-flex p-2 justify-content-center mb-5"><h1>ESCOLHA UM CURSO</h1></div>
+<div class="d-flex p-2 justify-content-center mb-5"><h1>Inscrições Abertas</h1></div>
 <div class="row">
 {% for curso in cursos %}
 <div class="col-sm-4">
-<div class="card border-secondary mb-3 mt-3 shadow position-relative" style="height: 300px;">
+<div class="card border-secondary mb-3 mt-3 shadow position-relative" style="height: 320px;">
   {% if curso.num_inscricoes >= curso.vagas %}
     <span class="position-absolute top-0 end-0 badge bg-danger p-2">Lotado</span>
   {% endif %}
@@ -38,7 +38,8 @@
           <div class="text-left mr-2">
             {% if curso.usuario_inscrito %}
             <a href="#" class="btn btn-secondary position-relative" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-              <i class="fa-solid fa-circle-check"></i>  INSCRITO
+              <i class="fa-solid fa-circle-check"
+              style="color: lightgreen;"></i>  INSCRITO
               {% with numerator=curso.num_inscricoes denominator=curso.vagas %}
               {% if numerator|div:denominator > 0.5 %}
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
