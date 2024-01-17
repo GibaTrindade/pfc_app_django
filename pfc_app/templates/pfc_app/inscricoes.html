@@ -35,9 +35,15 @@
                         {% if  inscricao.curso.periodo_avaliativo %}
                             {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
                                 {% if  inscricao.curso_avaliado %}
-                                    <td class="text-center"><a href="#" class="btn btn-secondary">CURSO AVALIADO</a></td>
+                                    <td class="text-center"><a href="#" 
+                                                            class="btn btn-secondary"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Curso já avaliado"
+                                                            >AVALIADO</a></td>
                                 {% else %}
-                                    <td class="text-center"><a href="/avaliacao/{{ inscricao.curso.id }}" class="btn btn-primary">AVALIAR CURSO</a></td>
+                                    <td class="text-center"><a href="/avaliacao/{{ inscricao.curso.id }}" 
+                                                            class="btn btn-primary"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Avaliar curso"
+                                                            >AVALIAR</a></td>
                                 {% endif %}
                             {% else %}
                                 <td>-</td>
@@ -85,7 +91,7 @@
                             
                         {% endif %}
                    
-                    {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido  %}
+                    {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido and inscricao.curso_avaliado  %}
                         <td class="text-center">
                             <a href="{% url 'generate_all_pdfs' curso_id=inscricao.curso.id unico=1 %}" 
                             class="btn btn-primary"

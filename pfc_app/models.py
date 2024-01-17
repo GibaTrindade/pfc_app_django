@@ -171,22 +171,43 @@ def calcular_carga_horaria(sender, instance, **kwargs):
     instance.ch_valida = instance.curso.ch_curso
 
 
-notas=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'))
+notas=(('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),('0', 'N/A'))
+
+class Tema(models.Model):
+    nome = models.CharField(max_length=100)
+    class Meta:
+        verbose_name = "Avaliação-Tema"
+
+    def __str__(self):
+        return self.nome
+    
+
+class Subtema(models.Model):
+    nome = models.CharField(max_length=100)
+    tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.nome
+    class Meta:
+        verbose_name = "Avaliação-Subtema"
 
 class Avaliacao(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     participante = models.ForeignKey(User, on_delete=models.CASCADE)
-    nota_atributo1 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
-    nota_atributo2 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
-    nota_atributo3 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
-    nota_atributo4 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
-    nota_atributo5 = models.IntegerField(choices=notas, default=None, blank=False, null=False)
+    
+    subtema = models.ForeignKey(Subtema, blank=False, null=False, on_delete=models.CASCADE)
+    nota = models.TextField(choices=notas, default=None, blank=False, null=False)
+    # conteudo_estrutura_acao_capacitacao = models.TextField(choices=notas, default=None, blank=False, null=False)
+    # interface_grafica_acao_capacitacao = models.TextField(choices=notas, default=None, blank=False, null=False)
+    # nota_atributo4 = models.TextField(choices=notas, default=None, blank=False, null=False)
+    # nota_atributo5 = models.TextField(choices=notas, default=None, blank=False, null=False)
     
     def __str__(self):
         return self.curso.nome_curso + ' > '+ self.participante.username
     
     class Meta:
         verbose_name_plural = "avaliações"
+
 
 def user_directory_path(instance, filename):
     # O "instance" é a instância do modelo Avaliacao e "filename" é o nome do arquivo original

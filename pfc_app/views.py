@@ -15,7 +15,9 @@ from django.contrib.auth import update_session_auth_hash
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.template import loader
-from .models import Curso, Inscricao, StatusInscricao, Avaliacao, Validacao_CH, StatusValidacao, User, Certificado
+from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
+                    Validacao_CH, StatusValidacao, User, Certificado,\
+                    Tema, Subtema
 from .forms import AvaliacaoForm, DateFilterForm
 from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef, Value
 from django.db.models.functions import Concat
@@ -298,6 +300,7 @@ def inscricao_existente(request):
 @login_required
 def avaliacao(request, curso_id):
     # Checa se o curso existe
+    temas = Tema.objects.all()
     try:
       curso = Curso.objects.get(pk=curso_id)
     except:
@@ -316,37 +319,45 @@ def avaliacao(request, curso_id):
        return redirect('lista_cursos')
     
     if request.method == 'POST':
-        form = AvaliacaoForm(request.POST)
-        if form.is_valid():
+        #form = AvaliacaoForm(request.POST)
+        #if form.is_valid():
             # Faça o que for necessário com os dados da avaliação, como salvá-los no banco de dados
-            usuario = request.user
-            ja_avaliado=Avaliacao.objects.filter(participante=usuario, curso=curso)
-            
-            if ja_avaliado:
-                messages.error(request, f"Avaliação já realizada!")
-                return redirect('inscricoes')
-            
-
-
-            avaliacao = form.save(commit=False)
-            avaliacao.participante = usuario
-            
-            avaliacao.curso = curso
-            #form.save()
-            avaliacao.save()
-            # Redirecione para uma página de sucesso ou outra ação apropriada
-            messages.success(request, 'Avaliação Realizada!')
+        usuario = request.user
+        ja_avaliado=Avaliacao.objects.filter(participante=usuario, curso=curso)
+        
+        if ja_avaliado:
+            messages.error(request, f"Avaliação já realizada!")
             return redirect('inscricoes')
-        messages.error(request, form.errors)
-            #return render(request, 'sucesso.html')
-       #else:
-           #messages.error(request, 'Nenhum item pode ficar em branco')
-           #return render(request, 'pfc_app/avaliacao.html', {'form': form})
+        
+        subtemas = Subtema.objects.all()
+        for subtema in subtemas:
+            #print("id: "+subtema.id)
+            avaliacao = Avaliacao(curso=curso, participante=request.user,
+                                    subtema=subtema, nota=request.POST.get(subtema.nome))
+            avaliacao.save()
 
-    else:
-        form = AvaliacaoForm()
+        #avaliacao = form.save(commit=False)
+        #avaliacao.participante = usuario
+        
+        #avaliacao.curso = curso
+        #form.save()
+        #avaliacao.save()
+        # Redirecione para uma página de sucesso ou outra ação apropriada
+        messages.success(request, 'Avaliação Realizada!')
+        return redirect('inscricoes')
+    #messages.error(request, form.errors)
+        #return render(request, 'sucesso.html')
+    #else:
+        #messages.error(request, 'Nenhum item pode ficar em branco')
+        #return render(request, 'pfc_app/avaliacao.html', {'form': form})
 
-    return render(request, 'pfc_app/avaliacao.html', {'form': form, 'curso':curso})
+    
+        
+        
+
+        #form = AvaliacaoForm()
+
+    return render(request, 'pfc_app/avaliacao.html', {'temas': temas, 'curso':curso})
 
 
 def validar_ch(request):
