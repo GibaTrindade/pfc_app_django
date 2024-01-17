@@ -81,7 +81,9 @@ class InscricaoAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">Gerar Certificado</a>', reverse('generate_single_pdf', args=[obj.id]))
 
 class AvaliacaoAdmin(admin.ModelAdmin):
-    form = AvaliacaoForm
+    #form = AvaliacaoForm
+    list_display = ('curso', 'participante', 'subtema', 'nota')
+    list_filter = ('curso', 'participante',)
 
 class Validacao_CHAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'get_caminho_arquivo', 'enviado_em', 'ch_solicitada', 
@@ -105,7 +107,7 @@ admin.site.register(Inscricao, InscricaoAdmin)
 admin.site.register(StatusCurso)
 admin.site.register(StatusInscricao)
 admin.site.register(StatusValidacao)
-admin.site.register(Avaliacao)
+admin.site.register(Avaliacao, AvaliacaoAdmin)
 admin.site.register(Tema)
 admin.site.register(Subtema)
 admin.site.register(Validacao_CH, Validacao_CHAdmin)
