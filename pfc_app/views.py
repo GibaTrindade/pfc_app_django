@@ -349,7 +349,7 @@ def avaliacao(request, curso_id):
     return render(request, 'pfc_app/avaliacao.html', {'form': form, 'curso':curso})
 
 
-def enviar_pdf(request):
+def validar_ch(request):
     if request.method == 'POST':
         status_validacao = StatusValidacao.objects.get(nome="PENDENTE")
         arquivo_pdf = request.FILES['arquivo_pdf']
@@ -369,7 +369,7 @@ def enviar_pdf(request):
            ch_solicitada = int(ch_solicitada)
         except:
             messages.error(request, 'O campo carga horária precisa ser númerico!')
-            return redirect('enviar_pdf')
+            return redirect('validar_ch')
         avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, 
                                  nome_curso=nome_curso, ch_solicitada=ch_solicitada, 
                                  data_termino_curso=data_termino, data_inicio_curso = data_inicio,
@@ -378,12 +378,12 @@ def enviar_pdf(request):
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')
-        return redirect('enviar_pdf')
+        return redirect('validar_ch')
 
     validacoes_user = Validacao_CH.objects.filter(usuario=request.user)
 
 
-    return render(request, 'pfc_app/enviar_pdf.html', {'validacoes': validacoes_user})
+    return render(request, 'pfc_app/validar_ch.html', {'validacoes': validacoes_user})
 
 
 def download_all_pdfs(request):

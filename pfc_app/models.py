@@ -227,7 +227,7 @@ class Validacao_CH(models.Model):
     agenda_pfc = models.BooleanField(default=False, blank=False, null=False)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING)#, default=status_validacao.id)
     condicao_na_acao = models.CharField(max_length=20, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
-    analisado_em = models.DateField(blank=False, null=False)
+    analisado_em = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return self.usuario.username
