@@ -380,7 +380,10 @@ def enviar_pdf(request):
         messages.success(request, 'Arquivo enviado com sucesso!')
         return redirect('enviar_pdf')
 
-    return render(request, 'pfc_app/enviar_pdf.html')
+    validacoes_user = Validacao_CH.objects.filter(usuario=request.user)
+
+
+    return render(request, 'pfc_app/enviar_pdf.html', {'validacoes': validacoes_user})
 
 
 def download_all_pdfs(request):
