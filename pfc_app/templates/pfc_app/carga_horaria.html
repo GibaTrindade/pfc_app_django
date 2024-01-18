@@ -23,16 +23,16 @@
         </div>
     </form>
     <div class="row d-flex">
-        <div class="col-md-5 col-12 mb-3 mr-3 mt-3">
+        <div class="col-md-5 col-12 mb-3 mr-3">
             <div class="card">
                 <h4 class="card-header text-center">{{ carga_horaria_total }} hora{{ carga_horaria_total|pluralize}} </h4>
                 <div class="card-body">
-                    <h5 class="card-title">Cursos PFC: {{ carga_horaria_pfc }} horas </h5>
-                    <h5 class="card-title">Carga Horária Externa Validada: {{ carga_horaria_validada }} horas </h5>
+                    <h5 class="card-title">Cursos PFC: {{ carga_horaria_pfc }} hora{{ carga_horaria_pfc|pluralize}} </h5>
+                    <h5 class="card-title">Carga Horária Externa Validada: {{ carga_horaria_validada }} hora{{ carga_horaria_validada|pluralize}} </h5>
                 </div>
             </div>
         </div>
-        <div class="col-md-7 col-12 px-3 overflow-auto border rounded" style="height: 55vh;">
+        <div class="col-md-7 col-12 mb-3 overflow-auto border rounded" style="height: 55vh;">
             <div class="d-flex p-2 justify-content-center mb-5"><h3>Lista de Cursos</h3></div>
                 <div class="row">
                     <div class="col-6 border-end px-1">
