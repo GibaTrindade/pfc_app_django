@@ -20,10 +20,16 @@
         <strong><small> 
           
           Esqueci minha senha
-        </small></strong></p></a>
-      <button class="btn btn-md btn-primary btn-block mt-3 mb-3" type="submit">Entrar</button>
-     
+        </small></strong></p>
+      </a>
 
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-md btn-primary btn-block mt-3 mb-3" type="submit">Entrar</button>
+        <a href="{% url 'registrar' %}" class="btn btn-md btn-secondary 
+        btn-block mt-3 mb-3">
+        Solicitar login
+        </a>
+      </div>
 
 </form>
 </div>

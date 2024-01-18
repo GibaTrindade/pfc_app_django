@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="col"></div>
+  <div class="col-5">
+<form id='meuFormulario' method="POST" action="{% url 'registrar' %}" class="form-signin">
+    {% include 'parciais/_messages.html' %}
+    {% csrf_token %}
+
+    <div id='mensagemCarregando' class="alert alert-danger" style='display: none;'><strong>Enviando email...</strong></div>
+      <h1 class="h3 mb-3 font-weight-normal">Faça seu cadastro</h1>
+      <label for="nome" class="sr-only">Nome completo</label>
+      <input type="text" value="{{ nome }}" name="nome" id="nome" class="form-control mt-3" placeholder="Digite seu nome" required autofocus>
+      <label for="cpf" class="sr-only">CPF</label>
+      <input type="text" value="{{ cpf }}" name="cpf" id="cpf" class="form-control mt-3" placeholder="Digite seu cpf sem pontos e sem traço" required>
+      <label for="username" class="sr-only">Username</label>
+      <input type="text" value="{{ username }}" name="username" id="username" class="form-control mt-3" placeholder="Escolha um username" required>
+      <label for="email" class="sr-only">Email</label>
+      <input type="text" value="{{ email }}" name="email" id="email" class="form-control mt-3" placeholder="Digite seu email" required>
+      <label for="telefone" class="sr-only">Telefone</label>
+      <input type="text" value="{{ telefone }}" name="telefone" id="telefone" class="form-control mt-3" placeholder="Digite seu telefone" required>
+      <label for="orgao_origem" class="sr-only">Órgão de origem</label>
+      <input type="text" value="{{ orgao_origem }}" name="orgao_origem" id="orgao_origem" class="form-control mt-3" placeholder="Digite seu órgão de origem" required>
+      
+
+      <div class="d-flex justify-content-between">
+        <button type="submit" id="botaoEnviar" class="btn btn-md btn-secondary btn-block mt-3 mb-3">Solicitar login</button>
+      </div>
+
+</form>
+</div>
+<div class="col"></div>
+</div>
+<script>
+
+
+document.getElementById('meuFormulario').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Desabilitar o botão de envio
+    var botaoEnviar = document.getElementById('botaoEnviar');
+    botaoEnviar.disabled = true;
+
+    // Mostrar mensagem de carregamento
+    document.getElementById('mensagemCarregando').style.display = 'block';
+
+    // Preparar dados do formulário para envio
+    var formData = new FormData(this);
+
+    // Enviar dados com AJAX
+    fetch("{% url 'registrar' %}", {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Esconder mensagem de carregamento
+        // document.getElementById('mensagemCarregando').style.display = 'none';
+
+        // Redirecionar ou atualizar a página
+        if(data.success) {
+            window.location.href = "{% url 'login' %}";
+        } else {
+            alert('Erro ao enviar e-mail.');
+        }
+    });
+});
+</script>
+{% endblock %}

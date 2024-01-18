@@ -13,7 +13,7 @@ import string
 from django.utils.encoding import force_bytes
 from django.contrib.auth import update_session_auth_hash
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
@@ -58,6 +58,53 @@ def login(request):
         return redirect('lista_cursos')
 
     return render(request, 'pfc_app/login.html')
+
+def registrar(request):
+    if request.method != 'POST':
+        return render(request, 'pfc_app/registrar.html')
+
+    nome = request.POST.get('nome')
+    cpf = request.POST.get('cpf')
+    username = request.POST.get('username')
+    email = request.POST.get('email')
+    telefone = request.POST.get('telefone')
+    orgao_origem = request.POST.get('orgao_origem')
+
+
+    # Contexto para manter os dados no formulário
+    context = {
+        'nome': nome,
+        'cpf': cpf,
+        'username': username,
+        'email': email,
+        'telefone': telefone,
+        'orgao_origem': orgao_origem
+    }
+    print(context)
+    
+        
+    cpf_padrao = CPF()
+    # Validar CPF
+    if not cpf_padrao.validate(cpf):
+        messages.error(request, f'CPF digitado está errado!')
+        return render(request, 'pfc_app/registrar.html', context)
+
+    
+    send_mail('Solicitação de cadastro', 
+              f'Nome:{nome}\n '
+              f'CPF: {cpf}\n '
+              f'Username: {username}\n '
+              f'Email: {email}\n '
+              f'Telefone: {telefone}\n '
+              f'Órgão de origem: {orgao_origem}\n ', 
+              'ncdseplag@gmail.com', 
+              ['pfc.seplag@gmail.com', 'g.trindade@gmail.com'])
+
+    
+    messages.success(request, f'Solicitação enviada com sucesso. Aguarde suas credenciais!')
+        
+    return JsonResponse({'success': True})
+    # return render(request, 'pfc_app/login.html')
 
 def logout(request):
     auth.logout(request)
@@ -221,9 +268,12 @@ class CursoDetailView(DetailView):
         inscricoes_docentes = Inscricao.objects.filter(curso=curso, condicao_na_acao='DOCENTE')
 
         usuarios_docentes = [inscricao.participante for inscricao in inscricoes_docentes]
-
+        usuario_inscrito = Exists(
+            Inscricao.objects.filter(curso=curso, participante=self.request.user)
+            )
         # Adicione o usuário docente ao contexto
         context['usuarios_docentes'] = usuarios_docentes
+        context['usuario_inscrito'] = usuario_inscrito
 
         return context
 
