@@ -123,13 +123,19 @@ def carga_horaria(request):
      
      )
   try:
-    satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+    status_validacao_deferida = StatusValidacao.objects.get(nome='DEFERIDA')
+    status_validacao_deferida_parc = StatusValidacao.objects.get(nome='DEFERIDA PARCIALMENTE')
   except:
-    novo_status = StatusValidacao(nome="APROVADA")
-    novo_status.save()
-    satus_validacao = StatusValidacao.objects.get(nome='APROVADA')
+    novo_status_deferida = StatusValidacao(nome="DEFERIDA")
+    novo_status_deferida_parc = StatusValidacao(nome="DEFERIDA PARCIALMENTE")
+    novo_status_deferida.save()
+    novo_status_deferida_parc.save()
+    status_validacao_deferida = StatusValidacao.objects.get(nome='DEFERIDA')
+    status_validacao_deferida_parc = StatusValidacao.objects.get(nome='DEFERIDA PARCIALMENTE')
 
-  validacoes = Validacao_CH.objects.filter(usuario=request.user, status=satus_validacao)
+  validacoes = Validacao_CH.objects.filter(usuario=request.user, 
+                                           status__in=[status_validacao_deferida, 
+                                                       status_validacao_deferida_parc])
   
   ## Calculo para verificar se o usuario ja está inscrito em um dado curso
 
@@ -160,6 +166,7 @@ def carga_horaria(request):
             inscricoes_do_usuario = inscricoes_do_usuario.filter(curso__data_termino__lte=data_hoje)
             validacoes = validacoes.filter(data_termino_curso__lte=data_hoje)
   
+  cursos_feitos_pfc = inscricoes_do_usuario
   # Distinc para que so conte 1 curso por periodo
   inscricoes_do_usuario = inscricoes_do_usuario.values('curso__nome_curso').distinct()
   # Calcula a soma da carga horária das inscrições do usuário
@@ -167,7 +174,10 @@ def carga_horaria(request):
   validacoes_ch = validacoes.aggregate(Sum('ch_confirmada'))['ch_confirmada__sum'] or 0
   carga_horaria_total = carga_horaria_pfc + validacoes_ch
 
+
   context = {
+      'inscricoes_pfc': cursos_feitos_pfc,
+      'validacoes_externas': validacoes,
       'carga_horaria_pfc': carga_horaria_pfc,
       'carga_horaria_validada': validacoes_ch,
       'carga_horaria_total': carga_horaria_total,
@@ -362,7 +372,7 @@ def avaliacao(request, curso_id):
 
 def validar_ch(request):
     if request.method == 'POST':
-        status_validacao = StatusValidacao.objects.get(nome="PENDENTE")
+        status_validacao = StatusValidacao.objects.get(nome="EM ANÁLISE")
         arquivo_pdf = request.FILES['arquivo_pdf']
         nome_curso = request.POST['nome_curso']
         ch_solicitada = request.POST['ch_solicitada']
@@ -405,7 +415,10 @@ def validar_ch(request):
     carreiras = Carreira.objects.all()
 
 
-    return render(request, 'pfc_app/validar_ch.html', {'validacoes': validacoes_user, 'opcoes': condica_acao, 'carreiras': carreiras})
+    return render(request, 'pfc_app/validar_ch.html', 
+                  {'validacoes': validacoes_user, 
+                   'opcoes': condica_acao, 
+                   'carreiras': carreiras})
 
 
 def download_all_pdfs(request):
