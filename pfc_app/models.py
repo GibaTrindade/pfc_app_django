@@ -94,7 +94,17 @@ class Trilha(models.Model):
 
     def __str__(self):
         return self.nome
-    
+
+class InstituicaoPromotora(models.Model):
+    nome = models.CharField(max_length=400, blank=False, null=False)
+    def __str__(self):
+        return self.nome
+
+
+class InstituicaoCertificadora(models.Model):
+    nome = models.CharField(max_length=400, blank=False, null=False)
+    def __str__(self):
+        return self.nome
 
 class Curso(models.Model):
     TURNO_CHOICES = [
@@ -124,8 +134,8 @@ class Curso(models.Model):
     data_termino = models.DateField(blank=True, null=True)
     turno = models.CharField(max_length=10, choices=TURNO_CHOICES, default="TARDE")
     turma = models.CharField(max_length=10, choices=TURMA_CHOICES, default="TURMA1")
-    inst_certificadora = models.CharField(max_length=400, blank=False, null=False)
-    inst_promotora = models.CharField(max_length=400, blank=False, null=False)
+    inst_certificadora = models.ForeignKey(InstituicaoCertificadora, on_delete=models.SET_NULL, blank=True, null=True)
+    inst_promotora = models.ForeignKey(InstituicaoPromotora, on_delete=models.SET_NULL, blank=True, null=True)
     participantes = models.ManyToManyField(User, through='Inscricao', related_name='curso_participante')
     avaliacoes = models.ManyToManyField(User, through='Avaliacao', related_name='curso_avaliacao')
     #acao = models.ForeignKey(Acao, on_delete=models.CASCADE)
@@ -223,6 +233,14 @@ class StatusValidacao(models.Model):
     class Meta:
         verbose_name_plural = "status validações"
 
+
+class Carreira(models.Model):
+    nome = models.CharField(max_length=80)
+    sigla = models.CharField(max_length=20)
+    def __str__(self):
+        return self.nome+f' ({self.sigla})'
+
+
 class Validacao_CH(models.Model):
     CONDICAO_ACAO_CHOICES = [
         ('DISCENTE', 'DISCENTE'),
@@ -249,6 +267,7 @@ class Validacao_CH(models.Model):
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING)#, default=status_validacao.id)
     condicao_na_acao = models.CharField(max_length=20, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
     analisado_em = models.DateField(blank=True, null=True)
+    carreira = models.ForeignKey(Carreira, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     def __str__(self):
         return self.usuario.username

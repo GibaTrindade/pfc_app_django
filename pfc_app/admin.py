@@ -113,6 +113,9 @@ admin.site.register(Certificado)
 admin.site.register(RequerimentoCH)
 admin.site.register(Competencia)
 admin.site.register(Trilha)
+admin.site.register(InstituicaoCertificadora)
+admin.site.register(InstituicaoPromotora)
+admin.site.register(Carreira)
 
 
 admin.site.site_header = 'PFC'

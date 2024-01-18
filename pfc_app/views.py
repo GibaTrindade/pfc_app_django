@@ -17,7 +17,7 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
-                    Tema, Subtema
+                    Tema, Subtema, Carreira
 from .forms import AvaliacaoForm, DateFilterForm
 from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef, Value
 from django.db.models.functions import Concat
@@ -370,6 +370,8 @@ def validar_ch(request):
         data_termino = request.POST['data_termino']
         instituicao_promotora = request.POST['instituicao_promotora']
         ementa = request.POST['ementa']
+        condicao_na_acao = request.POST['condicao_acao']
+        carreira_id = condicao_na_acao = request.POST['carreira']
         try:
             agenda_pfc_check = request.POST['agenda_pfc']
             agenda_pfc = True
@@ -381,20 +383,29 @@ def validar_ch(request):
         except:
             messages.error(request, 'O campo carga horária precisa ser númerico!')
             return redirect('validar_ch')
+        try:
+            carreira = Carreira.objects.get(pk=carreira_id)
+        except:
+            messages.error(request, 'Carreira não encontrada')
+            return redirect('validar_ch')
+        
         avaliacao = Validacao_CH(usuario=request.user, arquivo_pdf=arquivo_pdf, 
                                  nome_curso=nome_curso, ch_solicitada=ch_solicitada, 
                                  data_termino_curso=data_termino, data_inicio_curso = data_inicio,
                                  instituicao_promotora=instituicao_promotora, ementa=ementa, 
-                                 agenda_pfc=agenda_pfc, status=status_validacao)
+                                 agenda_pfc=agenda_pfc, status=status_validacao,
+                                 condicao_na_acao=condicao_na_acao, carreira=carreira)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')
         return redirect('validar_ch')
 
     validacoes_user = Validacao_CH.objects.filter(usuario=request.user)
+    condica_acao = Validacao_CH.CONDICAO_ACAO_CHOICES
+    carreiras = Carreira.objects.all()
 
 
-    return render(request, 'pfc_app/validar_ch.html', {'validacoes': validacoes_user})
+    return render(request, 'pfc_app/validar_ch.html', {'validacoes': validacoes_user, 'opcoes': condica_acao, 'carreiras': carreiras})
 
 
 def download_all_pdfs(request):
