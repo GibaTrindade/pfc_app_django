@@ -268,6 +268,7 @@ class Validacao_CH(models.Model):
     condicao_na_acao = models.CharField(max_length=20, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
     analisado_em = models.DateField(blank=True, null=True)
     carreira = models.ForeignKey(Carreira, on_delete=models.DO_NOTHING, blank=True, null=True)
+    trilha = models.ForeignKey(Trilha, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     def __str__(self):
         return self.usuario.username
