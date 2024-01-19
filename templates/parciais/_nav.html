@@ -1,6 +1,6 @@
 <!--_nav.html-->
-
-<nav class="navbar navbar-expand-lg navbar-dark static-top p-0" style="background-color: #0C5283;">
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light static-top p-0 align-items-center">
     <div class="container-fluid">
         <a class="navbar-brand " href="#">
             <img src="/media/igpe.png" alt="" width="60" height="60">
@@ -9,53 +9,99 @@
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                
-                {% if user.is_authenticated %}
+        <div class="collapse navbar-collapse justify-content-center" id="navbarResponsive">
+                <ul class="d-flex list-unstyled navbar-nav mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
                 
                     {% if user.role == "ADMIN" %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/">| Admin |</a>
+                        <li class="nav-item iconChange  me-4 pt-2">
+                            <a class="nav-link text-center  p-0" href="/admin/">
+                                <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                    <img class="one iconHeight mx-2" src="/static/android2.svg" alt="android2">
+                                    <img class="two iconHeight mx-2" src="/static/android.svg"
+                                        alt="android">
+                                </div>
+                                <div class="smallFont textColor">Admin</div>
+                            </a>
                         </li>
                     {% endif %}
+                    <li class="nav-item iconChange  me-4 pt-2">
+                        <a href="{% url 'lista_cursos' %}" class="nav-link text-center  p-0">
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                <img class="one iconHeight mx-2" src="/static/book.svg" alt="book">
+                                <img class="two iconHeight mx-2" src="/static/book-half.svg"
+                                    alt="book-half">
+                            </div>
+                            <div class="smallFont textColor">Inscrições Abertas</div>
+                        </a>
+                    </li>
+                    <li class="nav-item iconChange  me-4 pt-2">
+                        <a class="nav-link text-center  p-0" href="{% url 'validar_ch' %}">
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                <img class="one iconHeight mx-2" src="/static/send-check.svg" alt="enviar">
+                                <img class="two iconHeight mx-2" src="/static/send-check-fill.svg"
+                                    alt="enviar-half">
+                            </div>
+                            <div class="smallFont textColor">Validar Carga Horária</div>
+                              
+                        </a>
+                    </li>
+    
+                    <li class="nav-item iconChange  me-4 pt-2">
+                        <a class="nav-link text-center  p-0" href="{% url 'inscricoes' %}">
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                <img class="one iconHeight mx-2" src="/static/mortarboard.svg" alt="mortarboard">
+                                <img class="two iconHeight mx-2" src="/static/mortarboard-fill.svg"
+                                    alt="mortarboard-half">
+                            </div>
+                            <div class="smallFont textColor">Meus Cursos</div> 
+                        </a>
+                    </li>
                     
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_cursos' %}">| Inscrições Abertas |</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'validar_ch' %}">| Validar Carga Horária |</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'inscricoes' %}">| Meus Cursos |</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'carga_horaria' %}">| Minha Carga Horária |</a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                       <i class="bi bi-person-circle"></i> {{user.username}}
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Minha Conta</a></li>
-                        <li><a class="dropdown-item" href="{% url 'change_password' %}">Alterar Senha</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
-                    </ul>
-                </li>
-                
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Entrar</a>
-                </li>
-                {% endif %}
-            </ul>
+                    <li class="nav-item iconChange  me-4 pt-2">
+                        <a class="nav-link text-center  p-0" href="{% url 'carga_horaria' %}"> 
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                <img class="one iconHeight mx-2" src="/static/bar-chart-line.svg" alt="bar-chart-line">
+                                <img class="two iconHeight mx-2" src="/static/bar-chart-line-fill.svg"
+                                    alt="bar-chart-line-fill">
+                            </div>
+                            <div class="smallFont textColor">Minha Carga Horária</div> 
+                        </a>
+                    </li>
+    
+                    <li class="nav-item dropdown iconChange  me-4 pt-2">
+                        <a class="nav-link text-center  p-0 dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                <img class="one iconHeight mx-2" src="/static/person-check.svg" alt="person-check">
+                                <img class="two iconHeight mx-2" src="/static/person-fill-check.svg"
+                                    alt="person-check-fill">
+                            </div>
+                            <div class="smallFont textColor">{{user.username}}</div> 
+                           
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Minha Conta</a></li>
+                            <li><a class="dropdown-item" href="{% url 'change_password' %}">Alterar Senha</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Entrar</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            
         </div>
-        </div>
+    
 </nav>
 
 <!--/_nav.html-->
