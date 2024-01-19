@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row">
   <div class="col"></div>
-  <div class="col-5">
+  <div class="col-md-5 col-sm-12">
 <form method="POST" action="{% url 'login' %}" class="form-signin">
     {% include 'parciais/_messages.html' %}
     {% csrf_token %}
