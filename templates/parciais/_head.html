@@ -12,5 +12,55 @@
 
     {% load bootstrap5 %}
     {% bootstrap_css %}
+<style>
+.textColor {
+        color: #2a5a94;
+    }
+#verticalbar {
+        height: 40px;
+        width: 1px;
+        background: #97a2b0;
+    }
+.changeWidth {
+            width: 36px;
+        }
 
+        .iconChange:after {
+            content: "";
+            display: block;
+            margin: auto;
+            height: 3px;
+            width: 0px;
+            background: transparent;
+            transition: all 0.5s ease;
+        }
+
+        .iconChange:hover::after {
+            width: 100%;
+            background: #0d6efd;
+        }
+
+        .iconHeight {
+            height: 22px;
+            width: 22px;
+        }
+
+        .iconChange:hover a {
+            color: #0d6efd;
+        }
+
+        .iconChange img {
+            transition: all 500ms;
+        }
+
+        .iconChange:hover img {
+            transform: translateX(-180%);
+            transform-origin: right;
+            transition: transform 500ms ease-in-out;
+        }
+
+        .smallFont {
+            font-size: 15px;
+        }
+</style>
 <!--/_head.html-->
