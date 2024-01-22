@@ -8,7 +8,17 @@
     {% include 'parciais/_messages.html' %}
     {% csrf_token %}
 
-    <div id='mensagemCarregando' class="alert alert-danger" style='display: none;'><strong>Enviando email...</strong></div>
+    <div id='mensagemCarregando' class="alert alert-danger" style='display: none;'>
+        
+            <div class="text-center">
+                <strong>Enviando email...   
+                    <div class="spinner-grow text-dark" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                    </div>
+                </strong>
+              </div>
+        
+    </div>
       <h1 class="h3 mb-3 font-weight-normal">Faça seu cadastro</h1>
       <label for="nome" class="sr-only">Nome completo</label>
       <input type="text" value="{{ nome }}" name="nome" id="nome" class="form-control mt-3" placeholder="Digite seu nome" required autofocus>

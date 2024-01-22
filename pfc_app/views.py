@@ -80,7 +80,6 @@ def registrar(request):
         'telefone': telefone,
         'orgao_origem': orgao_origem
     }
-    print(context)
     
         
     cpf_padrao = CPF()
