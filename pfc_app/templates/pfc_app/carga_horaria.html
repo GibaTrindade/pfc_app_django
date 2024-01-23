@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load filtros %}
 
 {% block content %}
 {% include 'parciais/_messages.html' %}
@@ -18,30 +18,30 @@
             <label for="{{ form.data_fim.id_for_label }}" >Até</label>
             
         </div>
-        <div class="col-md-3 form-floating mb-3">
-            <button type="submit" class="btn btn-primary btn-lg">Filtrar por Término do Curso</button>
+        <div class="col-md-4 form-floating mb-3">
+            <button type="submit" class="btn btn-primary btn-lg">FILTRAR POR TÉRMINO DO CURSO</button>
         </div>
     </form>
     <div class="row d-flex">
         <div class="col-md-5 col-12 mb-3 mr-3">
             <div class="card">
-                <h2 class="card-header justify-content-center bg-warning d-flex align-items-center" style="height: 10vh;">{{ carga_horaria_total }} hora{{ carga_horaria_total|pluralize}} </h2>
+                <h2 class="card-header justify-content-center bg-warning d-flex align-items-center" style="height: 10vh;">{{ carga_horaria_total }} hora{{ carga_horaria_total|custom_pluralize:'s'}} </h2>
                 <div class="card-body">
-                    <h5 class="card-title">Cursos PFC: {{ carga_horaria_pfc }} hora{{ carga_horaria_pfc|pluralize}} </h5>
-                    <h5 class="card-title">Carga Horária Externa Validada: {{ carga_horaria_validada }} hora{{ carga_horaria_validada|pluralize}} </h5>
+                    <h5 class="card-title">Cursos PFC: {{ carga_horaria_pfc }} hora{{ carga_horaria_pfc|custom_pluralize:'s'}} </h5>
+                    <h5 class="card-title">Carga Horária Externa Validada: {{ carga_horaria_validada }} hora{{ carga_horaria_validada|custom_pluralize:'s'}} </h5>
                 </div>
             </div>
         </div>
         <div class="col-md-7 col-12 mb-3 overflow-scroll border rounded" style="height: 50vh;">
-            <div class="d-flex py-2 justify-content-center mb-5" ><h3>Lista de Cursos</h3></div>
+            <div class="d-flex py-2 justify-content-center mb-5" ><h3>LISTA DE CURSOS</h3></div>
                 <div class="row">
                     <div class="col-6 border-end px-2">
-                        <div class="text-center"><h5>Cursos PFC</h5></div>
+                        <div class="text-center"><h5>CURSOS PFC</h5></div>
                         <table class="table">
                             <thead>
                             <tr>
-                                <th scope="col" class="col-6">Nome do curso</th>
-                                <th scope="col" class="col-6 text-center">Carga horária</th>
+                                <th scope="col" class="col-6">NOME DO CURSO</th>
+                                <th scope="col" class="col-6 text-center">CARGA HORÁRIA</th>
 
                             </tr>
                             </thead>
@@ -56,12 +56,12 @@
                         </table>
                     </div>
                     <div class="col-6 border-start px-1">
-                        <div class="text-center"><h5>Cursos Externos</h5></div>
+                        <div class="text-center"><h5>CURSOS EXTERNOS</h5></div>
                         <table class="table">
                             <thead>
                             <tr>
-                                <th scope="col" class="col-6">Nome do curso</th>
-                                <th scope="col" class="col-6 text-center">Carga horária</th>
+                                <th scope="col" class="col-6">NOME DO CURSO</th>
+                                <th scope="col" class="col-6 text-center">CARGA HORÁRIA</th>
 
                             </tr>
                             </thead>
