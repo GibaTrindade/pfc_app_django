@@ -2,26 +2,23 @@
 {% load static %}
 {% block content %}
 
-
-    {% include 'parciais/_messages.html' %}
-    {% csrf_token %}
-
+{% include 'parciais/_messages.html' %}
 <div class="d-flex w-100 justify-content-center mt-3">
 <div class=" col-md-3 col-12">
   <form method="POST" action="{% url 'login' %}">
-        {% include 'parciais/_messages.html' %}
+        
         {% csrf_token %}
 
         <img class="mb-1 mx-auto d-block" src="{% static 'PFC-nome.png' %}" alt="" width="auto" height="150">
         <h1 class="h3 mb-3 fw-normal text-center">Faça o login</h1>
 
         <div class="form-floating">
-          <label for="usuario" class="sr-only">Usuário</label>
-        <input type="text" name="usuario" id="usuario" class="form-control mt-3" placeholder="username" required autofocus>
+        <input type="input" name="usuario" id="usuario_id" class="form-control mt-3" required autofocus>
+        <label for="usuario_id">Digite seu usuário</label>
         </div>
         <div class="form-floating">
-          <label for="senha" class="sr-only">Senha</label>
-        <input type="password" name="senha" id="senha" class="form-control mt-3" placeholder="Password" required>
+        <input type="password" name="senha" id="senha_id" class="form-control" required>
+        <label for="senha_id">Digite sua senha</label>
         </div>
 
         <a href="{% url 'reset_password_request' %}" style="color: red; text-decoration: none !important;"><p>
