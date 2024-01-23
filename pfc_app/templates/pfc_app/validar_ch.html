@@ -30,7 +30,7 @@
                 <div class="col form-floating mb-3">
                     <select class="form-control" name="carreira" id="id_carreira">
                         {% for carreira in carreiras %}
-                            <option value="{{ carreira.id }}">{{ carreira.nome }} ({{ carreira.sigla }})</option>
+                            <option value="{{ carreira.id }}">{{ carreira.sigla }}</option>
                         {% endfor %}
                     </select>
                     <label for="id_carreira">Escolha a Carreira</label>

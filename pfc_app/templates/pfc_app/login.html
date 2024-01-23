@@ -1,39 +1,50 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<div class="row">
-  <div class="col"></div>
-  <div class="col-md-5 col-sm-12">
-<form method="POST" action="{% url 'login' %}" class="form-signin">
+
+
     {% include 'parciais/_messages.html' %}
     {% csrf_token %}
 
-    
-      <h1 class="h3 mb-3 font-weight-normal">Faça o login</h1>
-      <label for="usuario" class="sr-only">Usuário</label>
-      <input type="text" name="usuario" id="usuario" class="form-control mt-3" placeholder="username" required autofocus>
-      <label for="senha" class="sr-only">Senha</label>
-      <input type="password" name="senha" id="senha" class="form-control mt-3" placeholder="Password" required>
-      
-      <a href="{% url 'reset_password_request' %}" style="color: red; text-decoration: none !important;"><p>
-        <i class="bi bi-incognito"></i>
-        <strong><small> 
-          
-          Esqueci minha senha
-        </small></strong></p>
-      </a>
+<div class="d-flex w-100 justify-content-center mt-3">
+<div class=" col-md-3 col-12">
+  <form method="POST" action="{% url 'login' %}">
+        {% include 'parciais/_messages.html' %}
+        {% csrf_token %}
 
-      <div class="d-flex justify-content-between">
-        <button class="btn btn-md btn-primary btn-block mt-3 mb-3" type="submit">Entrar</button>
-        <a href="{% url 'registrar' %}" class="btn btn-md btn-secondary 
-        btn-block mt-3 mb-3">
-        Solicitar login
+        <img class="mb-1 mx-auto d-block" src="{% static 'PFC-nome.png' %}" alt="" width="auto" height="150">
+        <h1 class="h3 mb-3 fw-normal text-center">Faça o login</h1>
+
+        <div class="form-floating">
+          <label for="usuario" class="sr-only">Usuário</label>
+        <input type="text" name="usuario" id="usuario" class="form-control mt-3" placeholder="username" required autofocus>
+        </div>
+        <div class="form-floating">
+          <label for="senha" class="sr-only">Senha</label>
+        <input type="password" name="senha" id="senha" class="form-control mt-3" placeholder="Password" required>
+        </div>
+
+        <a href="{% url 'reset_password_request' %}" style="color: red; text-decoration: none !important;"><p>
+          <i class="bi bi-incognito"></i>
+          <strong><small> 
+            
+            Esqueci minha senha
+          </small></strong></p>
         </a>
-      </div>
 
-</form>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-md btn-primary btn-block mt-3 mb-3" type="submit">Entrar</button>
+          <a href="{% url 'registrar' %}" class="btn btn-md btn-outline-secondary
+          btn-block mt-3 mb-3">
+          Solicitar login
+          </a>
+        </div>
+      
+ </form>
 </div>
-<div class="col"></div>
 </div>
+
+
+
 {% endblock %}
 
