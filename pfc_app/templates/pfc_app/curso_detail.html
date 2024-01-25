@@ -36,7 +36,7 @@
     </div>
     <div class="row mb-2">
         
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="row d-flex justify-content-center align-items-center">
                 <p><strong>Carga Horária:</strong> {{curso.ch_curso}} horas</p>
                 <p><strong>Vagas:</strong> {{curso.vagas}}</p>
@@ -48,12 +48,19 @@
                     <p><strong>Instrutor-{{ forloop.counter }}</strong>: {{usuario_docente.nome}}</p>
                 </div>
             {% endfor %}
-            <div class="row d-flex justify-content-center align-items-center">
-                     {% if read_only != "0" %}
+            <div class="row d-flex justify-content-center align-items-center mb-4">
                      {% if not usuario_inscrito %}
-                        <a href="/inscrever/{{curso.id}}/" class="btn btn-success "></i>INSCREVER-SE</a>
+                        {% if lotado %}
+                            <a href="/inscrever/{{curso.id}}/" 
+                            class="btn btn-warning "></i>ENTRAR NA FILA</a>
+                        {% else %}
+                            <a href="/inscrever/{{curso.id}}/" 
+                            class="btn btn-success "></i>INSCREVER-SE</a>
+                        {% endif %}
+                        
                     {% endif %}
-                    {% endif %}
+                    
+                    
             </div>
         </div>
             <div class="col-md-6">

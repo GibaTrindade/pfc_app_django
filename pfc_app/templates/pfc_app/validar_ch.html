@@ -9,17 +9,17 @@
         
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="col-12">
+            
                 
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <input type="input" class="form-control" style="background-color: #f5f5f5;" name="nome_curso" id="nome_curso_id" required>
                     <label for="nome_curso_id" >Nome do Curso Para Validação</label>
                 </div>
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <input type="input" class="form-control" style="background-color: #f5f5f5;" name="ch_solicitada" id="ch_solicitada_id" required>
                     <label for="ch_solicitada_id" >Carga Horária Solicitada</label>
                 </div>
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <select class="form-control" style="background-color: #f5f5f5;" name="condicao_acao" id="id_condicao_acao">
                         {% for codigo, nome in opcoes %}
                             <option value="{{ codigo }}">{{ nome }}</option>
@@ -27,7 +27,7 @@
                     </select>
                     <label for="id_condicao_acao">Selecione uma Opção</label>
                 </div>
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <select class="form-control" style="background-color: #f5f5f5;" name="carreira" id="id_carreira">
                         {% for carreira in carreiras %}
                             <option value="{{ carreira.id }}">{{ carreira.sigla }}</option>
@@ -35,20 +35,23 @@
                     </select>
                     <label for="id_carreira">Escolha a Carreira</label>
                 </div>
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <input type="date" class="form-control" style="background-color: #f5f5f5;" name="data_inicio"  id="id_data_inicio" required>
                     <label for="id_data_inicio" >Data de Início do Curso</label>
                 </div>
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <input type="date" class="form-control" style="background-color: #f5f5f5;" name="data_termino"  id="id_data_termino" required>
                     <label for="id_data_termino" >Data de Término do Curso</label>
                 </div>
-                <div class="col form-floating mb-3">
+                <div class=" form-floating mb-3">
                     <input type="input" class="form-control" style="background-color: #f5f5f5;" name="instituicao_promotora" id="instituicao_promotora_id" required>
                     <label for="instituicao_promotora_id" >Instituição Promotora</label>
                 </div>
-                
-                <div class="col  mb-3 form-check">
+                <div class=" form-floating mb-3">
+                    <textarea type="input" rows=3 class="form-control" style="background-color: #f5f5f5;" name="ementa" id="ementa_id" required> </textarea>
+                    <label for="ementa_id" >Ementa</label>
+                </div>
+                <div class="  mb-3 form-check">
                     <input class="form-check-input" type="checkbox" value="sim" id="agenda_pfc_id" name="agenda_pfc">
                     <label class="form-check-label" for="agenda_pfc_id">
                         Ficou sabendo pela agenda PFC?
@@ -61,7 +64,7 @@
                     <button class="input-group-text btn-primary" for="inputGroupFile02" type="submit">ENVIAR</button>
                     
                 </div>
-            </div>
+            
         </form>
     </div>
     <div class="col-md-7 col-12 overflow-scroll border rounded" style="height: 60vh;">

@@ -53,7 +53,7 @@
           {% if curso.status.nome == "A INICIAR" %}
             
               {% if curso.num_inscricoes >= curso.vagas %}
-                    <a href="/curso_detail/{{ curso.id }}" class="btn btn-warning">ENTRAR NA FILA</a>
+                    <a href="/curso_detail/{{ curso.id }}/true" class="btn btn-warning">ENTRAR NA FILA</a>
               {% else %}
                     <a href="/curso_detail/{{ curso.id }}" class="btn btn-primary position-relative">
                       <i class="fa-solid fa-pen-to-square"></i>  INSCREVER

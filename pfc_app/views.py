@@ -42,6 +42,8 @@ from validate_docbr import CPF
 
 def login(request):
     if request.method != 'POST':
+        if request.user.is_authenticated:
+            return redirect('lista_cursos')
         return render(request, 'pfc_app/login.html')
 
     usuario = request.POST.get('usuario')
@@ -263,13 +265,19 @@ class CursoDetailView(DetailView):
         curso = self.get_object()
         usuario_docente = None
 
+        lotado = self.kwargs.get('lotado', None)
+        if lotado:
+            lotado_bool = lotado.lower() == 'true'
+            context['lotado'] = lotado_bool
+        else:
+            context['lotado'] = False
+
         # Verifique se há uma inscrição do tipo 'DOCENTE' relacionada a este curso
         inscricoes_docentes = Inscricao.objects.filter(curso=curso, condicao_na_acao='DOCENTE')
 
         usuarios_docentes = [inscricao.participante for inscricao in inscricoes_docentes]
-        usuario_inscrito = Exists(
-            Inscricao.objects.filter(curso=curso, participante=self.request.user)
-            )
+        usuario_inscrito = Inscricao.objects.filter(curso=curso, participante=self.request.user).exists()
+    
         # Adicione o usuário docente ao contexto
         context['usuarios_docentes'] = usuarios_docentes
         context['usuario_inscrito'] = usuario_inscrito

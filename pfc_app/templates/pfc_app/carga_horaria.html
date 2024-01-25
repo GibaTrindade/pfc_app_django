@@ -18,12 +18,12 @@
             <label for="{{ form.data_fim.id_for_label }}" >Até</label>
             
         </div>
-        <div class="col-md-4 form-floating mb-3">
-            <button type="submit" class="btn btn-primary btn-lg">FILTRAR POR TÉRMINO DO CURSO</button>
+        <div class="col-md-4 form-floating mb-3 d-flex align-items-center">
+            <button type="submit" class="btn btn-primary">FILTRAR POR TÉRMINO DO CURSO</button>
         </div>
     </form>
     <div class="row d-flex">
-        <div class="col-md-5 col-12 mb-3 mr-3">
+        <div class="col-md-5 col-12 my-3 mr-3">
             <div class="card">
                 <h2 class="card-header justify-content-center bg-warning d-flex align-items-center" style="height: 10vh;">{{ carga_horaria_total }} hora{{ carga_horaria_total|custom_pluralize:'s'}} </h2>
                 <div class="card-body">
@@ -32,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-7 col-12 mb-3 overflow-scroll border rounded" style="height: 50vh;">
+        <div class="col-md-7 col-12 mt-3 overflow-scroll border rounded" style="height: 50vh;">
             <div class="d-flex py-2 justify-content-center mb-5" ><h3>LISTA DE CURSOS</h3></div>
                 <div class="row">
                     <div class="col-6 border-end px-2">
