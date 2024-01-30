@@ -7,7 +7,7 @@
 <div class="row">
 {% for curso in cursos %}
 <div class="col-sm-4">
-<div class="card border-secondary mb-3 mt-3 shadow position-relative" style="height: 320px;">
+<div class="card border-secondary mb-3 mt-3 position-relative zoom" style="height: 320px;">
   {% if curso.num_inscricoes >= curso.vagas %}
     <span class="position-absolute top-0 end-0 badge bg-danger p-2">Lotado</span>
   {% endif %}

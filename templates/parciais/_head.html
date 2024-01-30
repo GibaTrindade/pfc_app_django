@@ -15,7 +15,16 @@
     {% load bootstrap5 %}
     {% bootstrap_css %}
 <style>
-footer {
+.zoom {
+        transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out; /* Adiciona transição à transformação e à sombra */
+}
+
+.zoom:hover {
+    transform: scale(1.05); /* Aumenta o tamanho do card em 5% */
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
+}
+
+    footer {
     position: fixed;
     left: 0;
     bottom: 0;
