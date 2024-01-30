@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'parciais/_messages.html' %}
+
+
+<div class="container d-flex justify-content-center bg-gradient" 
+        style="background-color: rgb(112,44,249); height: 20vh; margin-bottom: -5vh;">
+<h1 style="color: #fdfdfd">Dashboard</h1>
+</div>
+<div class="row d-flex justify-content-center align-items-start">
+    <div class="col-xxl-3 col-sm-6 col-12 mx-5 border rounded zoom" 
+        style="height: 15vh; background-color: white;">
+        <div class="row d-flex justify-content-center align-items-center" style="height:100%;">
+            <img class="img-fluid " src="{% static 'nerd-diploma.jpg' %}" alt="" style="height: 100%; width: auto;">
+            <div class="col"><h5>40 inscrições concluídas</h5></div>
+        </div>    
+    </div>
+    <div class="col-xxl-3 col-sm-6 col-12 mx-5 border rounded zoom" 
+        style="height: 15vh; background-color: white;">
+        <div class="row d-flex justify-content-center align-items-center" style="height:100%;">
+            <img class="img-fluid " src="{% static 'quadro.png' %}" alt="" style="height: 100%; width: auto;">
+            <div class="col"><h5>10 cursos ministrados</h5></div>
+        </div>    
+    </div>
+    <div class="col-xxl-3 col-sm-6 col-12 mx-5 border rounded zoom" 
+        style="height: 15vh; background-color: white;">
+        <div class="row d-flex justify-content-center align-items-center" style="height:100%;">
+            <img class="img-fluid " src="{% static 'naruto.png' %}" alt="" style="height: 100%; width: auto;">
+            <div class="col"><h5>240 horas-aula entregues</h5></div>
+        </div>    
+    </div>
+
+
+</div>
+
+{% endblock %}

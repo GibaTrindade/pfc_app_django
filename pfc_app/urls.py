@@ -5,10 +5,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', views.cursos, name='lista_cursos'),
+    path('', views.dashboard, name='dashboard'),
     path('accounts/login/', views.login, name='login'),
     path('registrar/', views.registrar, name='registrar'),
     path('logout/', views.logout, name='logout'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('cursos/', views.cursos, name='lista_cursos'),
     path('ch/', views.carga_horaria, name='carga_horaria'),
     path('inscricoes/', views.inscricoes, name='inscricoes'),

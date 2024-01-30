@@ -39,6 +39,9 @@ from reportlab.lib.units import inch
 from validate_docbr import CPF
 
 # Create your views here.
+def dashboard(request):
+    return render(request, 'pfc_app/dashboard.html')
+
 
 def login(request):
     if request.method != 'POST':

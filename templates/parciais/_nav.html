@@ -28,6 +28,17 @@
                         </li>
                     {% endif %}
                     <li class="nav-item iconChange  me-4 pt-2">
+                        <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                            
+                                <img class="one iconHeight mx-2" src="/static/graph-down-arrow.svg" alt="android2">
+                                <img class="two iconHeight mx-2" src="/static/graph-up-arrow.svg"
+                                    alt="android">
+                            </div>
+                            <div class="smallFont textColor">Dashboard</div>
+                        </a>
+                    </li>
+                    <li class="nav-item iconChange  me-4 pt-2">
                         <a href="{% url 'lista_cursos' %}" class="nav-link text-center  p-0">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
@@ -94,11 +105,28 @@
                         </ul>
                     </li>
                     {% else %}
-                    {% comment %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Entrar</a>
-                    </li>
-                    {% endcomment %}
+                    <li class="nav-item iconChange  me-4 pt-2">
+                            <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">
+                                <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                    <img class="one iconHeight mx-2" src="/static/graph-down-arrow.svg" alt="android2">
+                                    <img class="two iconHeight mx-2" src="/static/graph-up-arrow.svg"
+                                        alt="android">
+                                </div>
+                                <div class="smallFont textColor">Dashboard</div>
+                            </a>
+                        </li>
+                        <li class="nav-item iconChange  me-4 pt-2">
+                            <a class="nav-link text-center  p-0" href="{% url 'login' %}">
+                                <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                    <img class="one iconHeight mx-2" src="/static/door-closed.svg" alt="android2">
+                                    <img class="two iconHeight mx-2" src="/static/door-open.svg"
+                                        alt="android">
+                                </div>
+                                <div class="smallFont textColor">Login</div>
+                            </a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
