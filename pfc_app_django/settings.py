@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'django_static_fontawesome',
     'mathfilters',
+    'explorer',
 ]
 
 MIDDLEWARE = [
@@ -197,4 +198,8 @@ JAZZMIN_SETTINGS = {
     
     
 }
+
+
+EXPLORER_CONNECTIONS = { 'Default': 'default' }
+EXPLORER_DEFAULT_CONNECTION = 'default'
 

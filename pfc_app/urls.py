@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from . import views
 from django.contrib.auth import views as auth_views
 from django.conf import settings
@@ -28,6 +28,7 @@ urlpatterns = [
     path('reset-password/', views.reset_password_request, name='reset_password_request'),
     path('change-password/', views.change_password, name='change_password'),
     path('generate_reconhecimento/<int:validacao_id>/', views.generate_all_reconhecimento, name='generate_reconhecimento'),
+    path('explorer/', include('explorer.urls')),
 ]
 
 if settings.DEBUG:
