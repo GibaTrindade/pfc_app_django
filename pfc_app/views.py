@@ -19,7 +19,7 @@ from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
                     Tema, Subtema, Carreira
 from .forms import AvaliacaoForm, DateFilterForm
-from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef, Value
+from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef, Value, Subquery
 from django.db.models.functions import Concat
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
@@ -121,6 +121,11 @@ def logout(request):
 def cursos(request):
   lista_cursos = Curso.objects.all()
   data_atual = date.today()
+  status_inscricao=Subquery(
+        Inscricao.objects.filter(
+            curso=OuterRef('pk'), participante=request.user
+        ).values('status__nome')[:1]
+    )
   subquery = ArraySubquery(
     Inscricao.objects.filter(curso=OuterRef('pk'))
         .exclude(condicao_na_acao='DOCENTE')
@@ -141,7 +146,8 @@ def cursos(request):
         usuario_inscrito=Exists(
            Inscricao.objects.filter(participante=request.user, curso=OuterRef('pk'))
                                 ),
-        lista_inscritos = subquery
+        lista_inscritos = subquery,
+        status_inscricao = status_inscricao
         
     ).order_by('data_inicio').all().filter(data_inicio__gt=data_atual)
   #template = loader.get_template('base.html')

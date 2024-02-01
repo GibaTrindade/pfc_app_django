@@ -1,6 +1,6 @@
 <!--_nav.html-->
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-light static-top p-0 align-items-center border-bottom">
+<nav class="navbar navbar-expand-lg navbar-light static-top p-0 align-items-center border-bottom shadow-sm">
     <div class="container-fluid">
         <a class="navbar-brand " href="#">
             <img src="/media/igpe.png" alt="" width="60" height="60">
@@ -19,8 +19,8 @@
                             <a class="nav-link text-center  p-0" href="/admin/">
                                 <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                    <img class="one iconHeight mx-2" src="/static/android2.svg" alt="android2">
-                                    <img class="two iconHeight mx-2" src="/static/android.svg"
+                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/android2.svg' %}" alt="android2">
+                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/android.svg' %}"
                                         alt="android">
                                 </div>
                                 <div class="smallFont textColor">Admin</div>
@@ -31,8 +31,8 @@
                         <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                             
-                                <img class="one iconHeight mx-2" src="/static/graph-down-arrow.svg" alt="android2">
-                                <img class="two iconHeight mx-2" src="/static/graph-up-arrow.svg"
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/graph-down-arrow.svg' %}" alt="android2">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/graph-up-arrow.svg' %}"
                                     alt="android">
                             </div>
                             <div class="smallFont textColor">Dashboard</div>
@@ -42,8 +42,8 @@
                         <a href="{% url 'lista_cursos' %}" class="nav-link text-center  p-0">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                <img class="one iconHeight mx-2" src="/static/book.svg" alt="book">
-                                <img class="two iconHeight mx-2" src="/static/book-half.svg"
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/book.svg' %}" alt="book">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/book-half.svg' %}"
                                     alt="book-half">
                             </div>
                             <div class="smallFont textColor">Inscrições Abertas</div>
@@ -53,8 +53,8 @@
                         <a class="nav-link text-center  p-0" href="{% url 'validar_ch' %}">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                <img class="one iconHeight mx-2" src="/static/send-check.svg" alt="enviar">
-                                <img class="two iconHeight mx-2" src="/static/send-check-fill.svg"
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/send-check.svg' %}" alt="enviar">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/send-check-fill.svg' %}"
                                     alt="enviar-half">
                             </div>
                             <div class="smallFont textColor">Validar Carga Horária</div>
@@ -66,8 +66,8 @@
                         <a class="nav-link text-center  p-0" href="{% url 'inscricoes' %}">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                <img class="one iconHeight mx-2" src="/static/mortarboard.svg" alt="mortarboard">
-                                <img class="two iconHeight mx-2" src="/static/mortarboard-fill.svg"
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/mortarboard.svg' %}" alt="mortarboard">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/mortarboard-fill.svg' %}"
                                     alt="mortarboard-half">
                             </div>
                             <div class="smallFont textColor">Meus Cursos</div> 
@@ -78,8 +78,8 @@
                         <a class="nav-link text-center  p-0" href="{% url 'carga_horaria' %}"> 
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                <img class="one iconHeight mx-2" src="/static/bar-chart-line.svg" alt="bar-chart-line">
-                                <img class="two iconHeight mx-2" src="/static/bar-chart-line-fill.svg"
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/bar-chart-line.svg' %}" alt="bar-chart-line">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/bar-chart-line-fill.svg' %}"
                                     alt="bar-chart-line-fill">
                             </div>
                             <div class="smallFont textColor">Minha Carga Horária</div> 
@@ -90,8 +90,8 @@
                         <a class="nav-link text-center  p-0 dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                <img class="one iconHeight mx-2" src="/static/person-check.svg" alt="person-check">
-                                <img class="two iconHeight mx-2" src="/static/person-fill-check.svg"
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/person-check.svg' %}" alt="person-check">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/person-fill-check.svg' %}"
                                     alt="person-check-fill">
                             </div>
                             <div class="smallFont textColor">{{user.username}}</div> 
@@ -109,8 +109,8 @@
                             <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">
                                 <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                    <img class="one iconHeight mx-2" src="/static/graph-down-arrow.svg" alt="android2">
-                                    <img class="two iconHeight mx-2" src="/static/graph-up-arrow.svg"
+                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/graph-down-arrow.svg' %}" alt="android2">
+                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/graph-up-arrow.svg' %}"
                                         alt="android">
                                 </div>
                                 <div class="smallFont textColor">Dashboard</div>
@@ -120,8 +120,8 @@
                             <a class="nav-link text-center  p-0" href="{% url 'login' %}">
                                 <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
-                                    <img class="one iconHeight mx-2" src="/static/door-closed.svg" alt="android2">
-                                    <img class="two iconHeight mx-2" src="/static/door-open.svg"
+                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/door-closed.svg' %}" alt="android2">
+                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/door-open.svg' %}"
                                         alt="android">
                                 </div>
                                 <div class="smallFont textColor">Login</div>
