@@ -26,6 +26,18 @@
                                 <div class="smallFont textColor">Admin</div>
                             </a>
                         </li>
+                        <li class="nav-item iconChange  me-4 pt-2">
+                            <a class="nav-link text-center  p-0" href="{% url 'usuarios_sem_ch' %}">
+                                <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/people.svg' %}" alt="android2">
+                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/people-fill.svg' %}"
+                                        alt="android">
+                                </div>
+                                <div class="smallFont textColor">Lista Usuários</div>
+                            </a>
+                        </li>
+                        
                     {% endif %}
                     <li class="nav-item iconChange  me-4 pt-2">
                         <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">

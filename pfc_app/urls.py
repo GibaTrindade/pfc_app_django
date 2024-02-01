@@ -29,6 +29,8 @@ urlpatterns = [
     path('change-password/', views.change_password, name='change_password'),
     path('generate_reconhecimento/<int:validacao_id>/', views.generate_all_reconhecimento, name='generate_reconhecimento'),
     path('explorer/', include('explorer.urls')),
+    path('usuarios_sem_ch/', views.usuarios_sem_ch, name='usuarios_sem_ch'),
+
 ]
 
 if settings.DEBUG:

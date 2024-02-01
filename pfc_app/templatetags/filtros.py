@@ -21,6 +21,8 @@ def dividir(value, arg=60):
     except:
         return ''
     if value >= 0:
-        return str(round(value / arg * 100, 2))+'%'
+        ch_percentual = round(value / arg * 100, 2) if value / arg * 100 <= 100 else 100
+
+        return str(ch_percentual)+'%'
     else:
         return ''

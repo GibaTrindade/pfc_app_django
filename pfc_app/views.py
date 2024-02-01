@@ -19,8 +19,8 @@ from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
                     Tema, Subtema, Carreira
 from .forms import AvaliacaoForm, DateFilterForm
-from django.db.models import Count, Q, Sum, Case, When, BooleanField, Exists, OuterRef, Value, Subquery
-from django.db.models.functions import Concat
+from django.db.models import Count, Q, Sum, F, When, BooleanField, Exists, OuterRef, Value, Subquery
+from django.db.models.functions import Coalesce
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from datetime import date, datetime
@@ -167,6 +167,23 @@ def cursos(request):
   #print(context['cursos'][1].inscricao_set.count())
   return render(request, 'pfc_app/lista_cursos.html' ,context)
 
+@login_required
+def usuarios_sem_ch(request):
+    # Filter users with a total load less than 60
+    users = User.objects.annotate(
+        total_ch=Coalesce(Sum('inscricao__ch_valida'), 0)
+    ).filter(total_ch__lt=60).filter(grupo_ocupacional='GGOV').order_by('nome')
+
+    # Calculate remaining load needed to reach 60
+    users = users.annotate(ch_faltante=60 - F('total_ch'))
+
+    # Select the fields you need for the table
+    users = users.values('nome', 'email', 'total_ch', 'ch_faltante')
+
+    context = {
+        'usuarios_sem_ch': users,
+    }
+    return render(request, 'pfc_app/usuarios_sem_ch.html', context )
 
 @login_required
 def carga_horaria(request):

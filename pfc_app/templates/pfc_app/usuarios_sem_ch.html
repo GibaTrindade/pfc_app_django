@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'parciais/_messages.html' %}
+<div class="d-flex w-100 justify-content-center mt-3">
+<div class=" col-12">
+<div class="d-flex p-2 justify-content-center mb-5"><h3>USUÁRIOS COM CH < 60h</h3></div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Nome do curso</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Carga horária concluída</th>
+                    <th scope="col">Carga horária faltante</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios_sem_ch %}
+
+    
+                    
+                    <tr>
+                        <th scope="row">{{ usuario.nome }}</th>
+                        <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.total_ch }}</td>
+
+                        <td>{{ usuario.ch_faltante }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+          </div>
+</div>
+</div>
+
+
+
+{% endblock %}

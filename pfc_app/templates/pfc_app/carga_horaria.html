@@ -31,16 +31,29 @@
                 </h2>
                 
                 <div class="card-body">
+                {% if carga_horaria_total >= 60 %}
                     <div class="progress mb-2 ">
-                    <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" 
-                        role="progressbar" 
-                        aria-valuenow="75" 
-                        aria-valuemin="0" 
-                        aria-valuemax="100" 
-                        style="width: {{ carga_horaria_total|dividir }}; color: black;">
-                        <strong>{{ carga_horaria_total|dividir }}</strong>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
+                            role="progressbar" 
+                            aria-valuenow="75" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100" 
+                            style="width: {{ carga_horaria_total|dividir }}; color: white;">
+                            <strong>{{ carga_horaria_total|dividir }}</strong>
+                        </div>
                     </div>
-                </div>
+                {% else %}
+                    <div class="progress mb-2 ">
+                        <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" 
+                            role="progressbar" 
+                            aria-valuenow="75" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100" 
+                            style="width: {{ carga_horaria_total|dividir }}; color: black;">
+                            <strong>{{ carga_horaria_total|dividir }}</strong>
+                        </div>
+                    </div>
+                {% endif %}
                     <h5 class="card-title">Cursos PFC: {{ carga_horaria_pfc }} hora{{ carga_horaria_pfc|custom_pluralize:'s'}} </h5>
                     <h5 class="card-title">Carga Horária Externa Validada: {{ carga_horaria_validada }} hora{{ carga_horaria_validada|custom_pluralize:'s'}} </h5>
                 </div>
