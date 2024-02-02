@@ -1045,9 +1045,15 @@ def change_password(request):
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Important!
+            update_session_auth_hash(request, user)
             messages.success(request, 'Senha alterada com sucesso!')
             return redirect('lista_cursos')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    # A mensagem de erro é adicionada para cada erro encontrado.
+                    # Você pode personalizar esta parte para melhor atender às suas necessidades.
+                    messages.error(request, f"Erro: {error}")
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'pfc_app/change_password.html', {'form': form})

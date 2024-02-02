@@ -172,12 +172,12 @@ MESSAGE_TAGS = {
 
 # Configurações de E-mail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ncdseplag@gmail.com'
+EMAIL_HOST_PASSWORD = 'jworzvpvvsguxzfu'
+DEFAULT_FROM_EMAIL = 'ncdseplag@gmail.com'
 
 
 
@@ -204,21 +204,4 @@ EXPLORER_CONNECTIONS = { 'Default': 'default' }
 EXPLORER_DEFAULT_CONNECTION = 'default'
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-    },
-}
 

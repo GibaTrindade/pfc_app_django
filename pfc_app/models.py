@@ -106,6 +106,17 @@ class InstituicaoCertificadora(models.Model):
     def __str__(self):
         return self.nome
 
+class Categoria(models.Model):
+    nome = models.CharField(max_length=400, blank=False, null=False)
+    def __str__(self):
+        return self.nome
+    
+class Modalidade(models.Model):
+    nome = models.CharField(max_length=400, blank=False, null=False)
+    def __str__(self):
+        return self.nome
+
+
 class Curso(models.Model):
     TURNO_CHOICES = [
         ('MANHA', 'MANHÃ'),
