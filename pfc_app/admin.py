@@ -118,6 +118,8 @@ admin.site.register(Trilha)
 admin.site.register(InstituicaoCertificadora)
 admin.site.register(InstituicaoPromotora)
 admin.site.register(Carreira)
+admin.site.register(Categoria)
+admin.site.register(Modalidade)
 
 
 admin.site.site_header = 'PFC'
