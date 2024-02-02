@@ -17,7 +17,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
-                    Tema, Subtema, Carreira
+                    Tema, Subtema, Carreira, Modalidade, Categoria
 from .forms import AvaliacaoForm, DateFilterForm
 from django.db.models import Count, Q, Sum, F, When, BooleanField, Exists, OuterRef, Value, Subquery
 from django.db.models.functions import Coalesce
@@ -171,8 +171,11 @@ def cursos(request):
 def usuarios_sem_ch(request):
     # Filter users with a total load less than 60
     users = User.objects.annotate(
-        total_ch=Coalesce(Sum('inscricao__ch_valida'), 0)
-    ).filter(total_ch__lt=60).filter(grupo_ocupacional='GGOV').order_by('nome')
+        total_ch_inscricao=Coalesce(Sum('inscricao__ch_valida', filter=Q(inscricao__concluido=True, inscricao__curso__status__nome='FINALIZADO'), distinct=True), 0),
+        total_ch_validacao=Coalesce(Sum('requerente_validacao__ch_confirmada', filter=Q(requerente_validacao__status__nome='DEFERIDA'), distinct=True), 0)
+    ).annotate(
+        total_ch=F('total_ch_inscricao') + F('total_ch_validacao')
+    ).filter(grupo_ocupacional='GGOV').order_by('nome')
 
     # Calculate remaining load needed to reach 60
     users = users.annotate(ch_faltante=60 - F('total_ch'))
@@ -496,12 +499,17 @@ def validar_ch(request):
     validacoes_user = Validacao_CH.objects.filter(usuario=request.user)
     condica_acao = Validacao_CH.CONDICAO_ACAO_CHOICES
     carreiras = Carreira.objects.all()
+    modalidades = Modalidade.objects.all()
+    categorias = Categoria.objects.all()
 
 
     return render(request, 'pfc_app/validar_ch.html', 
                   {'validacoes': validacoes_user, 
                    'opcoes': condica_acao, 
-                   'carreiras': carreiras})
+                   'carreiras': carreiras,
+                   'modalidades': modalidades,
+                   'categorias': categorias
+                   })
 
 
 def download_all_pdfs(request):
@@ -906,7 +914,7 @@ def generate_all_reconhecimento(request, validacao_id):
             # Caminho relativo para a imagem dentro do diretório 'static'
         
         assinatura_relative_path = 'assinatura.jpg'
-        igpe_relative_path = 'Igpe.jpg'
+        igpe_relative_path = 'igpe.png'
         egape_relative_path = 'Egape.jpg'
         pfc_relative_path = 'PFC1.png'
         seplag_relative_path = 'seplag-transp-horizontal.png'
