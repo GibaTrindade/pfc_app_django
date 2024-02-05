@@ -268,7 +268,7 @@ class Validacao_CH(models.Model):
     nome_curso = models.CharField(max_length=100, default='')
     instituicao_promotora = models.CharField(max_length=200, default='')
     requerimento_ch  = models.ForeignKey("RequerimentoCH", on_delete=models.SET_NULL, blank=True, null=True)
-    responsavel_analise = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='responsavel_validacao')
+    responsavel_analise = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=523, blank=False, null=False, related_name='responsavel_validacao')
     ch_solicitada = models.IntegerField(blank=True, null=True)
     ch_confirmada = models.IntegerField(blank=True, null=True)
     data_termino_curso = models.DateField(blank=False, null=False)
@@ -277,7 +277,7 @@ class Validacao_CH(models.Model):
     agenda_pfc = models.BooleanField(default=False, blank=False, null=False)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING)#, default=status_validacao.id)
     condicao_na_acao = models.CharField(max_length=20, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
-    analisado_em = models.DateField(blank=True, null=True)
+    analisado_em = models.DateField(blank=False, null=False, default=timezone.now)
     carreira = models.ForeignKey(Carreira, on_delete=models.DO_NOTHING, blank=True, null=True)
     trilha = models.ForeignKey(Trilha, on_delete=models.DO_NOTHING, blank=True, null=True)
 

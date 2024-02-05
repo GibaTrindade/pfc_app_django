@@ -90,6 +90,8 @@ def registrar(request):
         return JsonResponse({'success': False, 'msg': 'Username já existe!'})
     if User.objects.filter(email=email).exists():
         return JsonResponse({'success': False, 'msg': 'Email já existe!'})
+    if User.objects.filter(cpf=cpf).exists():
+        return JsonResponse({'success': False, 'msg': 'CPF já existe!'})
 
     cpf_padrao = CPF()
     # Validar CPF
