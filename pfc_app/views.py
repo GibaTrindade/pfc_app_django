@@ -75,7 +75,7 @@ def registrar(request):
     telefone = request.POST.get('telefone')
     orgao_origem = request.POST.get('orgao_origem')
 
-
+    
     # Contexto para manter os dados no formulário
     context = {
         'nome': nome,
@@ -86,12 +86,17 @@ def registrar(request):
         'orgao_origem': orgao_origem
     }
     
-        
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({'success': False, 'msg': 'Username já existe!'})
+    if User.objects.filter(email=email).exists():
+        return JsonResponse({'success': False, 'msg': 'Email já existe!'})
+
     cpf_padrao = CPF()
     # Validar CPF
     if not cpf_padrao.validate(cpf):
-        messages.error(request, f'CPF digitado está errado!')
-        return render(request, 'pfc_app/registrar.html', context)
+        #messages.error(request, f'CPF digitado está errado!')
+        return JsonResponse({'success': False, 'msg': 'CPF Inválido!'})
+        #return render(request, 'pfc_app/registrar.html', context)
 
     
     send_mail('Solicitação de cadastro', 

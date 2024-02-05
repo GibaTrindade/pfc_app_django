@@ -173,7 +173,7 @@ class Inscricao(models.Model):
         ('DOCENTE', 'DOCENTE'),
     ]
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
-    participante = models.ForeignKey(User, on_delete=models.CASCADE, )
+    participante = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name = ("Usuário"))
     ch_valida = models.IntegerField(blank=True, null=True)
     condicao_na_acao = models.CharField(max_length=400, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
     status = models.ForeignKey(StatusInscricao, on_delete=models.PROTECT)
