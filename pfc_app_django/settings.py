@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_static_fontawesome',
     'mathfilters',
     'explorer',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

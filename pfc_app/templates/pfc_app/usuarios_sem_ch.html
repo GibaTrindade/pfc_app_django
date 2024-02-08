@@ -6,12 +6,75 @@
 <div class="d-flex w-100 justify-content-center mt-3">
 <div class=" col-12">
 <div class="d-flex p-2 justify-content-center mb-5"><h3>USUÁRIOS COM CH < 60h</h3></div>
+            
+                <form method="get">
+                    {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-3 col-12">
+                        <div class=" form-floating mb-3">
+                            <input  type="input" 
+                                    class="form-control" 
+                                    style="background-color: #f5f5f5;" 
+                                    name="nome__icontains" 
+                                    id="id_nome__icontains" 
+                                    >
+                            <label for="id_nome__icontains" >Busque pelo nome do usuário</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-12">
+                        <div class=" form-floating mb-3">
+                            <input  type="input" 
+                                    class="form-control" 
+                                    style="background-color: #f5f5f5;" 
+                                    name="email__icontains" 
+                                    id="id_email__icontains" 
+                                    >
+                            <label for="id_email__icontains" >Busque pelo email do usuário</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-12">
+                        <div class=" form-floating mb-3">
+                            <select class="form-control" 
+                                    style="background-color: #f5f5f5;" 
+                                    name="lotacao" 
+                                    id="id_lotacao">
+                                {% for value, lotacao in filtro.form.lotacao.field.choices %}
+                                    <option value="{{ lotacao }}">{{ lotacao }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_modalidade">Busque pela lotação</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-12">
+                        <div class=" form-floating mb-3">
+                            <select class="form-control" 
+                                    style="background-color: #f5f5f5;" 
+                                    name="lotacao_especifica" 
+                                    id="id_lotacao_especifica">
+                                {% for value, lotacao_esp in filtro.form.lotacao_especifica.field.choices %}
+                                    <option value="{{ lotacao_esp }}">{{ lotacao_esp }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_modalidade">Busque pela lotação específica</label>
+                        </div>
+                    </div>
+
+                    <button class='btn btn-primary' type='submit'>
+                        Filtrar
+                    </button>
+                </div>
+                </form>
+            
+        
+        
         <div class="table-responsive">
             <table class="table">
                 <thead>
                 <tr>
                     <th scope="col">Nome do curso</th>
                     <th scope="col">Email</th>
+                    <th scope="col">Lotação</th>
+                    <th scope="col">Lotação específica</th>
                     <th scope="col">Carga horária concluída</th>
                     <th scope="col">Carga horária faltante</th>
                 </tr>
@@ -24,6 +87,8 @@
                     <tr>
                         <th scope="row">{{ usuario.nome }}</th>
                         <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.lotacao }}</td>
+                        <td>{{ usuario.lotacao_especifica }}</td>
                         <td>{{ usuario.total_ch }}</td>
 
                         <td>{{ usuario.ch_faltante }}</td>
@@ -31,7 +96,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+
           </div>
+          
 </div>
 </div>
 
