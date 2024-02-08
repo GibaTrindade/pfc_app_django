@@ -383,7 +383,7 @@ def inscrever(request, curso_id):
           return redirect('detail_curso', pk=curso_id)
     
     try:
-      if curso.eh_evento:
+      if curso.eh_evento or not request.user.is_externo:
           inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_aprovada)
       else:
           inscricao, criada = Inscricao.objects.get_or_create(participante=request.user, curso=curso, status=status_id_pendente)
