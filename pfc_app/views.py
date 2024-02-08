@@ -37,6 +37,7 @@ from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from io import BytesIO
 from reportlab.lib.units import inch
 from validate_docbr import CPF
+from .filters import UserFilter
 
 # Create your views here.
 def dashboard(request):
@@ -176,6 +177,7 @@ def cursos(request):
 
 @login_required
 def usuarios_sem_ch(request):
+
     # Filter users with a total load less than 60
     users = User.objects.annotate(
         total_ch_inscricao=Coalesce(Sum('inscricao__ch_valida', filter=Q(inscricao__concluido=True, inscricao__curso__status__nome='FINALIZADO'), distinct=True), 0),
@@ -188,10 +190,16 @@ def usuarios_sem_ch(request):
     users = users.annotate(ch_faltante=60 - F('total_ch'))
 
     # Select the fields you need for the table
-    users = users.values('nome', 'email', 'total_ch', 'ch_faltante')
+    users = users.values('nome', 'email', 'lotacao', 'lotacao_especifica', 'total_ch', 'ch_faltante')
 
+    filtro = UserFilter(request.GET, queryset=users)
+    users = filtro.qs
+    # lotacao_values = User.objects.values_list('lotacao', flat=True).distinct().order_by('lotacao')
+    # lotacao_especifica = User.objects.values_list('lotacao_especifica', flat=True).distinct().order_by('lotacao_especifica')
+    
     context = {
         'usuarios_sem_ch': users,
+        'filtro': filtro,
     }
     return render(request, 'pfc_app/usuarios_sem_ch.html', context )
 
