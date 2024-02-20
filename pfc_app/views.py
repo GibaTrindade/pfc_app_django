@@ -482,7 +482,10 @@ def validar_ch(request):
         instituicao_promotora = request.POST['instituicao_promotora']
         ementa = request.POST['ementa']
         condicao_na_acao = request.POST['condicao_acao']
-        carreira_id = condicao_na_acao = request.POST['carreira']
+        carreira_id = request.POST['carreira']
+        conhecimento_previo = request.POST['conhecimento_previo']
+        conhecimento_posterior = request.POST['conhecimento_posterior']
+        voce_indicaria = request.POST['voce_indicaria']
         try:
             agenda_pfc_check = request.POST['agenda_pfc']
             agenda_pfc = True
@@ -505,7 +508,10 @@ def validar_ch(request):
                                  data_termino_curso=data_termino, data_inicio_curso = data_inicio,
                                  instituicao_promotora=instituicao_promotora, ementa=ementa, 
                                  agenda_pfc=agenda_pfc, status=status_validacao,
-                                 condicao_na_acao=condicao_na_acao, carreira=carreira)
+                                 condicao_na_acao=condicao_na_acao, carreira=carreira,
+                                 conhecimento_previo=conhecimento_previo, 
+                                 conhecimento_posterior=conhecimento_posterior,
+                                 voce_indicaria=voce_indicaria)
         avaliacao.save()
         # Redirecionar ou fazer algo após o envio bem-sucedido
         messages.success(request, 'Arquivo enviado com sucesso!')

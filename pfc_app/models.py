@@ -193,6 +193,8 @@ def calcular_carga_horaria(sender, instance, **kwargs):
 
 
 notas=(('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),('0', 'N/A'))
+notas10=(('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
+       ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9'), ('10', '10'))
 
 class Tema(models.Model):
     nome = models.CharField(max_length=100)
@@ -268,7 +270,7 @@ class Validacao_CH(models.Model):
     nome_curso = models.CharField(max_length=100, default='')
     instituicao_promotora = models.CharField(max_length=200, default='')
     requerimento_ch  = models.ForeignKey("RequerimentoCH", on_delete=models.SET_NULL, blank=True, null=True)
-    responsavel_analise = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=523, blank=False, null=False, related_name='responsavel_validacao')
+    responsavel_analise = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='responsavel_validacao')
     ch_solicitada = models.IntegerField(blank=True, null=True)
     ch_confirmada = models.IntegerField(blank=True, null=True)
     data_termino_curso = models.DateField(blank=False, null=False)
@@ -280,6 +282,9 @@ class Validacao_CH(models.Model):
     analisado_em = models.DateField(blank=False, null=False, default=timezone.now)
     carreira = models.ForeignKey(Carreira, on_delete=models.DO_NOTHING, blank=True, null=True)
     trilha = models.ForeignKey(Trilha, on_delete=models.DO_NOTHING, blank=True, null=True)
+    conhecimento_previo = models.TextField(choices=notas, blank=False, null=False)
+    conhecimento_posterior = models.TextField(choices=notas, blank=False, null=False)
+    voce_indicaria = models.TextField(choices=notas10, blank=False, null=False)
 
     def __str__(self):
         return self.usuario.username

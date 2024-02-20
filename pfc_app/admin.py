@@ -100,6 +100,12 @@ class Validacao_CHAdmin(admin.ModelAdmin):
 
     get_caminho_arquivo.short_description = 'Caminho do Arquivo'
 
+    def save_model(self, request, obj, form, change):
+        if change:
+            obj.responsavel_analise = request.user  # Define o usuário logado como responsável pela análise
+            print(request.user)
+        super().save_model(request, obj, form, change)
+
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(User, CustomUserAdmin)
