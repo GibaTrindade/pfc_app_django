@@ -20,7 +20,7 @@ from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Tema, Subtema, Carreira, Modalidade, Categoria
 from .forms import AvaliacaoForm, DateFilterForm
 from django.db.models import Count, Q, Sum, F, When, BooleanField, Exists, OuterRef, Value, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Concat
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from datetime import date, datetime
@@ -144,6 +144,15 @@ def cursos(request):
         .annotate(nomes_concatenados=StringAgg('participante__nome', delimiter=', '))
         .values('nomes_concatenados')
 )
+  subquery_docentes = ArraySubquery(
+    Inscricao.objects.filter(curso=OuterRef('pk'))
+        .exclude(condicao_na_acao='DISCENTE')
+        .order_by('inscrito_em')
+        .annotate(nome_completo=Concat('participante__first_name', Value(' '), 'participante__last_name'))
+        .values('curso')
+        .annotate(nomes_concatenados=StringAgg('nome_completo', delimiter=', '))
+        .values('nomes_concatenados')
+)
   
   cursos_com_inscricoes = Curso.objects.annotate(
         num_inscricoes=Count('inscricao', 
@@ -155,6 +164,7 @@ def cursos(request):
            Inscricao.objects.filter(participante=request.user, curso=OuterRef('pk'))
                                 ),
         lista_inscritos = subquery,
+        lista_docentes = subquery_docentes,
         status_inscricao = status_inscricao
         
     ).order_by('data_inicio').all().filter(data_inicio__gt=data_atual)
@@ -168,7 +178,10 @@ def cursos(request):
                         # .values('nome_com_virgula')
                         # .order_by('participante__nome')
                         # .distinct('participante__nome')
-                        # .values_list('participante__nome', flat=True)                  
+                        # .values_list('participante__nome', flat=True)        
+  for curso in cursos_com_inscricoes:
+      print(curso.lista_docentes)
+
   context = {
     'cursos': cursos_com_inscricoes,
   }
