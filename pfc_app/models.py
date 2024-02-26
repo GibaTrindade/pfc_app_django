@@ -35,6 +35,8 @@ class User(AbstractUser):
     avatar = models.ImageField(null=True, blank=True)
     avatar_base64 = models.TextField(blank=True, null=True)
     
+    USERNAME_FIELD = "cpf"
+
     def publish(self):
         self.published_date = timezone.now()
         self.save()
