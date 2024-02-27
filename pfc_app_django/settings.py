@@ -183,7 +183,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 
 JAZZMIN_SETTINGS = {
-    "login_logo": "pfc_app/logos/PFC1-400x174.png",
+    "login_logo": "pfc_app/logos/Logo2024-180x180.png",
     "welcome_sign": "Bem-vindo",
     "site_icon": "pfc_app/logos/IG.png",
     "site_logo": "pfc_app/logos/IG.png",

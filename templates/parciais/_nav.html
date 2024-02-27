@@ -39,6 +39,7 @@
                         </li>
                         
                     {% endif %}
+                    {% comment %}
                     <li class="nav-item iconChange  me-4 pt-2">
                         <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
@@ -50,6 +51,7 @@
                             <div class="smallFont textColor">Dashboard</div>
                         </a>
                     </li>
+                    {% endcomment %}
                     <li class="nav-item iconChange  me-4 pt-2">
                         <a href="{% url 'lista_cursos' %}" class="nav-link text-center  p-0">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
@@ -110,14 +112,14 @@
                            
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Minha Conta</a></li>
                             <li><a class="dropdown-item" href="{% url 'change_password' %}">Alterar Senha</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
                         </ul>
                     </li>
                     {% else %}
-                    <li class="nav-item iconChange  me-4 pt-2">
+                    {% comment %}
+                        <li class="nav-item iconChange  me-4 pt-2">
                             <a class="nav-link text-center  p-0" href="{% url 'dashboard' %}">
                                 <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
                                 
@@ -128,6 +130,7 @@
                                 <div class="smallFont textColor">Dashboard</div>
                             </a>
                         </li>
+                        {% endcomment %}
                         <li class="nav-item iconChange  me-4 pt-2">
                             <a class="nav-link text-center  p-0" href="{% url 'login' %}">
                                 <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">

@@ -9,12 +9,12 @@
         
         {% csrf_token %}
 
-        <img class="mb-1 mx-auto d-block" src="{% static 'PFC-nome.png' %}" alt="" width="auto" height="150">
+        <img class="mb-1 mx-auto d-block" src="{% static 'pfc_app/logos/Logo2024-180x180.png' %}" alt="" width="auto" height="150">
         <h1 class="h3 mb-3 fw-normal text-center">Faça o login</h1>
 
         <div class="form-floating">
         <input type="input" name="usuario" id="usuario_id" class="form-control mt-3" required autofocus>
-        <label for="usuario_id">Digite seu usuário</label>
+        <label for="usuario_id">Digite seu CPF</label>
         </div>
         <div class="form-floating">
         <input type="password" name="senha" id="senha_id" class="form-control" required>

@@ -179,8 +179,6 @@ def cursos(request):
                         # .order_by('participante__nome')
                         # .distinct('participante__nome')
                         # .values_list('participante__nome', flat=True)        
-  for curso in cursos_com_inscricoes:
-      print(curso.lista_docentes)
 
   context = {
     'cursos': cursos_com_inscricoes,

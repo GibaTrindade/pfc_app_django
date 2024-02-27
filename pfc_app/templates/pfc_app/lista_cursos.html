@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load mathfilters %}
+{% load filtros %}
 
 {% block content %}
 {% include 'parciais/_messages.html' %}
@@ -32,7 +33,7 @@
         <p class="card-text">
           <i class="bi bi-person-arms-up"></i>
           <small class="text-muted"><strong>
-                                      Instrutores:
+                                      Instrutor{{curso.lista_docentes|length|custom_pluralize:'es'}}:
                                     </strong> 
                                     {% if curso.lista_docentes|length  > 1 %}
                                       {{curso.lista_docentes.0}} e 
@@ -134,7 +135,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            {{curso.ementa_curso | safe}}
+            {{curso.ementa_curso | linebreaksbr | safe}}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
