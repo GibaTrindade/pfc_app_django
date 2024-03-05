@@ -786,7 +786,7 @@ def generate_single_pdf(request, inscricao_id):
     assinatura_relative_path = 'assinatura.jpg'
     igpe_relative_path = 'igpe.png'
     egape_relative_path = 'Egape.png'
-    pfc_relative_path = 'PFC1.png'
+    pfc_relative_path = 'retangulartransp.png'
     seplag_relative_path = 'seplagtransparente.png'
 
     # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
@@ -816,6 +816,7 @@ def generate_single_pdf(request, inscricao_id):
     p_subtitle2.drawOn(c, width-800, height-190)
     p1.wrapOn(c, 500, 100)
     p1.drawOn(c, width-800, height-300)
+    c.setTitle("Certificado PFC")
     c.save()
         
         #zipf.write(pdf_filename, os.path.basename(pdf_filename))
@@ -892,6 +893,7 @@ def generate_all_reconhecimento(request, validacao_id):
 
         tag_mapping = {
             "[cpf]": cpf_formatado,
+            "[origem]": user.origem,
             "[data_envio]": validacao.enviado_em.strftime("%d/%m/%Y"),
             "[lotacao]": user.lotacao,
             "[nome_curso]": validacao.nome_curso,
@@ -962,7 +964,7 @@ def generate_all_reconhecimento(request, validacao_id):
         assinatura_relative_path = 'assinatura.jpg'
         igpe_relative_path = 'igpe.png'
         egape_relative_path = 'Egape.jpg'
-        pfc_relative_path = 'PFC1.png'
+        pfc_relative_path = 'retangulartransp.png'
         seplag_relative_path = 'seplag-transp-horizontal.png'
 
 
@@ -1034,8 +1036,7 @@ def generate_all_reconhecimento(request, validacao_id):
         meio = (width/2)-(p_title.width/2)
         p_title.drawOn(c, meio, height-50)
         
-        
-        print(p_subtitle.height)
+        c.setTitle("Requerimento de Carga Horária")
         
         
         #p_subtitle2.wrapOn(c, 500, 100)
