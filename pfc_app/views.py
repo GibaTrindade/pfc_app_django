@@ -40,7 +40,9 @@ from validate_docbr import CPF
 from .filters import UserFilter
 
 # Create your views here.
+@login_required
 def dashboard(request):
+    return render(request, 'pfc_app/presentation.html')
     return render(request, 'pfc_app/dashboard.html')
 
 
@@ -61,7 +63,7 @@ def login(request):
     else:
         auth.login(request, user)
         messages.success(request, f'Oi, {user.nome.split(" ")[0].capitalize()}!')
-        return redirect('lista_cursos')
+        return redirect('home')
 
     return render(request, 'pfc_app/login.html')
 
@@ -880,6 +882,14 @@ def generate_all_reconhecimento(request, validacao_id):
             messages.error(request, f'CPF de {user.nome} está com número de caracteres errado!')
             return redirect('lista_cursos')
 
+        competencias = [competencia.nome for competencia in validacao.competencia.all()]
+        if competencias:  # Verifica se a lista não está vazia
+            # Caso haja mais de uma competência, substitui a última vírgula por " e "
+            texto_competencia = ", ".join(competencias[:-1]) + " e " + competencias[-1] if len(competencias) > 1 else competencias[0]
+        else:
+            texto_competencia = ""
+
+
         tag_mapping = {
             "[cpf]": cpf_formatado,
             "[data_envio]": validacao.enviado_em.strftime("%d/%m/%Y"),
@@ -889,13 +899,17 @@ def generate_all_reconhecimento(request, validacao_id):
             "[data_inicio]": validacao.data_inicio_curso.strftime("%d/%m/%Y"),
             "[data_termino]": validacao.data_termino_curso.strftime("%d/%m/%Y"),
             "[ch_valida]": validacao.ch_confirmada,
+            "[ch_solicitada]": validacao.ch_solicitada,
             "[data_analise]": dateformat.format(datetime.now(), 'd \d\e F \d\e Y'),
-            "[responsavel_analise]": validacao.responsavel_analise
+            "[responsavel_analise]": validacao.responsavel_analise,
+            "[competencias]": texto_competencia
         }
 
 # Substitua as tags pelo valor correspondente no texto
         for tag, value in tag_mapping.items():
             requerimento = requerimento.replace(tag, str(value))
+            fundamentacao = fundamentacao.replace(tag, str(value))
+            conclusao = conclusao.replace(tag, str(value))
             local_data = local_data.replace(tag, str(value))
             rodape = rodape.replace(tag, str(value))
 
@@ -954,7 +968,7 @@ def generate_all_reconhecimento(request, validacao_id):
 
         # Construa o caminho absoluto usando 'settings.STATIC_ROOT'
        
-        assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
+        #assinatura_path = os.path.join(settings.MEDIA_ROOT, assinatura_relative_path)
         igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
         egape_path = os.path.join(settings.MEDIA_ROOT, egape_relative_path)
         pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
@@ -965,7 +979,7 @@ def generate_all_reconhecimento(request, validacao_id):
 
         # Desenhe a imagem como fundo
         
-        c.drawImage(assinatura_path, 200, 80, width=196, height=63, preserveAspectRatio=True, mask='auto')
+        #c.drawImage(assinatura_path, 200, 80, width=196, height=63, preserveAspectRatio=True, mask='auto')
         c.drawImage(igpe_path, 32 + 20, height-35, width=32, height=32, preserveAspectRatio=True, mask='auto')
         #c.drawImage(egape_path, width-650, 20, width=196, height=63, preserveAspectRatio=True, mask='auto')
         c.drawImage(pfc_path, width-100, height-35, width=98, height=32, preserveAspectRatio=True, mask='auto')

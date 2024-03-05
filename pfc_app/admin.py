@@ -91,6 +91,7 @@ class Validacao_CHAdmin(admin.ModelAdmin):
                     'gerar_reconhecimento_ch', 'analisado_em',)
     list_editable = ('ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)
     list_filter = ('usuario', 'status',)
+    readonly_fields = ('conhecimento_previo', 'conhecimento_posterior', 'voce_indicaria')
 
     def gerar_reconhecimento_ch(self, obj):
         return format_html('<a href="{}">Gerar Reconhecimento</a>', reverse('generate_reconhecimento', args=[obj.id]))

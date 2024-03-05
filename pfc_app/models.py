@@ -195,8 +195,7 @@ def calcular_carga_horaria(sender, instance, **kwargs):
 
 
 notas=(('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),('0', 'N/A'))
-notas10=(('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
-       ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9'), ('10', '10'))
+
 
 class Tema(models.Model):
     nome = models.CharField(max_length=100)
@@ -284,9 +283,10 @@ class Validacao_CH(models.Model):
     analisado_em = models.DateField(blank=False, null=False, default=timezone.now)
     carreira = models.ForeignKey(Carreira, on_delete=models.DO_NOTHING, blank=True, null=True)
     trilha = models.ForeignKey(Trilha, on_delete=models.DO_NOTHING, blank=True, null=True)
+    competencia = models.ManyToManyField(Competencia, blank=True, null=True)
     conhecimento_previo = models.TextField(choices=notas, blank=False, null=False)
     conhecimento_posterior = models.TextField(choices=notas, blank=False, null=False)
-    voce_indicaria = models.TextField(choices=notas10, blank=False, null=False)
+    voce_indicaria = models.TextField(choices=notas, blank=False, null=False)
 
     def __str__(self):
         return self.usuario.username
