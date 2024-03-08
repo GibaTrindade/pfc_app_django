@@ -118,6 +118,8 @@ class Modalidade(models.Model):
     def __str__(self):
         return self.nome
 
+class PlanoCurso(models.Model):
+    pass
 
 class Curso(models.Model):
     TURNO_CHOICES = [
