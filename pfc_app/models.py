@@ -118,9 +118,6 @@ class Modalidade(models.Model):
     def __str__(self):
         return self.nome
 
-class PlanoCurso(models.Model):
-    pass
-
 class Curso(models.Model):
     TURNO_CHOICES = [
         ('MANHA', 'MANHÃ'),
@@ -170,6 +167,42 @@ class Curso(models.Model):
     def __str__(self):
         return self.nome_curso
     
+
+
+class PlanoCurso(models.Model):
+    curso = models.OneToOneField(Curso, on_delete=models.CASCADE) 
+    publico_alvo = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Público-alvo"))
+    quantidade_turma = models.SmallIntegerField(blank=True, null=True, verbose_name = ("Quantidade de turmas"))
+    pre_requisitos = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Pré-requisitos"))
+    objetivo_geral = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Objetivo geral"))
+    objetivo_especifico = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Objetivo específico"))
+    metodologia_ensino = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Metodologia de ensino"))
+    metodologia_avaliacao = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Metodologia de avaliação"))
+    recursos_professor = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Recursos professor"))
+    recursos_aluno = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Recursos aluno"))
+    referencia_bibliografica = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Referências bibliográficas"))
+    criado_em = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return 'Plano do curso: ' + self.curso.nome_curso
+    
+    class Meta:
+        verbose_name_plural = "planos de curso"
+        verbose_name = "plano de curso"
+
+class CronogramaExecucao(models.Model):
+    TURNO = [
+        ('MANHÃ', 'MANHÃ'),
+        ('TARDE', 'TARDE'),
+    ]
+    plano = models.ForeignKey(PlanoCurso, on_delete=models.CASCADE) 
+    aula = models.SmallIntegerField(blank=True, null=True)
+    turno = models.CharField(max_length=10, choices=TURNO, blank=True, null=True)
+    conteudo = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Conteúdo"))
+    atividade = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Atividades"))
+
+    class Meta:
+        verbose_name_plural = "cronogramas de execução"
 
 class Inscricao(models.Model):
     CONDICAO_ACAO_CHOICES = [

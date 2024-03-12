@@ -17,6 +17,16 @@ class InscricaoInline(admin.TabularInline):
     list_display = ('curso', 'participante', 'ch_valida', 'condicao_na_acao', 'status')
     ordering = ['-participante__nome']
 
+class CronogramaExecucaoInline(admin.TabularInline):
+    model = CronogramaExecucao
+    extra = 1
+    fields = ['aula', 'turno', 'conteudo', 'atividade']
+    #list_display = ('curso', 'participante', 'ch_valida', 'condicao_na_acao', 'status')
+    #ordering = ['-participante__nome']
+
+class PlanoCursoAdmin(admin.ModelAdmin):
+    inlines = [CronogramaExecucaoInline]
+    list_display = ('curso',)
 
 class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
@@ -127,6 +137,7 @@ admin.site.register(InstituicaoPromotora)
 admin.site.register(Carreira)
 admin.site.register(Categoria)
 admin.site.register(Modalidade)
+admin.site.register(PlanoCurso, PlanoCursoAdmin)
 
 
 admin.site.site_header = 'PFC'
