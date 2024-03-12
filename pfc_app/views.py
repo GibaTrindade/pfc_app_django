@@ -942,12 +942,19 @@ def generate_all_reconhecimento(request, validacao_id):
         style_subtitle = ParagraphStyle('subtitle',
                                     fontName = 'Helvetica',
                                     fontSize=14)
+        style_numero = ParagraphStyle('numero',
+                                    fontName = 'Helvetica',
+                                    fontSize=12,
+                                    leading=17,
+                                    alignment=TA_RIGHT)
         
         width, height = A4
         print(width)
         print(height)
+        numero_doc = 'N° ' + str(validacao_id)+'/'+str(validacao.analisado_em.year)
         c = canvas.Canvas(pdf_filename, pagesize=A4)
         p_title=Paragraph("ANÁLISE PARA RECONHECIMENTO DE CARGA HORÁRIA", style_title)
+        p_numero = Paragraph(numero_doc, style_numero)
         p_subtitle=Paragraph("I - DO REQUERIMENTO", style_subtitle)
         p_subtitle_f=Paragraph("II - DA FUNDAMENTAÇÃO", style_subtitle)
         p_subtitle_c=Paragraph("III - DA CONCLUSÃO", style_subtitle)
@@ -1035,6 +1042,10 @@ def generate_all_reconhecimento(request, validacao_id):
         p_title.wrapOn(c, 500, 100)
         meio = (width/2)-(p_title.width/2)
         p_title.drawOn(c, meio, height-50)
+
+        p_numero.wrapOn(c, 500, 30)
+        right = (width/2) - (p_numero.width/2)
+        p_numero.drawOn(c, width-550, height-100)
         
         c.setTitle("Requerimento de Carga Horária")
         
