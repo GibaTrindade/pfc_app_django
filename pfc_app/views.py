@@ -169,7 +169,7 @@ def cursos(request):
         lista_docentes = subquery_docentes,
         status_inscricao = status_inscricao
         
-    ).order_by('data_inicio').all().filter(data_inicio__gt=data_atual)
+    ).order_by('data_inicio').all().filter(data_inicio__gte=data_atual)
   #template = loader.get_template('base.html')
   #cursos_nao_inscrito = cursos_com_inscricoes.exclude(inscricao__participante=request.user)
   #lista_inscritos=Inscricao.objects.filter(curso=OuterRef('pk'))

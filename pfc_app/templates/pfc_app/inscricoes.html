@@ -90,14 +90,25 @@
                             {% endif %}
                             
                         {% endif %}
-                   
-                    {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido and inscricao.curso_avaliado  %}
-                        <td class="text-center">
-                            <a href="{% url 'generate_all_pdfs' curso_id=inscricao.curso.id unico=1 %}" 
-                            class="btn btn-primary"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Baixa seu certificado">
-                            <i class="bi bi-download"></i> CERTIFICADO</a>
-                        </td>
+                    {% if  inscricao.curso.eh_evento %}
+                        {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido %}
+                            <td class="text-center">
+                                <a href="{% url 'generate_all_pdfs' curso_id=inscricao.curso.id unico=1 %}" 
+                                class="btn btn-primary"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Baixa seu certificado">
+                                <i class="bi bi-download"></i> CERTIFICADO</a>
+                            </td>
+                        {% endif %}
+                    {% else %}
+
+                        {% if  inscricao.curso.status.nome == "FINALIZADO" and inscricao.concluido and inscricao.curso_avaliado  %}
+                            <td class="text-center">
+                                <a href="{% url 'generate_all_pdfs' curso_id=inscricao.curso.id unico=1 %}" 
+                                class="btn btn-primary"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Baixa seu certificado">
+                                <i class="bi bi-download"></i> CERTIFICADO</a>
+                            </td>
+                        {% endif %}
                     {% endif %}
                     
                 </tr>
