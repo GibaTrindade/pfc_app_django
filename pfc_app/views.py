@@ -892,6 +892,7 @@ def generate_all_reconhecimento(request, validacao_id):
 
 
         tag_mapping = {
+            "[nome_completo]": validacao.usuario.nome,
             "[cpf]": cpf_formatado,
             "[origem]": user.origem,
             "[data_envio]": validacao.enviado_em.strftime("%d/%m/%Y"),
