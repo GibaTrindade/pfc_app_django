@@ -28,6 +28,7 @@ urlpatterns = [
     path('reset-password/', views.reset_password_request, name='reset_password_request'),
     path('change-password/', views.change_password, name='change_password'),
     path('generate_reconhecimento/<int:validacao_id>/', views.generate_all_reconhecimento, name='generate_reconhecimento'),
+    path('gerar_ata/<int:curso_id>/', views.gerar_ata, name='gerar_ata'),
     path('explorer/', include('explorer.urls')),
     path('usuarios_sem_ch/', views.usuarios_sem_ch, name='usuarios_sem_ch'),
 

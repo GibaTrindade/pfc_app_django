@@ -31,7 +31,9 @@ class PlanoCursoAdmin(admin.ModelAdmin):
 class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
 
-    list_display = ('nome_curso', 'data_criacao', 'data_inicio', 'data_termino', 'vagas', 'numero_inscritos', 'status', 'periodo_avaliativo','gerar_certificados',)
+    list_display = ('nome_curso', 'data_inicio', 'data_termino', 
+                    'vagas', 'numero_inscritos', 'status', 'periodo_avaliativo',
+                    'gerar_certificados', 'gerar_ata',)
     fields = ['nome_curso', 'ementa_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'trilha', 'descricao', ('data_inicio', 'data_termino'), 'turno', 'turma',
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status', 'periodo_avaliativo', 'eh_evento',
@@ -48,6 +50,9 @@ class CursoAdmin(admin.ModelAdmin):
 
     def gerar_certificados(self, obj):
         return format_html('<a href="{}">Gerar Certificados</a>', reverse('generate_all_pdfs', args=[obj.id]))
+
+    def gerar_ata(self, obj):
+        return format_html('<a href="{}">Gerar Ata</a>', reverse('gerar_ata', args=[obj.id]))
 
 
 

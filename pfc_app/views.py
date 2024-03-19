@@ -31,9 +31,14 @@ from django.http import HttpResponse
 from django.shortcuts import get_list_or_404
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, PageTemplate
+from reportlab.platypus import SimpleDocTemplate, Paragraph, \
+                                Spacer, Image, PageBreak, \
+                                PageTemplate, SimpleDocTemplate, Table, TableStyle
+                                
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib import colors
+from reportlab.graphics.shapes import *
 from io import BytesIO
 from reportlab.lib.units import inch
 from validate_docbr import CPF
@@ -1124,3 +1129,175 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'pfc_app/change_password.html', {'form': form})
+
+def draw_logos_infos(curso, canvas, doc):
+    draw_logos(curso, canvas, doc)
+        # Coordenadas para o logo (ajuste conforme necessário)
+    logo_width = 50
+    logo_height = 50
+    x_ig = doc.width + doc.leftMargin +doc.rightMargin - 27.5 - logo_width  # Alinhamento à direita
+    y_ig = doc.height + doc.bottomMargin + doc.topMargin - logo_height -20 # No topo
+        # Posição e texto do parágrafo
+    x_text = 27.5
+    y_text = y_ig + 30  # Ajuste conforme necessário
+    text = f"Curso: {curso.nome_curso}<br/>Data:<br/>Horário:<br/>Local:"
+
+    # Definir o estilo do texto
+    styles = getSampleStyleSheet()
+    style = styles['Normal']
+    style.fontSize = 10
+    style.leading = 12  # Espaçamento entre linhas
+
+     # Criando o objeto Paragraph para o texto do curso
+    paragraph = Paragraph(text, style)
+
+    # Determina a largura máxima para o texto
+    max_width = doc.width / 2  # Metade da largura da página
+
+    # Calcula a altura necessária para o texto
+    required_height = paragraph.wrap(max_width, 40)[1]  # Retorna uma tupla (width, height)
+    # Desenha o parágrafo no canvas
+    paragraph.drawOn(canvas, x_text, y_text - required_height)
+
+def draw_logos(curso, canvas, doc):
+    # Coordenadas para o logo (ajuste conforme necessário)
+    logo_width = 50
+    logo_height = 50
+    x_ig = doc.width + doc.leftMargin +doc.rightMargin - 27.5 - logo_width  # Alinhamento à direita
+    y_ig = doc.height + doc.bottomMargin + doc.topMargin - logo_height -20 # No topo
+
+    x_pfc = x_ig - logo_width - 10
+    y_pfc = y_ig
+
+    igpe_relative_path = 'igpe.png'
+    pfc_relative_path = 'retangulartransp.png'
+    igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+    pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+    
+    # Substitua 'path/to/your/logo.png' pelo caminho do seu logo
+    canvas.drawImage(igpe_path, x_ig, y_ig, width=logo_width, height=logo_height, mask='auto')
+    canvas.drawImage(pfc_path, x_pfc, y_pfc, width=logo_width, height=logo_height, mask='auto')
+
+def docentes_curso(curso):
+
+    # Obtém as inscrições que são de 'DOCENTE' para este curso específico
+    inscricoes_docentes = Inscricao.objects.filter(curso=curso, condicao_na_acao='DOCENTE')
+
+    # Extrai os participantes (Users) dessas inscrições
+    participantes_docentes = [inscricao.participante for inscricao in inscricoes_docentes]
+
+    return participantes_docentes
+
+def create_signature_line(width=200, height=1):
+    """
+    Cria uma linha para a área de assinatura.
+
+    :param width: Largura da linha.
+    :param height: Altura (espessura) da linha.
+    :return: Objeto Drawing contendo a linha.
+    """
+    d = Drawing(width, height)
+    d.add(Line(0, 0, width, 0))
+    return d
+
+def assinatura_ata(curso):
+    # Obtém a folha de estilos padrão do ReportLab
+    styles = getSampleStyleSheet()
+
+    # Obtém um estilo existente da folha de estilos e o personaliza para as assinaturas
+    signature_style = styles['Normal'].clone('SignatureStyle')
+    signature_style.fontSize = 12  # Define o tamanho da fonte
+    signature_style.alignment = 1  # Centraliza o texto (0 = esquerda, 1 = centro, 2 = direita)
+    # Elementos para a primeira assinatura
+    coordinator_elements = [
+        [Paragraph(curso.coordenador.nome, signature_style)],
+        [Spacer(1, 20)],
+        [create_signature_line()],
+        [Paragraph("Assinatura da Coordenação", signature_style)]
+    ]
+
+    docentes = docentes_curso(curso)
+    # Elementos para a segunda assinatura
+    second_coordinator_elements = [
+        [Paragraph(docentes[0].nome, signature_style)],
+        [Spacer(1, 20)],
+        [create_signature_line()],
+        [Paragraph("Assinatura Instrutoria", signature_style)]
+    ]
+
+    signature_data = []
+    for i in range(len(coordinator_elements)):
+        # Adiciona elementos da primeira assinatura, espaço separador, e elementos da segunda assinatura
+        signature_data.append(coordinator_elements[i] + [''] + second_coordinator_elements[i])
+    # Define a largura do separador, por exemplo, 50 pontos
+    separator_width = 50
+    signature_table = Table(signature_data, colWidths=[200, separator_width, 200])
+
+    signature_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP')
+    ]))
+
+    return (
+        [Spacer(1, 20), signature_table]
+    )
+
+
+@login_required
+def gerar_ata(request, curso_id):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Ata.pdf"'
+    curso = Curso.objects.get(pk=curso_id)
+    doc = SimpleDocTemplate(response, pagesize=A4)
+    
+    styles = getSampleStyleSheet()
+    header_style = styles['Heading1']  # Pode ajustar o estilo conforme necessário
+    header_style.alignment = 1  # 1 para centralizar
+    info_style = styles['Normal']  # Usando o estilo Normal como base
+    info_style.fontSize = 10
+
+    header = Paragraph("FREQUÊNCIA", header_style)
+    # Assume que a largura da página seja dividida igualmente pelas colunas
+    column_widths = [30, 270, 240]  # A largura total é 595, ajuste conforme necessário
+    lista_inscritos = curso.participantes.all()
+    # Cabeçalho da tabela
+    data = [['ORD', 'NOME', 'ASSINATURA']]
+    ordem = 0
+
+    # Adicionando algumas linhas de exemplo. Você pode ajustar isso conforme necessário
+    # Por exemplo, você pode querer calcular o número de linhas que cabem em uma página
+    for i, participante in enumerate(lista_inscritos, start=1):
+        data.append([str(i), participante.nome, ''])
+        ordem = i
+
+    for j in range(1, 6):
+        data.append([str(ordem + j), '', ''])  # Adiciona 5 linhas em branco.
+
+    table = Table(data, colWidths=column_widths)
+
+    # Estilizando a tabela
+    table.setStyle(TableStyle([
+                       ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+                       ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                       ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                       ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                       ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                       ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+                       ('FONTSIZE', (0, 1), (-1, -1), 8),
+                       ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                   ]))
+    table.repeatRows = 1
+
+    espaco_altura = 20
+    spacer = Spacer(1, espaco_altura)
+
+    assinatura = assinatura_ata(curso)
+
+    elements = [header, spacer, table]  # Adicione o header antes da tabela
+    elements += assinatura
+    doc.build(
+        elements, 
+        onFirstPage=lambda canvas, doc: draw_logos_infos(curso, canvas, doc),
+        onLaterPages=lambda canvas, doc: draw_logos(curso, canvas, doc)
+        )
+    return response
