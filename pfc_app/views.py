@@ -1218,12 +1218,15 @@ def assinatura_ata(curso):
 
     docentes = docentes_curso(curso)
     # Elementos para a segunda assinatura
-    second_coordinator_elements = [
-        [Paragraph(docentes[0].nome, signature_style)],
-        [Spacer(1, 20)],
-        [create_signature_line()],
-        [Paragraph("Assinatura Instrutoria", signature_style)]
-    ]
+    if curso.eh_evento:
+        second_coordinator_elements = [[''], [''], [''], ['']]
+    else:
+        second_coordinator_elements = [
+            [Paragraph(docentes[0].nome, signature_style)],
+            [Spacer(1, 20)],
+            [create_signature_line()],
+            [Paragraph("Assinatura Instrutoria", signature_style)]
+        ]
 
     signature_data = []
     for i in range(len(coordinator_elements)):
@@ -1259,7 +1262,8 @@ def gerar_ata(request, curso_id):
     header = Paragraph("FREQUÊNCIA", header_style)
     # Assume que a largura da página seja dividida igualmente pelas colunas
     column_widths = [30, 270, 240]  # A largura total é 595, ajuste conforme necessário
-    lista_inscritos = curso.participantes.filter(inscricao__condicao_na_acao='DISCENTE').order_by('nome')
+    lista_inscritos = curso.participantes.filter(
+        inscricao__condicao_na_acao='DISCENTE').order_by('nome')
     # Cabeçalho da tabela
     data = [['ORD', 'NOME', 'ASSINATURA']]
     ordem = 0
