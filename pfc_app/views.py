@@ -1259,7 +1259,7 @@ def gerar_ata(request, curso_id):
     header = Paragraph("FREQUÊNCIA", header_style)
     # Assume que a largura da página seja dividida igualmente pelas colunas
     column_widths = [30, 270, 240]  # A largura total é 595, ajuste conforme necessário
-    lista_inscritos = curso.participantes.all()
+    lista_inscritos = curso.participantes.filter(inscricao__condicao_na_acao='DISCENTE').order_by('nome')
     # Cabeçalho da tabela
     data = [['ORD', 'NOME', 'ASSINATURA']]
     ordem = 0
