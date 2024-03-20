@@ -159,6 +159,7 @@ class Curso(models.Model):
     periodo_avaliativo = models.BooleanField(default=False)
     eh_evento = models.BooleanField(default=False, verbose_name = ("É evento"))
     observacao = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Observação"))
+    horario = models.TextField(max_length=400, blank=True, null=True, verbose_name = ("Horário"))
 
     def publish(self):
         self.published_date = timezone.now()

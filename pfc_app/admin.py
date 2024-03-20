@@ -37,7 +37,7 @@ class CursoAdmin(admin.ModelAdmin):
     fields = ['nome_curso', 'ementa_curso', 'modalidade', 'tipo_reconhecimento', 'ch_curso', 'vagas',
                'categoria', 'trilha', 'descricao', ('data_inicio', 'data_termino'), 'turno', 'turma',
                'inst_certificadora', 'inst_promotora', 'coordenador', 'status', 'periodo_avaliativo', 'eh_evento',
-               'observacao', ]
+               'horario', 'observacao', ]
     list_filter = ('nome_curso', 'data_inicio', 'data_termino', 'periodo_avaliativo',)
     list_editable = ('status', 'periodo_avaliativo',)
 

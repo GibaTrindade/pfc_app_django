@@ -3,7 +3,7 @@
 {% block content %}
 {% include 'parciais/_messages.html' %}
 <div class="d-flex p-2 justify-content-center mb-4">
-    <h1>Curso: {{curso}}</h1>
+    <h1>{{curso.categoria}}: {{curso}}</h1>
 </div>
     <div class="row">
         
@@ -26,6 +26,9 @@
                 <p><strong>Turno:</strong> {{curso.turno}}</p>
                 <p><strong>Trilha:</strong> {{curso.trilha}}</p>
                 <p><strong>Descrição do Curso:</strong> {{curso.descricao}}</p>
+                {% if curso.horario %}
+                    <p><strong>Horário:</strong> {{curso.horario}}</p>
+                {% endif %}
                 {% if curso.observacao %}
                     <p><strong>Observação:</strong> {{curso.observacao}}</p>
                 {% endif %}
