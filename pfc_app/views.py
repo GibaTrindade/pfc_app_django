@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages, auth
 from django.conf import settings
 from django.core.mail import send_mail
@@ -108,7 +109,9 @@ def registrar(request):
         return JsonResponse({'success': False, 'msg': 'CPF Inválido!'})
         #return render(request, 'pfc_app/registrar.html', context)
 
-    
+    if not re.match(r'^\d{11}$', cpf):
+        return JsonResponse({'success': False, 'msg': 'Digite o CPF sem números e sem traços.'})
+
     send_mail('Solicitação de cadastro', 
               f'Nome:{nome}\n '
               f'CPF: {cpf}\n '
@@ -174,7 +177,7 @@ def cursos(request):
         lista_docentes = subquery_docentes,
         status_inscricao = status_inscricao
         
-    ).order_by('data_inicio').all().filter(data_inicio__gte=data_atual)
+    ).order_by('data_inicio').all().filter(data_inicio__gte=data_atual).exclude(status__nome = 'CANCELADO')
   #template = loader.get_template('base.html')
   #cursos_nao_inscrito = cursos_com_inscricoes.exclude(inscricao__participante=request.user)
   #lista_inscritos=Inscricao.objects.filter(curso=OuterRef('pk'))
@@ -316,7 +319,7 @@ def inscricoes(request):
     return render(request, 'pfc_app/inscricoes.html', context)
 
 
-class CursoDetailView(DetailView):
+class CursoDetailView(LoginRequiredMixin, DetailView):
    # model_detail.html
    model = Curso
 

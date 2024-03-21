@@ -8,7 +8,7 @@
 <div class="row">
 {% for curso in cursos %}
 <div class="col-sm-4">
-<div class="card border-secondary mb-3 mt-3 position-relative zoom" style="height: 330px;">
+<div class="card border-secondary mb-3 mt-3 position-relative zoom" style="height: auto;">
   {% if curso.num_inscricoes >= curso.vagas %}
     <span class="position-absolute top-0 end-0 badge bg-danger p-2">Lotado</span>
   {% endif %}
@@ -20,11 +20,15 @@
         </h6>
         <p class="card-text">
           <i class="bi bi-pencil-square"></i>
-          <small class="text-muted"><strong>Descrição: </strong> {{curso.descricao|truncatechars:90}}</small>
+          <small class="text-muted"><strong>Descrição: </strong> {{curso.descricao|truncatechars:70}}</small>
         </p>
         <p class="card-text">
           <i class="bi bi-journal-bookmark"></i>
           <small class="text-muted"><strong>Carga Horária:</strong> {{curso.ch_curso}}h</small>
+        </p>
+        <p class="card-text">
+          <i class="bi bi-fingerprint"></i>
+          <small class="text-muted"><strong>Modalidade:</strong> {{curso.modalidade}}</small>
         </p>
         <p class="card-text">
           <i class="bi bi-calendar-check"></i>
