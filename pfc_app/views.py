@@ -1173,7 +1173,7 @@ def draw_logos(curso, canvas, doc):
     y_pfc = y_ig
 
     igpe_relative_path = 'igpe.png'
-    pfc_relative_path = 'retangulartransp.png'
+    pfc_relative_path = 'PFC-NOVO-180x180.png'
     igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
     pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
     
@@ -1219,33 +1219,45 @@ def assinatura_ata(curso):
         [Paragraph("Assinatura da Coordenação", signature_style)]
     ]
 
-    docentes = docentes_curso(curso)
-    # Elementos para a segunda assinatura
-    if curso.eh_evento:
-        second_coordinator_elements = [[''], [''], [''], ['']]
+    coordinator_table = Table(coordinator_elements, colWidths=[400])
+    coordinator_table.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+
+    if not curso.eh_evento:  
+        # Assinaturas dos instrutores
+        docentes = docentes_curso(curso)
+        instrutor_elements = []
+        for i, docente in enumerate(docentes):
+            instrutor_elements.append([
+            Paragraph(docente.nome, signature_style),
+            Spacer(1, 20),
+            create_signature_line(),
+            Paragraph("Assinatura Instrutoria", signature_style)
+            ])
+            # Adiciona o separador apenas entre os instrutores, não após o último
+            if i < len(docentes) - 1:  # Verifica se não é o último instrutor
+                instrutor_elements.append([
+                    Paragraph("", signature_style)            
+                ] * 4)
+
+        if len(docentes) > 1:
+            # Inserir uma coluna de separação entre as assinaturas dos instrutores
+            col_widths = [200,50,200]
+            instrutor_elements = [instrutor_elements[:4],  instrutor_elements[4:]]
+        else:
+            col_widths = [400]
+            instrutor_elements = [instrutor_elements]
+        
+        instrutor_table = Table(instrutor_elements, colWidths=col_widths)
+        instrutor_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP')
+        ]))
+        # Combinar as tabelas de assinaturas verticalmente
+        elements = [Spacer(1, 20), coordinator_table, Spacer(1, 40), instrutor_table]
     else:
-        second_coordinator_elements = [
-            [Paragraph(docentes[0].nome, signature_style)],
-            [Spacer(1, 20)],
-            [create_signature_line()],
-            [Paragraph("Assinatura Instrutoria", signature_style)]
-        ]
-
-    signature_data = []
-    for i in range(len(coordinator_elements)):
-        # Adiciona elementos da primeira assinatura, espaço separador, e elementos da segunda assinatura
-        signature_data.append(coordinator_elements[i] + [''] + second_coordinator_elements[i])
-    # Define a largura do separador, por exemplo, 50 pontos
-    separator_width = 50
-    signature_table = Table(signature_data, colWidths=[200, separator_width, 200])
-
-    signature_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP')
-    ]))
-
+        elements = [Spacer(1, 20), coordinator_table, Spacer(1, 40)]
     return (
-        [Spacer(1, 20), signature_table]
+        elements
     )
 
 
