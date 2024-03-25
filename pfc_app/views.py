@@ -20,7 +20,7 @@ from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
                     Tema, Subtema, Carreira, Modalidade, Categoria
 from .forms import AvaliacaoForm, DateFilterForm
-from django.db.models import Count, Q, Sum, F, When, BooleanField, Exists, OuterRef, Value, Subquery
+from django.db.models import Count, Q, Sum, F, Avg, When, BooleanField, Exists, OuterRef, Value, Subquery
 from django.db.models.functions import Coalesce, Concat
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
@@ -35,7 +35,8 @@ from reportlab.lib.pagesizes import A4, letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, \
                                 Spacer, Image, PageBreak, \
                                 PageTemplate, SimpleDocTemplate, Table, TableStyle
-                                
+
+from reportlab.graphics.charts.barcharts import HorizontalBarChart, VerticalBarChart                           
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.lib import colors
@@ -44,6 +45,14 @@ from io import BytesIO
 from reportlab.lib.units import inch
 from validate_docbr import CPF
 from .filters import UserFilter
+import matplotlib
+matplotlib.use('Agg')  
+import matplotlib.pyplot as plt
+from matplotlib.ticker import PercentFormatter
+import matplotlib.colors as mc
+import colorsys
+from matplotlib.colors import to_rgb
+from pdf2docx import Converter
 
 # Create your views here.
 @login_required
@@ -1064,9 +1073,22 @@ def generate_all_reconhecimento(request, validacao_id):
         
         c.save()
         
-        
+        # Caminho para o arquivo DOCX que será criado
+        docx_filename = pdf_filename.replace('.pdf', '.docx')
+
+        # Converte o PDF em DOCX
+        cv = Converter(pdf_filename)
+        cv.convert(docx_filename)
+        cv.close()
+
+        # Adiciona o PDF ao arquivo ZIP
         zipf.write(pdf_filename, os.path.basename(pdf_filename))
+        
+        # Adiciona o DOCX ao arquivo ZIP
+        zipf.write(docx_filename, os.path.basename(docx_filename))
+
         os.remove(pdf_filename)
+        os.remove(docx_filename)
 
     # Configure a resposta HTTP para o arquivo ZIP
     response = HttpResponse(content_type='application/zip')
@@ -1229,7 +1251,7 @@ def assinatura_ata(curso):
         for i, docente in enumerate(docentes):
             instrutor_elements.append([
             Paragraph(docente.nome, signature_style),
-            Spacer(1, 20),
+            Spacer(1, 30),
             create_signature_line(),
             Paragraph("Assinatura Instrutoria", signature_style)
             ])
@@ -1319,4 +1341,104 @@ def gerar_ata(request, curso_id):
         onFirstPage=lambda canvas, doc: draw_logos_infos(curso, canvas, doc),
         onLaterPages=lambda canvas, doc: draw_logos(curso, canvas, doc)
         )
+    return response
+
+def adjust_lightness(color, amount):
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
+
+def gerar_relatorio(request, curso_id):
+    avaliacoes = Avaliacao.objects.filter(curso_id=curso_id).select_related('subtema', 'subtema__tema')
+
+    temas = Tema.objects.filter(subtema__avaliacao__curso_id=curso_id).distinct()
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="relatorio.pdf"'
+    c = canvas.Canvas(response, pagesize=A4)
+
+    # Gerar cores para cada nota
+    base_rgb = to_rgb('#668923')
+    # colors = [adjust_lightness('#4D6CFA', 1 - 0.15 * i) for i in range(5)]
+
+    colors = [
+        '#E1CDF9',
+        '#D0BBEA',
+        '#C8AEFC',
+        '#9E84D7',
+        '#3E2A7C'
+
+    ]
+
+    for tema in temas:
+        
+        notas_por_subtema = {}  # Dicionário para contagem de notas por subtema
+
+        for avaliacao in avaliacoes.filter(subtema__tema=tema):
+            subtema_nome = avaliacao.subtema.nome
+            nota = avaliacao.nota
+
+            if subtema_nome not in notas_por_subtema:
+                notas_por_subtema[subtema_nome] = {str(i): 0 for i in range(1, 6)}
+            notas_por_subtema[subtema_nome][nota] += 1
+
+        # Calcular as proporções
+        proporcoes_por_subtema = {}
+        contagens_por_subtema = {}
+        for subtema, notas in notas_por_subtema.items():
+            total = sum(notas.values())
+            proporcoes = {nota: (count / total if total else 0) for nota, count in notas.items()}
+            proporcoes_por_subtema[subtema] = proporcoes
+            contagens_por_subtema[subtema] = notas
+
+        # Criar o gráfico de barras empilhadas com proporções
+        fig, ax = plt.subplots(figsize=(8, 4))
+        bottom = [0] * len(proporcoes_por_subtema)
+        subtema_names = list(proporcoes_por_subtema.keys())
+        bar_heights = []
+        for i, nota in enumerate(range(1, 6)):
+            valores = [proporcoes_por_subtema[subtema].get(str(nota), 0) for subtema in proporcoes_por_subtema]
+            barras = ax.barh(subtema_names, valores, left=bottom, label=f'Nota {nota}', color=colors[i])
+            bottom = [bottom[i] + valores[i] for i in range(len(bottom))]
+
+            for bar, valor in zip(barras, valores):
+                    if valor > 0.05:  # Apenas mostrar texto para valores significativos
+                        # # Colocar o nome do subtema acima do conjunto de barras
+                        # ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + bar.get_height() + 0.05,
+                        #         subtema_names[i], ha='center', va='bottom', fontsize=10, color='black')
+                        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + bar.get_height() / 2,
+                                f'{valor:.1%}',  # Exibir a proporção como percentual
+                                ha='center', va='center')
+                        # Mostrar a nota abaixo do valor da proporção
+                        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + 0.05,
+                                f'Nota: {nota}', ha='center', va='center', fontsize=10, color='red')
+                        max_width = max([bar.get_width() for bar in barras])
+
+        # Adicionar os nomes dos subtemas acima das barras
+        # ax.get_yticks()[idx]
+        for idx, subtema in enumerate(subtema_names):
+            ax.text(0.5, ax.get_yticks()[idx]+0.35 , subtema, va='top', ha='center', fontsize=10, color='black', backgroundcolor='gray')
+
+        ax.set_xlim([0, 1])
+        ax.set_xlabel('Avaliações')
+        ax.set_xticks([]) 
+        ax.set_yticks([]) 
+        plt.tight_layout()
+        plt.title(f'{tema.nome}')
+        #plt.legend()
+
+        # Salvar o gráfico como uma imagem
+        fig.savefig(f'{tema.id}_proporcoes.png', bbox_inches='tight')
+        plt.close(fig)
+
+        # Adicionar a imagem do gráfico ao PDF
+        
+        c.drawCentredString(A4[0] / 2, A4[1] - 50, tema.nome)
+        c.drawImage(f'{tema.id}_proporcoes.png', 50, 200, width=500, height=200)  # Ajuste as dimensões conforme necessário
+# http://127.0.0.1:8000/gerar_relatorio/12
+        c.showPage()  # Cria uma nova página para cada tema
+    c.save()
     return response
