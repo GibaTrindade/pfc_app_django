@@ -1,5 +1,5 @@
 from django import forms
-from .models import Avaliacao  # Certifique-se de importar o modelo Avaliacao
+from .models import Avaliacao, Subtema  # Certifique-se de importar o modelo Avaliacao
 from django.forms import FileInput
 
 
@@ -35,3 +35,11 @@ class AvaliacaoForm(forms.ModelForm):
 class DateFilterForm(forms.Form):
     data_inicio = forms.DateField(label='Data de Início', required=False, widget=forms.TextInput(attrs={'type': 'date'}))
     data_fim = forms.DateField(label='Data de Fim', required=False, widget=forms.TextInput(attrs={'type': 'date'}))
+
+class SubtemaForm(forms.ModelForm):
+    class Meta:
+        model = Subtema
+        fields = ['nome', 'tema', 'cor']  # Inclui apenas o campo que você deseja modificar
+        widgets = {
+            'cor': forms.TextInput(attrs={'type': 'color'}),
+        }

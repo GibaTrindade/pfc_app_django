@@ -28,6 +28,10 @@ class PlanoCursoAdmin(admin.ModelAdmin):
     inlines = [CronogramaExecucaoInline]
     list_display = ('curso',)
 
+class SubtemaAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'tema', 'cor']
+    list_filter = ('tema',)
+
 class CursoAdmin(admin.ModelAdmin):
     inlines = [ InscricaoInline ]
 
@@ -122,6 +126,18 @@ class Validacao_CHAdmin(admin.ModelAdmin):
             print(request.user)
         super().save_model(request, obj, form, change)
 
+class ItemRelatorioInline(admin.TabularInline):
+    model = ItemRelatorio
+    extra = 1
+    fields = ['texto', 'tema']
+    #list_display = ('curso', 'participante', 'ch_valida', 'condicao_na_acao', 'status')
+    #ordering = ['-participante__nome']
+
+class RelatorioAdmin(admin.ModelAdmin):
+    inlines = [ItemRelatorioInline]
+    list_display = ('codigo',)
+
+
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(User, CustomUserAdmin)
@@ -131,7 +147,7 @@ admin.site.register(StatusInscricao)
 admin.site.register(StatusValidacao)
 admin.site.register(Avaliacao, AvaliacaoAdmin)
 admin.site.register(Tema)
-admin.site.register(Subtema)
+admin.site.register(Subtema, SubtemaAdmin)
 admin.site.register(Validacao_CH, Validacao_CHAdmin)
 admin.site.register(Certificado)
 admin.site.register(RequerimentoCH)
@@ -143,6 +159,7 @@ admin.site.register(Carreira)
 admin.site.register(Categoria)
 admin.site.register(Modalidade)
 admin.site.register(PlanoCurso, PlanoCursoAdmin)
+admin.site.register(Relatorio, RelatorioAdmin)
 
 
 admin.site.site_header = 'PFC'

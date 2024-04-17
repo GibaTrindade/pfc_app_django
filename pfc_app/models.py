@@ -245,6 +245,7 @@ class Tema(models.Model):
 class Subtema(models.Model):
     nome = models.CharField(max_length=100)
     tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
+    cor = models.CharField(max_length=7, default='#FFFFFF')
 
     def __str__(self):
         return self.nome
@@ -319,7 +320,7 @@ class Validacao_CH(models.Model):
     analisado_em = models.DateField(blank=False, null=False, default=timezone.now)
     carreira = models.ForeignKey(Carreira, on_delete=models.DO_NOTHING, blank=True, null=True)
     trilha = models.ForeignKey(Trilha, on_delete=models.DO_NOTHING, blank=True, null=True)
-    competencia = models.ManyToManyField(Competencia, blank=True, null=True)
+    competencia = models.ManyToManyField(Competencia)
     conhecimento_previo = models.TextField(choices=notas, blank=False, null=False)
     conhecimento_posterior = models.TextField(choices=notas, blank=False, null=False)
     voce_indicaria = models.TextField(choices=notas, blank=False, null=False)
@@ -360,3 +361,21 @@ class Certificado(models.Model):
 
     class Meta:
         verbose_name_plural = "certificados"
+
+
+class Relatorio(models.Model):
+    codigo = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.codigo
+
+    class Meta:
+        verbose_name_plural = "relatórios"
+
+class ItemRelatorio(models.Model):
+    texto = models.TextField(max_length=4000, blank=True, null=True)
+    tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
+    relatorio = models.ForeignKey(Relatorio, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.tema.nome

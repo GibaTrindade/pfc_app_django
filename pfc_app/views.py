@@ -18,10 +18,10 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
-                    Tema, Subtema, Carreira, Modalidade, Categoria
+                    Tema, Subtema, Carreira, Modalidade, Categoria, ItemRelatorio
 from .forms import AvaliacaoForm, DateFilterForm
-from django.db.models import Count, Q, Sum, F, Avg, When, BooleanField, Exists, OuterRef, Value, Subquery
-from django.db.models.functions import Coalesce, Concat
+from django.db.models import Count, Q, Sum, F, Avg, FloatField, When, BooleanField, Exists, OuterRef, Value, Subquery
+from django.db.models.functions import Coalesce, Concat, Cast
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from datetime import date, datetime
@@ -40,6 +40,7 @@ from reportlab.graphics.charts.barcharts import HorizontalBarChart, VerticalBarC
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.lib import colors
+from reportlab.lib.colors import HexColor
 from reportlab.graphics.shapes import *
 from io import BytesIO
 from reportlab.lib.units import inch
@@ -1299,8 +1300,13 @@ def gerar_ata(request, curso_id):
     header = Paragraph("FREQUÊNCIA", header_style)
     # Assume que a largura da página seja dividida igualmente pelas colunas
     column_widths = [30, 270, 240]  # A largura total é 595, ajuste conforme necessário
+    # lista_inscritos = curso.inscricoes.filter(
+    #     condicao_na_acao='DISCENTE',
+    #     status__nome='APROVADA'
+    # ).order_by('participante__nome')
+    
     lista_inscritos = curso.participantes.filter(
-        inscricao__condicao_na_acao='DISCENTE').order_by('nome')
+        inscricao__condicao_na_acao='DISCENTE', inscricao__status__nome='APROVADA').order_by('nome')
     # Cabeçalho da tabela
     data = [['ORD', 'NOME', 'ASSINATURA']]
     ordem = 0
@@ -1353,8 +1359,16 @@ def adjust_lightness(color, amount):
 
 def gerar_relatorio(request, curso_id):
     avaliacoes = Avaliacao.objects.filter(curso_id=curso_id).select_related('subtema', 'subtema__tema')
-
+    medias_notas_por_tema = Avaliacao.objects.filter(curso_id=curso_id).annotate(
+    nota_numerica=Cast('nota', FloatField())
+        ).values('subtema__tema__id', 'subtema__tema__nome') \
+        .annotate(media_notas=Avg('nota_numerica'))
+    medias_notas_dict = {item['subtema__tema__id']: item['media_notas'] for item in medias_notas_por_tema}
     temas = Tema.objects.filter(subtema__avaliacao__curso_id=curso_id).distinct()
+
+    # Conta o número de participantes distintos que avaliaram o curso
+    quantidade_avaliadores = Avaliacao.objects.filter(curso_id=curso_id).values('participante').distinct().count()
+
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="relatorio.pdf"'
@@ -1365,42 +1379,106 @@ def gerar_relatorio(request, curso_id):
     # colors = [adjust_lightness('#4D6CFA', 1 - 0.15 * i) for i in range(5)]
 
     colors = [
-        '#E1CDF9',
-        '#D0BBEA',
-        '#C8AEFC',
-        '#9E84D7',
-        '#3E2A7C'
+        '#F8D9A3',
+        '#FFD559',
+        '#DDDDDD',
+        '#B7E6E1',
+        '#86D4CD',
+        '#76C2AA'
 
     ]
-
+    width, height = A4
+    # http://127.0.0.1:8000/gerar_relatorio/12
     for tema in temas:
+        total_avaliacoes_tema = Avaliacao.objects.filter(subtema__tema_id=tema.id).count()
+        avaliacoes_baixas_tema = Avaliacao.objects.filter(subtema__tema_id=tema.id, nota__in=['1', '2']).count()
+        percentual_baixas_tema = (avaliacoes_baixas_tema / total_avaliacoes_tema) * 100 if total_avaliacoes_tema > 0 else 0
+        percentual_baixas_tema = round(percentual_baixas_tema, 2)
         
-        notas_por_subtema = {}  # Dicionário para contagem de notas por subtema
+        avaliacoes_altas_tema = Avaliacao.objects.filter(subtema__tema_id=tema.id, nota__in=['4', '5']).count()
+        percentual_altas_tema = (avaliacoes_altas_tema / total_avaliacoes_tema) * 100 if total_avaliacoes_tema > 0 else 0
+        percentual_altas_tema = round(percentual_altas_tema, 2)
 
+
+
+
+        media_notas = medias_notas_dict.get(tema.id, 0)  # Obtém a média das notas para o tema ou 0 se não houver avaliações
+        media_notas = round(media_notas, 1)
+        print(f'B+MB para o tema {tema.id}: {percentual_altas_tema}')
+
+        item_relatorio = ItemRelatorio.objects.get(tema=tema)
+        texto_tema = item_relatorio.texto
+        notas_por_subtema = {}  # Dicionário para contagem de notas por subtema
+        cor_por_subtema = {}
+        
+        
+        
         for avaliacao in avaliacoes.filter(subtema__tema=tema):
             subtema_nome = avaliacao.subtema.nome
             nota = avaliacao.nota
+            cor = avaliacao.subtema.cor
 
             if subtema_nome not in notas_por_subtema:
-                notas_por_subtema[subtema_nome] = {str(i): 0 for i in range(1, 6)}
+                notas_por_subtema[subtema_nome] = {str(i): 0 for i in range(0, 6)}
+                
             notas_por_subtema[subtema_nome][nota] += 1
 
+            if subtema_nome not in cor_por_subtema:
+                cor_por_subtema[subtema_nome] = cor
+            
+        #print(cor_por_subtema)
+        media_conhecimento_previo = 0
+        media_conhecimento_posterior = 0
         # Calcular as proporções
         proporcoes_por_subtema = {}
         contagens_por_subtema = {}
+        cor_subtema_dict = {}
+        
         for subtema, notas in notas_por_subtema.items():
             total = sum(notas.values())
+            cor_subtema = {cor: cor}
             proporcoes = {nota: (count / total if total else 0) for nota, count in notas.items()}
             proporcoes_por_subtema[subtema] = proporcoes
+            cor_subtema_dict[subtema] = cor_subtema
             contagens_por_subtema[subtema] = notas
-
+            
+            # TODO IMPLEMENTAR CONHECIMENTO OREVIO E ANTERIOR
+            if tema.nome == 'Conhecimento':
+                if subtema == "Conhecimento Prévio":
+                    soma_notas_vezes_count = 0
+                    soma_counts = 0
+                    for nota, count in notas.items():
+                        # print('nota: '+str(nota))
+                        # print('count: '+str(count))
+                        soma_notas_vezes_count += int(nota) * int(count)
+                        soma_counts += int(count)
+                    #print('previo: '+ media_conhecimento_previo)
+                    # print(soma_notas_vezes_count)
+                    # print(soma_counts)
+                    # print(soma_notas_vezes_count/soma_counts)
+                    media_conhecimento_previo = soma_notas_vezes_count/soma_counts
+                elif subtema == "Conhecimento Posterior":
+                    soma_notas_vezes_count = 0
+                    soma_counts = 0
+                    for nota, count in notas.items():
+                        # print('nota: '+str(nota))
+                        # print('count: '+str(count))
+                        soma_notas_vezes_count += int(nota) * int(count)
+                        soma_counts += int(count)
+                    #print('previo: '+ media_conhecimento_previo)
+                    # print(soma_notas_vezes_count)
+                    # print(soma_counts)
+                    # print(soma_notas_vezes_count/soma_counts)
+                    media_conhecimento_posterior = soma_notas_vezes_count/soma_counts
+                    
         # Criar o gráfico de barras empilhadas com proporções
         fig, ax = plt.subplots(figsize=(8, 4))
         bottom = [0] * len(proporcoes_por_subtema)
         subtema_names = list(proporcoes_por_subtema.keys())
         bar_heights = []
-        for i, nota in enumerate(range(1, 6)):
+        for i, nota in enumerate(range(0, 6)):
             valores = [proporcoes_por_subtema[subtema].get(str(nota), 0) for subtema in proporcoes_por_subtema]
+            cores = [cor_por_subtema[subtema] for subtema in subtema_names]
             barras = ax.barh(subtema_names, valores, left=bottom, label=f'Nota {nota}', color=colors[i])
             bottom = [bottom[i] + valores[i] for i in range(len(bottom))]
 
@@ -1411,23 +1489,29 @@ def gerar_relatorio(request, curso_id):
                         #         subtema_names[i], ha='center', va='bottom', fontsize=10, color='black')
                         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + bar.get_height() / 2,
                                 f'{valor:.1%}',  # Exibir a proporção como percentual
-                                ha='center', va='center')
+                                fontsize=14, ha='center', va='center')
                         # Mostrar a nota abaixo do valor da proporção
                         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + 0.05,
-                                f'Nota: {nota}', ha='center', va='center', fontsize=10, color='red')
+                                f'Nota: {nota}', ha='center', va='center', fontsize=10, color='#222222')
                         max_width = max([bar.get_width() for bar in barras])
+        # Definir o limite do eixo y para manter a altura das barras constante
+        if len(subtema_names) == 1:
+            ax.set_ylim(-1, 1)  # Ajuste estes valores conforme necessário para manter a altura das barras
+        else:
+            ax.set_ylim(-0.5, len(subtema_names))
 
+        ax.set_yticks(range(len(subtema_names)), subtema_names)
         # Adicionar os nomes dos subtemas acima das barras
         # ax.get_yticks()[idx]
         for idx, subtema in enumerate(subtema_names):
-            ax.text(0.5, ax.get_yticks()[idx]+0.35 , subtema, va='top', ha='center', fontsize=10, color='black', backgroundcolor='gray')
+            ax.text(0.5, ax.get_yticks()[idx]+0.35 , subtema, va='top', ha='center', fontsize=10, color='black', backgroundcolor='#FAFAFA')
 
         ax.set_xlim([0, 1])
-        ax.set_xlabel('Avaliações')
+        #ax.set_xlabel('Avaliações')
         ax.set_xticks([]) 
         ax.set_yticks([]) 
         plt.tight_layout()
-        plt.title(f'{tema.nome}')
+        plt.title(f'{tema.nome}', fontsize=16)
         #plt.legend()
 
         # Salvar o gráfico como uma imagem
@@ -1435,10 +1519,76 @@ def gerar_relatorio(request, curso_id):
         plt.close(fig)
 
         # Adicionar a imagem do gráfico ao PDF
+        #252423
+        style_body = ParagraphStyle('body',
+                                    fontName = 'Helvetica',
+                                    fontSize=12,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_JUSTIFY)
+        style_kpi = ParagraphStyle('body',
+                                    fontName = 'Helvetica-Bold',
+                                    fontSize=16,
+                                    leading=17,
+                                    textColor=HexColor('#000000'),
+                                    alignment=TA_CENTER,
+                                    )
+        style_text_kpi = ParagraphStyle('body',
+                                    fontName = 'Helvetica-Bold',
+                                    fontSize=10,
+                                    leading=12,
+                                    textColor=HexColor('#bbbbbb'),
+                                    alignment=TA_CENTER,
+                                    )
+
+        tag_mapping = {
+            "[C_PREVIO]": media_conhecimento_previo,
+            "[C_POST]": media_conhecimento_posterior,
+            "[R+MR%]": str(percentual_baixas_tema)+'%',
+            "[B+MB%]": str(percentual_altas_tema)+'%',
+            "[media]": media_notas,
+            "[num_resp]": quantidade_avaliadores
+        }
+
+        # Substitua as tags pelo valor correspondente no texto
+        for tag, value in tag_mapping.items():
+            texto_tema = texto_tema.replace(tag, str(value))
+            
         
-        c.drawCentredString(A4[0] / 2, A4[1] - 50, tema.nome)
-        c.drawImage(f'{tema.id}_proporcoes.png', 50, 200, width=500, height=200)  # Ajuste as dimensões conforme necessário
+        texto = texto_tema
+        p1=Paragraph(texto, style_body)
+        text_width, text_height = p1.wrapOn(c, 500, 400)
+        x_position = (width - text_width) / 2
+        p1.drawOn(c, x_position, 700-text_height)
+        c.setFont("Helvetica-Bold", 18)
+        c.drawCentredString(width / 2, height - 100, tema.nome)
+        c.drawImage(f'{tema.id}_proporcoes.png', 50, 200, width=500, height=250)  # Ajuste as dimensões conforme necessário
 # http://127.0.0.1:8000/gerar_relatorio/12
+        width_rect = 100
+        height_rect = 70
+        c.roundRect((width / 2)+50, 500, width_rect, height_rect, 10, stroke=1, fill=0)
+        c.roundRect((width / 2)-150, 500, width_rect, height_rect, 10, stroke=1, fill=0)
+        kpi_media = Paragraph(str(media_notas), style_kpi)
+        kpi_numero = Paragraph(str(quantidade_avaliadores), style_kpi)
+        kpi_media_text = Paragraph('Média Geral', style_text_kpi)
+        kpi_numero_text = Paragraph('N° de Respostas', style_text_kpi)
+        kpi_media_width, kpi_media_height = kpi_media.wrapOn(c, 30, 20)
+        kpi_numero_width, kpi_numero_height = kpi_numero.wrapOn(c, 30, 20)
+        kpi_numero_text_width, kpi_numero_text_height = kpi_numero_text.wrapOn(c, 80, 40)
+        kpi_media_text_width, kpi_media_text_height = kpi_media_text.wrapOn(c, 80, 40)
+        texto_x = (width / 2) + 50 + (width_rect / 2) - (kpi_media_width / 2)
+        texto_y = 500 + (height_rect / 2) - 6  # Ajuste o valor para centralizar verticalmente
+        texto_x2 = (width / 2) - 150 + (width_rect / 2) - (kpi_numero_width / 2)
+        texto_y2 = 500 + (height_rect / 2) - 6 
+        kpi_text_numero_x = (width / 2) - 150 + (width_rect / 2) - (kpi_numero_text_width / 2)
+        kpi_text_numero_y = 500 + height_rect - kpi_numero_text_height
+        kpi_text_media_x = (width / 2) + 50 + (width_rect / 2) - (kpi_media_text_width / 2)
+        kpi_text_media_y = 500 + height_rect - kpi_media_text_height
+        # Desenha o texto da média no quadrado
+        kpi_numero.drawOn(c, texto_x2, texto_y2)
+        kpi_media.drawOn(c, texto_x, texto_y)
+        kpi_media_text.drawOn(c, kpi_text_media_x, kpi_text_media_y)
+        kpi_numero_text.drawOn(c, kpi_text_numero_x, kpi_text_numero_y)
         c.showPage()  # Cria uma nova página para cada tema
     c.save()
     return response
