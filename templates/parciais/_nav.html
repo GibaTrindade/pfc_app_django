@@ -15,28 +15,27 @@
                     {% if user.is_authenticated %}
                 
                     {% if user.role == "ADMIN" %}
-                        <li class="nav-item iconChange  me-4 pt-2">
-                            <a class="nav-link text-center  p-0" href="/admin/">
+
+                        <li class="nav-item dropdown iconChange  me-4 pt-2">
+                            <a class="nav-link text-center  p-0 dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
-                                
-                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/android2.svg' %}" alt="android2">
-                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/android.svg' %}"
-                                        alt="android">
+                                    
+                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/person-check.svg' %}" alt="person-check">
+                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/person-fill-check.svg' %}"
+                                        alt="person-check-fill">
                                 </div>
-                                <div class="smallFont textColor">Admin</div>
+                                <div class="smallFont textColor">Admin</div> 
+                            
                             </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/admin/">Admin</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'usuarios_sem_ch' %}">Lista Usuários</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'relatorio' %}">Gerar Relatório</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item iconChange  me-4 pt-2">
-                            <a class="nav-link text-center  p-0" href="{% url 'usuarios_sem_ch' %}">
-                                <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
-                                
-                                    <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/people.svg' %}" alt="android2">
-                                    <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/people-fill.svg' %}"
-                                        alt="android">
-                                </div>
-                                <div class="smallFont textColor">Lista Usuários</div>
-                            </a>
-                        </li>
+
                         
                     {% endif %}
                     {% comment %}

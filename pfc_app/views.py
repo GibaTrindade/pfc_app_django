@@ -18,7 +18,8 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
-                    Tema, Subtema, Carreira, Modalidade, Categoria, ItemRelatorio
+                    Tema, Subtema, Carreira, Modalidade, Categoria, ItemRelatorio,\
+                    PlanoCurso
 from .forms import AvaliacaoForm, DateFilterForm
 from django.db.models import Count, Q, Sum, F, Avg, FloatField, When, BooleanField, Exists, OuterRef, Value, Subquery
 from django.db.models.functions import Coalesce, Concat, Cast
@@ -1357,9 +1358,181 @@ def adjust_lightness(color, amount):
     c = colorsys.rgb_to_hls(*mc.to_rgb(c))
     return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
 
+def draw_logos_relatorio(c: canvas.Canvas, width, height):
+    # Coordenadas para o logo (ajuste conforme necessário)
+    logo_width = 50
+    logo_width_seplag = 150
+    logo_height_seplag = 30
+    logo_height = 50
+    x_ig = width  - 40 - logo_width  # Alinhamento à direita
+    y_ig = height - logo_height -20 # No topo
+
+    x_seplag =(width/2) - (logo_width_seplag/2)  # Alinhamento à direita
+    y_seplag = y_ig # No topo
+    
+    x_pfc = 40
+    y_pfc = y_ig
+
+    igpe_relative_path = 'igpe.png'
+    pfc_relative_path = 'PFC-NOVO-180x180.png'
+    seplag_relative_path = 'seplagtransparente.png'
+    igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+    pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+    seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
+    
+    # Substitua 'path/to/your/logo.png' pelo caminho do seu logo
+    c.drawImage(igpe_path, x_ig, y_ig, width=logo_width, height=logo_height, mask='auto')
+    c.drawImage(seplag_path, x_seplag, y_seplag, width=logo_width_seplag, height=logo_height_seplag, mask='auto')
+    c.drawImage(pfc_path, x_pfc, y_pfc, width=logo_width, height=logo_height, mask='auto')
+
+
+def capa_relatorio(c: canvas.Canvas, width, height, plano_curso: PlanoCurso):
+    draw_logos_relatorio(c, width, height)
+    x_position = (width) / 2
+    y_position = (height) / 2
+    c.setFont("Helvetica-Bold", 16)
+    c.setFillColor('#4472C4')
+    text_width = c.stringWidth('Relatório Geral', "Helvetica-Bold", 16)
+    c.drawString(x_position-(text_width/2), y_position, 'Relatório Geral')
+    c.setFont("Helvetica", 12)
+    text_width = c.stringWidth(plano_curso.curso.nome_curso, "Helvetica-Bold", 11)
+    c.drawString(x_position-(text_width/2), y_position-40, plano_curso.curso.nome_curso)
+
+    c.showPage()
+
+
+def pagina_dados_curso(c: canvas.Canvas, width, height, curso_id):
+    
+    plano_curso = PlanoCurso.objects.get(curso_id = curso_id)
+    capa_relatorio(c, width, height, plano_curso)
+    inscricoes_validas = Inscricao.objects.filter(
+        ~Q(status__nome='CANCELADA'),
+        ~Q(status__nome='EM FILA'),
+        ~Q(condicao_na_acao='DOCENTE'),
+        curso=plano_curso.curso
+    ).count()
+    concluintes = Inscricao.objects.filter(
+        ~Q(status__nome='CANCELADA'),
+        ~Q(status__nome='EM FILA'),
+        ~Q(condicao_na_acao='DOCENTE'),
+        Q(concluido=True),
+        curso=plano_curso.curso
+    ).count()
+    instrutores = Inscricao.objects.filter(
+        ~Q(status__nome='CANCELADA'),
+        ~Q(status__nome='EM FILA'),
+        Q(condicao_na_acao='DOCENTE'),
+        curso=plano_curso.curso
+    ).order_by('inscrito_em')
+    # c.setFont("Helvetica-Bold", 14)
+    # c.drawAlignedString(100, height - 100, 'Dados do curso')
+    style_body = ParagraphStyle('title',
+                                    fontName = 'Helvetica-Bold',
+                                    fontSize=12,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_JUSTIFY)
+    style_body_sub = ParagraphStyle('subtitle',
+                                    fontName = 'Helvetica-Bold',
+                                    fontSize=11,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_JUSTIFY)
+    style_body_center = ParagraphStyle('body-center',
+                                    fontName = 'Helvetica',
+                                    fontSize=11,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_CENTER)
+    style_body_justify = ParagraphStyle('body-center',
+                                    fontName = 'Helvetica',
+                                    fontSize=10,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_JUSTIFY)
+    
+    
+    draw_logos_relatorio(c, width, height)
+    p1=Paragraph('Dados do curso', style_body)
+    text_width, text_height = p1.wrapOn(c, 500, 20)
+    x_position = (width - text_width) / 2
+    p1.drawOn(c, x_position, height-100)
+
+    # Define a cor da linha usando um código hexadecimal
+    cor_linha = HexColor("#4472C4")
+
+    # Define a cor e desenha uma linha horizontal
+    c.setStrokeColor(cor_linha)
+    c.line(50, height-100-text_height , width - 50, height-100-text_height)
+
+    nome_curso = plano_curso.curso.nome_curso
+    obj_geral = plano_curso.objetivo_geral
+    metodologia = plano_curso.metodologia_ensino
+    ch = plano_curso.curso.ch_curso
+    data_inicio = plano_curso.curso.data_inicio
+    data_termino = plano_curso.curso.data_termino
+    inst_promotora = plano_curso.curso.inst_promotora.nome
+    #ch, data_inicio, data_termino, inst_promotora, 
+    #total_inscritos, total_Certificados, instrutor_princ, instrutor_sec
+
+    p2=Paragraph('Nome da ação de capacitação: '+nome_curso, style_body_center)
+    text_width, text_height = p2.wrapOn(c, 500, 40)
+    x_position = (width - text_width) / 2
+    p2.drawOn(c, x_position, height-150)
+
+    # OBJETIVO GERAL #
+    p3=Paragraph('Objetivo geral', style_body_sub)
+    text_width, text_height = p3.wrapOn(c, 500, 40)
+    x_position = (width - text_width) / 2
+    p3.drawOn(c, x_position, height-200)
+    p4=Paragraph(obj_geral, style_body_justify)
+    text_width, text_height = p4.wrapOn(c, 500, 400)
+    x_position = (width - text_width) / 2
+    y_position = height-text_height-220
+    p4.drawOn(c, x_position, y_position)
+
+    # # METODOLOGIA #
+    p5=Paragraph('Metodologia', style_body_sub)
+    text_width, text_height = p5.wrapOn(c, 500, 40)
+    x_position = (width - text_width) / 2
+    y_position = y_position - 30
+    p5.drawOn(c, x_position, y_position)
+    p6=Paragraph(metodologia, style_body_justify)
+    text_width, text_height = p6.wrapOn(c, 500, 400)
+    x_position = (width - text_width) / 2
+    y_position = y_position - 20
+    p6.drawOn(c, x_position, y_position-text_height)
+
+    # INFOS #
+    
+    c.setFont("Helvetica", 10)
+    c.setFillColor('#4472C4')
+    y_position = y_position-text_height - 30
+    c.drawString(x_position, y_position, 'Carga-horária: '+str(ch)+' horas-aula')
+    y_position = y_position - 20
+    c.drawString(x_position, y_position, 'Data de início: '+str(data_inicio.strftime('%d/%m/%Y')))
+    y_position = y_position - 20
+    c.drawString(x_position, y_position, 'Data de término: '+str(data_termino.strftime('%d/%m/%Y')))
+    y_position = y_position - 20
+    c.drawString(x_position, y_position, 'Instituição promotora: '+inst_promotora)
+    y_position = y_position - 20
+    c.drawString(x_position, y_position, 'Total inscritos: '+str(inscricoes_validas))
+    y_position = y_position - 20
+    c.drawString(x_position, y_position, 'Total concluintes: '+str(concluintes))
+
+    for index, instrutor in enumerate(instrutores):
+        if index == 0:
+            label = 'Instrutor principal: '
+        else:
+            label = 'Instrutor secundário: '
+        y_position = y_position - 20
+        c.drawString(x_position, y_position, label+instrutor.participante.nome)
+
+    c.showPage()
+
 def gerar_relatorio(request, curso_id):
     avaliacoes = Avaliacao.objects.filter(curso_id=curso_id).select_related('subtema', 'subtema__tema')
-    medias_notas_por_tema = Avaliacao.objects.filter(curso_id=curso_id).annotate(
+    medias_notas_por_tema = Avaliacao.objects.filter(~Q(nota='0'), curso_id=curso_id ).annotate(
     nota_numerica=Cast('nota', FloatField())
         ).values('subtema__tema__id', 'subtema__tema__nome') \
         .annotate(media_notas=Avg('nota_numerica'))
@@ -1388,8 +1561,11 @@ def gerar_relatorio(request, curso_id):
 
     ]
     width, height = A4
-    # http://127.0.0.1:8000/gerar_relatorio/12
+    pagina_dados_curso(c, width, height, curso_id)
+
+    # http://127.0.0.1:8000/gerar_relatorio/13
     for tema in temas:
+
         total_avaliacoes_tema = Avaliacao.objects.filter(subtema__tema_id=tema.id).count()
         avaliacoes_baixas_tema = Avaliacao.objects.filter(subtema__tema_id=tema.id, nota__in=['1', '2']).count()
         percentual_baixas_tema = (avaliacoes_baixas_tema / total_avaliacoes_tema) * 100 if total_avaliacoes_tema > 0 else 0
@@ -1404,7 +1580,7 @@ def gerar_relatorio(request, curso_id):
 
         media_notas = medias_notas_dict.get(tema.id, 0)  # Obtém a média das notas para o tema ou 0 se não houver avaliações
         media_notas = round(media_notas, 1)
-        print(f'B+MB para o tema {tema.id}: {percentual_altas_tema}')
+        # print(f'B+MB para o tema {tema.id}: {percentual_altas_tema}')
 
         item_relatorio = ItemRelatorio.objects.get(tema=tema)
         texto_tema = item_relatorio.texto
@@ -1417,6 +1593,8 @@ def gerar_relatorio(request, curso_id):
             subtema_nome = avaliacao.subtema.nome
             nota = avaliacao.nota
             cor = avaliacao.subtema.cor
+            if nota=='0':
+                continue
 
             if subtema_nome not in notas_por_subtema:
                 notas_por_subtema[subtema_nome] = {str(i): 0 for i in range(0, 6)}
@@ -1442,7 +1620,7 @@ def gerar_relatorio(request, curso_id):
             cor_subtema_dict[subtema] = cor_subtema
             contagens_por_subtema[subtema] = notas
             
-            # TODO IMPLEMENTAR CONHECIMENTO OREVIO E ANTERIOR
+            # TODO IMPLEMENTAR CONHECIMENTO PRÉVIO E ANTERIOR
             if tema.nome == 'Conhecimento':
                 if subtema == "Conhecimento Prévio":
                     soma_notas_vezes_count = 0
@@ -1456,7 +1634,7 @@ def gerar_relatorio(request, curso_id):
                     # print(soma_notas_vezes_count)
                     # print(soma_counts)
                     # print(soma_notas_vezes_count/soma_counts)
-                    media_conhecimento_previo = soma_notas_vezes_count/soma_counts
+                    media_conhecimento_previo = round(soma_notas_vezes_count/soma_counts, 1)
                 elif subtema == "Conhecimento Posterior":
                     soma_notas_vezes_count = 0
                     soma_counts = 0
@@ -1469,7 +1647,7 @@ def gerar_relatorio(request, curso_id):
                     # print(soma_notas_vezes_count)
                     # print(soma_counts)
                     # print(soma_notas_vezes_count/soma_counts)
-                    media_conhecimento_posterior = soma_notas_vezes_count/soma_counts
+                    media_conhecimento_posterior = round(soma_notas_vezes_count/soma_counts, 1)
                     
         # Criar o gráfico de barras empilhadas com proporções
         fig, ax = plt.subplots(figsize=(8, 4))
@@ -1489,10 +1667,12 @@ def gerar_relatorio(request, curso_id):
                         #         subtema_names[i], ha='center', va='bottom', fontsize=10, color='black')
                         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + bar.get_height() / 2,
                                 f'{valor:.1%}',  # Exibir a proporção como percentual
-                                fontsize=14, ha='center', va='center')
+                                fontsize=12, ha='center', va='center')
                         # Mostrar a nota abaixo do valor da proporção
-                        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + 0.05,
-                                f'Nota: {nota}', ha='center', va='center', fontsize=10, color='#222222')
+                        if nota==0:
+                            nota = 'N/A'
+                        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + 0.055,
+                                f'Nota: {nota}', ha='center', va='center', fontsize=9, color='#222222')
                         max_width = max([bar.get_width() for bar in barras])
         # Definir o limite do eixo y para manter a altura das barras constante
         if len(subtema_names) == 1:
@@ -1503,8 +1683,9 @@ def gerar_relatorio(request, curso_id):
         ax.set_yticks(range(len(subtema_names)), subtema_names)
         # Adicionar os nomes dos subtemas acima das barras
         # ax.get_yticks()[idx]
+        background_color = (250/255, 250/255, 250/255, 0.5)
         for idx, subtema in enumerate(subtema_names):
-            ax.text(0.5, ax.get_yticks()[idx]+0.35 , subtema, va='top', ha='center', fontsize=10, color='black', backgroundcolor='#FAFAFA')
+            ax.text(0.5, ax.get_yticks()[idx]+0.35 , subtema, va='top', ha='center', fontsize=8, color='black', backgroundcolor=background_color)
 
         ax.set_xlim([0, 1])
         #ax.set_xlabel('Avaliações')
@@ -1521,8 +1702,14 @@ def gerar_relatorio(request, curso_id):
         # Adicionar a imagem do gráfico ao PDF
         #252423
         style_body = ParagraphStyle('body',
-                                    fontName = 'Helvetica',
+                                    fontName = 'Helvetica-Bold',
                                     fontSize=12,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_JUSTIFY)
+        style_body_text = ParagraphStyle('body-text',
+                                    fontName = 'Helvetica',
+                                    fontSize=10,
                                     leading=17,
                                     textColor=HexColor('#4472C4'),
                                     alignment=TA_JUSTIFY)
@@ -1530,7 +1717,7 @@ def gerar_relatorio(request, curso_id):
                                     fontName = 'Helvetica-Bold',
                                     fontSize=16,
                                     leading=17,
-                                    textColor=HexColor('#000000'),
+                                    textColor=HexColor('#4472C4'),
                                     alignment=TA_CENTER,
                                     )
         style_text_kpi = ParagraphStyle('body',
@@ -1554,14 +1741,27 @@ def gerar_relatorio(request, curso_id):
         for tag, value in tag_mapping.items():
             texto_tema = texto_tema.replace(tag, str(value))
             
-        
+        draw_logos_relatorio(c, width, height)
+        p_titulo_tema=Paragraph(tema.nome, style_body)
+        text_width, text_height = p_titulo_tema.wrapOn(c, 500, 20)
+        x_position = (width - text_width) / 2
+        p_titulo_tema.drawOn(c, x_position, height-100)
+
+        # Define a cor da linha usando um código hexadecimal
+        cor_linha = HexColor("#4472C4")
+
+        # Define a cor e desenha uma linha horizontal
+        c.setStrokeColor(cor_linha)
+        c.line(50, height-100-text_height , width - 50, height-100-text_height)
+
         texto = texto_tema
-        p1=Paragraph(texto, style_body)
+
+        p1=Paragraph(texto, style_body_text)
         text_width, text_height = p1.wrapOn(c, 500, 400)
         x_position = (width - text_width) / 2
         p1.drawOn(c, x_position, 700-text_height)
         c.setFont("Helvetica-Bold", 18)
-        c.drawCentredString(width / 2, height - 100, tema.nome)
+        # c.drawCentredString(width / 2, height - 100, tema.nome)
         c.drawImage(f'{tema.id}_proporcoes.png', 50, 200, width=500, height=250)  # Ajuste as dimensões conforme necessário
 # http://127.0.0.1:8000/gerar_relatorio/12
         width_rect = 100
@@ -1592,3 +1792,22 @@ def gerar_relatorio(request, curso_id):
         c.showPage()  # Cria uma nova página para cada tema
     c.save()
     return response
+
+def relatorio(request):
+    cursos = Curso.objects.order_by('data_inicio').filter(
+        status__nome = 'FINALIZADO', planocurso__isnull=False)
+    
+    
+    context = {
+        'cursos': cursos,
+    }
+
+    if request.method == 'POST':
+    
+        curso_id = request.POST['curso']
+        print(curso_id)
+        #gerar_relatorio(request, curso_id)
+        return redirect('gerar_relatorio', curso_id)
+    
+
+    return render(request, 'pfc_app/relatorio.html' ,context)

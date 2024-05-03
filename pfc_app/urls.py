@@ -30,6 +30,7 @@ urlpatterns = [
     path('generate_reconhecimento/<int:validacao_id>/', views.generate_all_reconhecimento, name='generate_reconhecimento'),
     path('gerar_ata/<int:curso_id>/', views.gerar_ata, name='gerar_ata'),
     path('gerar_relatorio/<int:curso_id>/', views.gerar_relatorio, name='gerar_relatorio'),
+    path('relatorio/', views.relatorio, name='relatorio'),
     path('explorer/', include('explorer.urls')),
     path('usuarios_sem_ch/', views.usuarios_sem_ch, name='usuarios_sem_ch'),
 
