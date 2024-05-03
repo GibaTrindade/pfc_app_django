@@ -769,6 +769,7 @@ def generate_single_pdf(request, inscricao_id):
         "[data_inicio]": data_inicio_formatada_str,
         "[data_termino]": data_termino_formatada_str,
         "[curso_carga_horaria]": curso.ch_curso,
+        "[condicao_na_acao]": str(inscricao.condicao_na_acao).lower(),
     }
 
 # Substitua as tags pelo valor correspondente no texto
