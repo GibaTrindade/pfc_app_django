@@ -120,11 +120,11 @@ class Validacao_CHAdmin(admin.ModelAdmin):
 
     get_caminho_arquivo.short_description = 'Caminho do Arquivo'
 
-    def save_model(self, request, obj, form, change):
-        if change:
-            obj.responsavel_analise = request.user  # Define o usuário logado como responsável pela análise
-            print(request.user)
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     if change:
+    #         obj.responsavel_analise = request.user  # Define o usuário logado como responsável pela análise
+    #         print(request.user)
+    #     super().save_model(request, obj, form, change)
 
 class ItemRelatorioInline(admin.TabularInline):
     model = ItemRelatorio
@@ -160,6 +160,7 @@ admin.site.register(Categoria)
 admin.site.register(Modalidade)
 admin.site.register(PlanoCurso, PlanoCursoAdmin)
 admin.site.register(Relatorio, RelatorioAdmin)
+admin.site.register(Curadoria)
 
 
 

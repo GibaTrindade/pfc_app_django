@@ -292,6 +292,18 @@ class Carreira(models.Model):
         return self.nome+f' ({self.sigla})'
 
 
+class Curadoria(models.Model):
+    nome_curso = models.CharField(max_length=100, default='')
+    link_inscricao = models.CharField(max_length=200, default='')
+    modalidade = models.ForeignKey(Modalidade, on_delete=models.SET_NULL, blank=True, null=True)
+    instituicao_promotora = models.ForeignKey(InstituicaoPromotora, on_delete=models.SET_NULL, blank=True, null=True)
+    carga_horaria_total = models.IntegerField(blank=True, null=True)
+    mes_competencia = models.DateField()
+    trilha = models.ForeignKey(Trilha, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return self.nome_curso
+
 class Validacao_CH(models.Model):
     CONDICAO_ACAO_CHOICES = [
         ('DISCENTE', 'DISCENTE'),
@@ -314,6 +326,7 @@ class Validacao_CH(models.Model):
     data_termino_curso = models.DateField(blank=False, null=False)
     data_inicio_curso = models.DateField(blank=False, null=False)
     ementa = models.TextField(default='', blank=False, null=False)
+    curadoria = models.ForeignKey(Curadoria, on_delete=models.SET_NULL, blank=True, null=True)
     agenda_pfc = models.BooleanField(default=False, blank=False, null=False)
     status = models.ForeignKey(StatusValidacao, on_delete=models.DO_NOTHING)#, default=status_validacao.id)
     condicao_na_acao = models.CharField(max_length=20, choices=CONDICAO_ACAO_CHOICES, blank=False, null=False, default="DISCENTE")
