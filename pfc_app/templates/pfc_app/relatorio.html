@@ -5,21 +5,24 @@
 
 <div class="d-flex p-2 justify-content-center mb-0"><h1>GERAR RELATÓRIO</h1></div>
 
-        <form method="POST" class="mt-3">
+        <form method="POST" class="mt-3" enctype="multipart/form-data">
             {% csrf_token %}
                 
                 <div class="row mb-3">
                   <div class="col-md-8 col-sm-12 text-md-start text-center">
                       
-                      <div class=" form-floating mb-3">
-                          <select class="form-control" style="background-color: #f5f5f5;" name="curso" id="id_curso">
-                              {% for curso in cursos %}
-                                  <option value="{{ curso.id }}">{{ curso.nome_curso }}</option>
-                              {% endfor %}
-                          </select>
-                          <label for="id_categoria">Escolha o curso</label>
-                      </div>
-        
+                    <div class=" form-floating mb-3">
+                        <select class="form-control" style="background-color: #f5f5f5;" name="curso" id="id_curso">
+                            {% for curso in cursos %}
+                                <option value="{{ curso.id }}">{{ curso.nome_curso }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="id_categoria">Escolha o curso</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_fotos">Selecionar Fotos:</label>
+                        <input type="file" class="form-control-file" id="id_fotos" name="fotos" multiple>
+                    </div>
                   </div>
                 </div>
                

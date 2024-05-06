@@ -55,6 +55,8 @@ import matplotlib.colors as mc
 import colorsys
 from matplotlib.colors import to_rgb
 from pdf2docx import Converter
+from PIL import Image
+import shutil
 
 # Create your views here.
 @login_required
@@ -1531,6 +1533,51 @@ def pagina_dados_curso(c: canvas.Canvas, width, height, curso_id):
 
     c.showPage()
 
+def pagina_fotos(c: canvas.Canvas, width, height):
+    style_body = ParagraphStyle('body',
+                                    fontName = 'Helvetica-Bold',
+                                    fontSize=12,
+                                    leading=17,
+                                    textColor=HexColor('#4472C4'),
+                                    alignment=TA_JUSTIFY)
+    
+    # Definir o diretório onde as imagens estão armazenadas
+    upload_dir = os.path.join(settings.BASE_DIR, 'tmp')
+
+    # Calcular a posição inicial para colocar as imagens
+    y_position = height - 330  # Deixar uma margem no topo
+    print(height)
+    # Listar todos os arquivos no diretório de upload
+    draw_logos_relatorio(c, width, height)
+    p_titulo_tema=Paragraph('Fotos do curso', style_body)
+    text_width, text_height = p_titulo_tema.wrapOn(c, 500, 20)
+    x_position = (width - text_width) / 2
+    p_titulo_tema.drawOn(c, x_position, height-100)
+
+    # Define a cor da linha usando um código hexadecimal
+    cor_linha = HexColor("#4472C4")
+
+    # Define a cor e desenha uma linha horizontal
+    c.setStrokeColor(cor_linha)
+    c.line(50, height-100-text_height , width - 50, height-100-text_height)
+
+    for filename in os.listdir(upload_dir):
+        if filename.lower().endswith((".png", ".jpg", ".jpeg")):  # Aceitar formatos de imagem comuns
+            path = os.path.join(upload_dir, filename)
+            img = Image.open(path)
+            img_width, img_height = img.size
+            scale_factor = 300 / img_width
+            scaled_height = img_height * scale_factor
+            
+
+            # Desenhar a imagem no canvas do PDF
+            c.drawImage(path, 50, y_position, width=267, height=200, mask='auto')
+            y_position -= 230 
+            
+
+    c.showPage()
+
+
 def gerar_relatorio(request, curso_id):
     avaliacoes = Avaliacao.objects.filter(curso_id=curso_id).select_related('subtema', 'subtema__tema')
     medias_notas_por_tema = Avaliacao.objects.filter(~Q(nota='0'), curso_id=curso_id ).annotate(
@@ -1791,8 +1838,27 @@ def gerar_relatorio(request, curso_id):
         kpi_media_text.drawOn(c, kpi_text_media_x, kpi_text_media_y)
         kpi_numero_text.drawOn(c, kpi_text_numero_x, kpi_text_numero_y)
         c.showPage()  # Cria uma nova página para cada tema
+    pagina_fotos(c, width, height)    
     c.save()
+    shutil.rmtree(os.path.join(settings.BASE_DIR, 'tmp'))
     return response
+
+
+def salva_fotos(fotos):
+    upload_dir = os.path.join(settings.BASE_DIR, 'tmp')
+    # Verificar se o diretório existe, se não, criá-lo
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    for foto in fotos:
+        if foto.content_type in ["image/jpeg", "image/png"]:
+            # Salvar temporariamente o arquivo para leitura
+            path = os.path.join(upload_dir, foto.name)
+            with open(path, 'wb+') as f:
+                for chunk in foto.chunks():
+                    f.write(chunk)
+
+
 
 def relatorio(request):
     cursos = Curso.objects.order_by('data_inicio').filter(
@@ -1805,8 +1871,9 @@ def relatorio(request):
 
     if request.method == 'POST':
     
-        curso_id = request.POST['curso']
-        print(curso_id)
+        curso_id = request.POST.get('curso')
+        fotos = request.FILES.getlist('fotos')  # Pega a lista de arquivos enviados
+        salva_fotos(fotos)
         #gerar_relatorio(request, curso_id)
         return redirect('gerar_relatorio', curso_id)
     
