@@ -1814,24 +1814,30 @@ def gerar_relatorio(request, curso_id):
 # http://127.0.0.1:8000/gerar_relatorio/12
         width_rect = 100
         height_rect = 70
-        c.roundRect((width / 2)+50, 500, width_rect, height_rect, 10, stroke=1, fill=0)
-        c.roundRect((width / 2)-150, 500, width_rect, height_rect, 10, stroke=1, fill=0)
+        c.roundRect((width / 2)+50, 470, width_rect, height_rect, 10, stroke=1, fill=0)
+        c.roundRect((width / 2)-150, 470, width_rect, height_rect, 10, stroke=1, fill=0)
+        media_text = 'Média Geral'
+        if tema.nome == 'Conhecimento':
+            media_conhecimento = round(media_conhecimento_posterior/media_conhecimento_previo, 1)
+            media_notas = media_conhecimento
+            media_text = 'Ganho de Conhecimento'
+           
         kpi_media = Paragraph(str(media_notas), style_kpi)
         kpi_numero = Paragraph(str(quantidade_avaliadores), style_kpi)
-        kpi_media_text = Paragraph('Média Geral', style_text_kpi)
+        kpi_media_text = Paragraph(media_text, style_text_kpi)
         kpi_numero_text = Paragraph('N° de Respostas', style_text_kpi)
         kpi_media_width, kpi_media_height = kpi_media.wrapOn(c, 30, 20)
         kpi_numero_width, kpi_numero_height = kpi_numero.wrapOn(c, 30, 20)
         kpi_numero_text_width, kpi_numero_text_height = kpi_numero_text.wrapOn(c, 80, 40)
         kpi_media_text_width, kpi_media_text_height = kpi_media_text.wrapOn(c, 80, 40)
         texto_x = (width / 2) + 50 + (width_rect / 2) - (kpi_media_width / 2)
-        texto_y = 500 + (height_rect / 2) - 6  # Ajuste o valor para centralizar verticalmente
+        texto_y = 470 + (height_rect / 2) - 6  # Ajuste o valor para centralizar verticalmente
         texto_x2 = (width / 2) - 150 + (width_rect / 2) - (kpi_numero_width / 2)
-        texto_y2 = 500 + (height_rect / 2) - 6 
+        texto_y2 = 470 + (height_rect / 2) - 6 
         kpi_text_numero_x = (width / 2) - 150 + (width_rect / 2) - (kpi_numero_text_width / 2)
-        kpi_text_numero_y = 500 + height_rect - kpi_numero_text_height
+        kpi_text_numero_y = 470 + height_rect - kpi_numero_text_height
         kpi_text_media_x = (width / 2) + 50 + (width_rect / 2) - (kpi_media_text_width / 2)
-        kpi_text_media_y = 500 + height_rect - kpi_media_text_height
+        kpi_text_media_y = 470 + height_rect - kpi_media_text_height
         # Desenha o texto da média no quadrado
         kpi_numero.drawOn(c, texto_x2, texto_y2)
         kpi_media.drawOn(c, texto_x, texto_y)
