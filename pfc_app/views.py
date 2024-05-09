@@ -28,6 +28,7 @@ from django.db.models.functions import Coalesce, Concat, Cast, ExtractYear
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from datetime import date, datetime
+import calendar
 from django.views.generic import DetailView
 import os
 import zipfile
@@ -1940,6 +1941,17 @@ def draw_logos_curadoria(c: canvas.Canvas, width, height):
 
 
 def gerar_curadoria(request, ano, mes):
+    # Ano e mês são presumivelmente passados como inteiros, se não, converta-os.
+    ano = int(ano)
+    mes = int(mes)
+
+    # O primeiro dia do mês é sempre 1
+    data_inicio = date(ano, mes, 1)
+
+    # Último dia do mês - monthrange retorna o dia da semana do primeiro dia do mês e o número de dias no mês
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    data_fim = date(ano, mes, ultimo_dia)
+
     trilhas = Trilha.objects.all()
 
     response = HttpResponse(content_type='application/pdf')
@@ -1997,9 +2009,8 @@ def gerar_curadoria(request, ano, mes):
         data_pfc = [
                 cabecalho_pfc,
             ]
-        for curso in trilha.cursos.filter(data_inicio__gte='2024-05-01', data_inicio__lte='2024-05-31'):
+        for curso in trilha.cursos.filter(data_inicio__gte=data_inicio, data_inicio__lte=data_fim):
             url = f"https://www.pfc.seplag.pe.gov.br/curso_detail/{curso.id}"
-            print(url)
             link_text = '<u><link href="' + url + '">' + 'Inscrição' + '</link></u>'
             data_pfc.append(
                 [Paragraph(curso.nome_curso, body_style), 
@@ -2012,8 +2023,12 @@ def gerar_curadoria(request, ano, mes):
         data = [
                 cabecalho,
             ]
-        for curadoria in trilha.curadorias.filter(mes_competencia__gte='2024-05-01', mes_competencia__lte='2024-05-31'):
-            print(curadoria.nome_curso)
+        
+        curadorias = trilha.curadorias.filter(
+            Q(mes_competencia__gte=data_inicio, mes_competencia__lte=data_fim) |
+            Q(permanente=True)
+        )
+        for curadoria in curadorias:
             
             url = curadoria.link_inscricao
             link_text = '<u><link href="' + url + '">' + 'Inscrição' + '</link></u>'
@@ -2030,7 +2045,9 @@ def gerar_curadoria(request, ano, mes):
         if len(data_pfc) > 1:
             table_pfc = Table(data_pfc, colWidths=[215, 50, 30, 80, 120])
 
-        table = Table(data, colWidths=[215, 50, 30, 80, 120])
+        if len(data) > 1:
+            table = Table(data, colWidths=[215, 50, 30, 80, 120])
+
         table_style = TableStyle([
             ('BACKGROUND', (0,0), (-1,0), colors.gray),
             ('TEXTCOLOR', (0,0), (-1,0), colors.white),
@@ -2042,11 +2059,14 @@ def gerar_curadoria(request, ano, mes):
             ('GRID', (0,0), (-1,-1), 1, colors.white),
             ('FONTSIZE', (0,0), (-1,-1), 8)
         ])
+        print(y_table)
+        
 
         if len(data_pfc) > 1:
             table_pfc.setStyle(table_style)
 
-        table.setStyle(table_style)
+        if len(data) > 1:
+            table.setStyle(table_style)
 
         hex_color = trilha.cor_circulo
         rgb_normalized = hex_to_rgb_normalizado(hex_color)
@@ -2056,12 +2076,41 @@ def gerar_curadoria(request, ano, mes):
         p.setFillColorRGB(0, 0, 0)
         p.drawString(75, y_table + 15, trilha.nome)
         if len(data_pfc) > 1:
-            w, h = table_pfc.wrapOn(p, 0, 0)  # Prepara a tabela para ser desenhada
+            w, h = table_pfc.wrapOn(p, 0, 0)
+            if y_table-h <= 40:
+                draw_logos_curadoria(p, width, height)
+                p.setFont("Helvetica", 26)
+                mes_escolhido = MONTHS[int(mes)-1][1]
+                text_title = f"Agenda de {mes_escolhido}"
+                p.drawCentredString(width / 2, height - 50, text_title) 
+                p.showPage()  # Cria uma nova página
+                p.setFont("Helvetica", 26)  # Redefinindo a fonte para o título
+                mes_escolhido = MONTHS[int(mes)-1][1]
+                text_title = f"Agenda de {mes_escolhido}"
+                p.drawCentredString(width / 2, height - 50, text_title)
+                draw_logos_curadoria(p, width, height)
+                y_table = 750  # Redefinir `y_table` para o topo da nova página  # Prepara a tabela para ser desenhada
             table_pfc.drawOn(p, 50, y_table-h)
             y_table -= h + 20
-        w, h = table.wrapOn(p, 0, 0)  # Prepara a tabela para ser desenhada
-        table.drawOn(p, 50, y_table-h)  # Desenha a tabela na posição x=50, y=500
-        y_table -= h + 60
+        if len(data) > 1:
+            w, h = table.wrapOn(p, 0, 0)  # Prepara a tabela para ser desenhada
+            if y_table-h <= 40:
+                draw_logos_curadoria(p, width, height)
+                p.setFont("Helvetica", 26)
+                mes_escolhido = MONTHS[int(mes)-1][1]
+                text_title = f"Agenda de {mes_escolhido}"
+                p.drawCentredString(width / 2, height - 50, text_title) 
+                p.showPage()  # Cria uma nova página
+                p.setFont("Helvetica", 26)  # Redefinindo a fonte para o título
+                mes_escolhido = MONTHS[int(mes)-1][1]
+                text_title = f"Agenda de {mes_escolhido}"
+                p.drawCentredString(width / 2, height - 50, text_title)
+                draw_logos_curadoria(p, width, height)
+                y_table = 750  # Redefinir `y_table` para o topo da nova página  # Prepara a tabela para ser desenhada
+            table.drawOn(p, 50, y_table-h)
+            y_table -= h + 60  # Desenha a tabela na posição x=50, y=500
+        else:
+            y_table -= 40
     draw_logos_curadoria(p, width, height)
     p.setFont("Helvetica", 26)
     mes_escolhido = MONTHS[int(mes)-1][1]

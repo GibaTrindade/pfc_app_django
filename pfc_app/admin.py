@@ -137,6 +137,10 @@ class RelatorioAdmin(admin.ModelAdmin):
     inlines = [ItemRelatorioInline]
     list_display = ('codigo',)
 
+class CuradoriaAdmin(admin.ModelAdmin):
+    list_display = ('nome_curso', 'mes_competencia', 'permanente',)
+    list_editable = ('permanente',)
+
 
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
@@ -160,7 +164,7 @@ admin.site.register(Categoria)
 admin.site.register(Modalidade)
 admin.site.register(PlanoCurso, PlanoCursoAdmin)
 admin.site.register(Relatorio, RelatorioAdmin)
-admin.site.register(Curadoria)
+admin.site.register(Curadoria, CuradoriaAdmin)
 
 
 
