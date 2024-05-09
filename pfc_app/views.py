@@ -1955,11 +1955,11 @@ def gerar_curadoria(request, ano, mes):
     trilhas = Trilha.objects.all()
 
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="agenda_maio_2024.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="agenda_pfc.pdf"'
 
     # Cria um objeto Canvas diretamente
     p = canvas.Canvas(response, pagesize=A4)
-
+    p.setTitle('Agenda PFC')
     width, height = A4
     
     # Estilo para o cabeçalho
