@@ -33,6 +33,8 @@ urlpatterns = [
     path('relatorio/', views.relatorio, name='relatorio'),
     path('explorer/', include('explorer.urls')),
     path('usuarios_sem_ch/', views.usuarios_sem_ch, name='usuarios_sem_ch'),
+    path('gerar_curadoria/<int:ano>/<int:mes>', views.gerar_curadoria, name='gerar_curadoria'),
+    path('curadoria/', views.curadoria, name='curadoria'),
 
 ]
 

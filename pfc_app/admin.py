@@ -105,7 +105,7 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     list_filter = ('curso', 'participante',)
 
 class Validacao_CHAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'get_caminho_arquivo', 'enviado_em', 'ch_solicitada', 
+    list_display = ('usuario', 'nome_curso', 'enviado_em', 'ch_solicitada', 
                     'ch_confirmada', 'data_termino_curso', 'status',
                     'gerar_reconhecimento_ch', 'analisado_em',)
     list_editable = ('ch_solicitada', 'ch_confirmada', 'data_termino_curso', 'status',)

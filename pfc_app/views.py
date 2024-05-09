@@ -19,10 +19,12 @@ from django.template import loader
 from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
                     Tema, Subtema, Carreira, Modalidade, Categoria, ItemRelatorio,\
-                    PlanoCurso
+                    PlanoCurso, Trilha, Curadoria
 from .forms import AvaliacaoForm, DateFilterForm
-from django.db.models import Count, Q, Sum, F, Avg, FloatField, When, BooleanField, Exists, OuterRef, Value, Subquery
-from django.db.models.functions import Coalesce, Concat, Cast
+from django.db.models import Count, Q, Sum, F, \
+                                Avg, FloatField, When, BooleanField, \
+                                Exists, OuterRef, Value, Subquery, Min, Max
+from django.db.models.functions import Coalesce, Concat, Cast, ExtractYear
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from datetime import date, datetime
@@ -57,6 +59,16 @@ from matplotlib.colors import to_rgb
 from pdf2docx import Converter
 from PIL import Image
 import shutil
+
+
+MONTHS = [
+    (1, "Janeiro"), (2, "Fevereiro"), (3, "Março"),
+    (4, "Abril"), (5, "Maio"), (6, "Junho"),
+    (7, "Julho"), (8, "Agosto"), (9, "Setembro"),
+    (10, "Outubro"), (11, "Novembro"), (12, "Dezembro")
+]
+
+
 
 # Create your views here.
 @login_required
@@ -1885,3 +1897,206 @@ def relatorio(request):
     
 
     return render(request, 'pfc_app/relatorio.html' ,context)
+
+def hex_to_rgb_normalizado(hex_color):
+    # Remover o prefixo '#' se houver
+    if hex_color.startswith('#'):
+        hex_color = hex_color[1:]
+    
+    # Converter os componentes R, G, B de hexadecimal para decimal
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    
+    # Normalizar os valores para o intervalo 0-1
+    return (r / 255, g / 255, b / 255)
+
+def draw_logos_curadoria(c: canvas.Canvas, width, height):
+    # Coordenadas para o logo (ajuste conforme necessário)
+    logo_width = 50
+    logo_width_seplag = 150
+    logo_height_seplag = 30
+    logo_height = 50
+    x_ig = width  - 50 - logo_width  # Alinhamento à direita
+    y_ig = height - logo_height -20 # No topo
+
+    x_seplag = width  - 50 - logo_width_seplag   # Alinhamento à direita
+    y_seplag = 10 # No topo
+    
+    x_pfc = x_ig - logo_width - 10
+    y_pfc = y_ig
+
+    igpe_relative_path = 'igpe.png'
+    pfc_relative_path = 'PFC-NOVO-180x180.png'
+    seplag_relative_path = 'seplagtransparente.png'
+    igpe_path = os.path.join(settings.MEDIA_ROOT, igpe_relative_path)
+    pfc_path = os.path.join(settings.MEDIA_ROOT, pfc_relative_path)
+    seplag_path = os.path.join(settings.MEDIA_ROOT, seplag_relative_path)
+    
+    # Substitua 'path/to/your/logo.png' pelo caminho do seu logo
+    c.drawImage(igpe_path, x_ig, y_ig, width=logo_width, height=logo_height, mask='auto')
+    c.drawImage(seplag_path, x_seplag, y_seplag, width=logo_width_seplag, height=logo_height_seplag, mask='auto')
+    c.drawImage(pfc_path, x_pfc, y_pfc, width=logo_width, height=logo_height, mask='auto')
+
+
+def gerar_curadoria(request, ano, mes):
+    trilhas = Trilha.objects.all()
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="agenda_maio_2024.pdf"'
+
+    # Cria um objeto Canvas diretamente
+    p = canvas.Canvas(response, pagesize=A4)
+
+    width, height = A4
+    
+    # Estilo para o cabeçalho
+    header_style = ParagraphStyle(
+        name='HeaderStyle',
+        fontSize=10,
+        fontName='Helvetica-Bold',
+        textColor=colors.white,
+        alignment=1,  # Centro
+        spaceAfter=5,
+    )
+
+    # Estilo para o corpo da tabela
+    body_style = ParagraphStyle(
+        name='BodyStyle',
+        fontSize=8,
+        fontName='Helvetica',
+        textColor=colors.black,
+        alignment=1,  # Centro
+        spaceAfter=5,
+    )
+
+    link_style = ParagraphStyle(
+        name='link_style',  # Nome do estilo
+        fontName='Helvetica',
+        fontSize=8,
+        textColor=colors.blue,  # Definindo a cor do texto para azul
+        underline=True,  # Adicionando sublinhado
+        alignment=1,  # Centro
+        spaceAfter=5,
+    )
+
+    cabecalho = [Paragraph("Curadoria", header_style), 
+                 Paragraph("Link", header_style), 
+                 Paragraph("CH", header_style), 
+                 Paragraph("Modalidade", header_style), 
+                 Paragraph("Promotor", header_style)]
+    cabecalho_pfc = [Paragraph("PFC", header_style), 
+                 Paragraph("Link", header_style), 
+                 Paragraph("CH", header_style), 
+                 Paragraph("Modalidade", header_style), 
+                 Paragraph("Período", header_style)]
+    
+    y_table = 750
+    # http://127.0.0.1:8000/curadoria
+    for trilha in trilhas:
+        data_pfc = [
+                cabecalho_pfc,
+            ]
+        for curso in trilha.cursos.filter(data_inicio__gte='2024-05-01', data_inicio__lte='2024-05-31'):
+            url = f"https://www.pfc.seplag.pe.gov.br/curso_detail/{curso.id}"
+            print(url)
+            link_text = '<u><link href="' + url + '">' + 'Inscrição' + '</link></u>'
+            data_pfc.append(
+                [Paragraph(curso.nome_curso, body_style), 
+                 Paragraph(link_text, link_style), 
+                 Paragraph(str(curso.ch_curso), body_style), 
+                 Paragraph(curso.modalidade.nome, body_style), 
+                 Paragraph(f"de {curso.data_inicio.strftime('%d/%m/%Y')} a {curso.data_termino.strftime('%d/%m/%Y')}", body_style) ],
+            )
+        
+        data = [
+                cabecalho,
+            ]
+        for curadoria in trilha.curadorias.filter(mes_competencia__gte='2024-05-01', mes_competencia__lte='2024-05-31'):
+            print(curadoria.nome_curso)
+            
+            url = curadoria.link_inscricao
+            link_text = '<u><link href="' + url + '">' + 'Inscrição' + '</link></u>'
+            #link_text = Hyperlink(url, 'Inscrição', color=colors.blue)
+            data.append(
+                [Paragraph(curadoria.nome_curso, body_style), 
+                 Paragraph(link_text, link_style), 
+                 Paragraph(str(curadoria.carga_horaria_total), body_style), 
+                 Paragraph(curadoria.modalidade.nome, body_style), 
+                 Paragraph("" if curadoria.instituicao_promotora is None else curadoria.instituicao_promotora.nome, body_style)],
+            )
+
+            
+        if len(data_pfc) > 1:
+            table_pfc = Table(data_pfc, colWidths=[215, 50, 30, 80, 120])
+
+        table = Table(data, colWidths=[215, 50, 30, 80, 120])
+        table_style = TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.gray),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0,0), (-1,0), 12),
+            ('BACKGROUND', (0,1), (-1,-1), colors.lightblue),
+            ('GRID', (0,0), (-1,-1), 1, colors.white),
+            ('FONTSIZE', (0,0), (-1,-1), 8)
+        ])
+
+        if len(data_pfc) > 1:
+            table_pfc.setStyle(table_style)
+
+        table.setStyle(table_style)
+
+        hex_color = trilha.cor_circulo
+        rgb_normalized = hex_to_rgb_normalizado(hex_color)
+        # Posiciona a tabela em uma localização específica
+        p.setFillColorRGB(rgb_normalized[0], rgb_normalized[1], rgb_normalized[2])
+        p.circle(60, y_table + 20, 10, stroke=0, fill=1)
+        p.setFillColorRGB(0, 0, 0)
+        p.drawString(75, y_table + 15, trilha.nome)
+        if len(data_pfc) > 1:
+            w, h = table_pfc.wrapOn(p, 0, 0)  # Prepara a tabela para ser desenhada
+            table_pfc.drawOn(p, 50, y_table-h)
+            y_table -= h + 20
+        w, h = table.wrapOn(p, 0, 0)  # Prepara a tabela para ser desenhada
+        table.drawOn(p, 50, y_table-h)  # Desenha a tabela na posição x=50, y=500
+        y_table -= h + 60
+    draw_logos_curadoria(p, width, height)
+    p.setFont("Helvetica", 26)
+    mes_escolhido = MONTHS[int(mes)-1][1]
+    text_title = f"Agenda de {mes_escolhido}"
+    p.drawCentredString(width / 2, height - 50, text_title) 
+    p.showPage()
+    p.save()
+    return response
+
+
+
+def curadoria(request):
+    year_range = Curadoria.objects.aggregate(
+        min_year=Min(ExtractYear('mes_competencia')),
+        max_year=Max(ExtractYear('mes_competencia'))
+    )
+    min_year = year_range['min_year']
+    max_year = year_range['max_year']
+
+    # Gera uma lista de anos desde o ano mínimo até o ano máximo
+    available_years = list(range(min_year, max_year + 1))
+    
+    
+    context = {
+        'cursos': cursos,
+        'anos': available_years,
+        'meses': MONTHS,
+    }
+
+    if request.method == 'POST':
+    
+        ano = request.POST.get('ano')
+        mes = request.POST.get('mes') 
+        
+        return redirect('gerar_curadoria', ano, mes)
+    
+
+    return render(request, 'pfc_app/curadoria.html' ,context)

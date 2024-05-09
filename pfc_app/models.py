@@ -93,6 +93,7 @@ class Trilha(models.Model):
     nome = models.CharField(max_length=400, blank=False, null=False)
     ativa = models.BooleanField(default=True, verbose_name = ("Está ativa"))
     competencias = models.ManyToManyField(Competencia)
+    cor_circulo = models.CharField(max_length=7, default='#000000')
 
     def __str__(self):
         return self.nome
@@ -155,7 +156,7 @@ class Curso(models.Model):
     coordenador = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     #history = HistoricalRecords()
     status = models.ForeignKey(StatusCurso, on_delete=models.PROTECT)
-    trilha = models.ForeignKey(Trilha, on_delete=models.PROTECT, blank=True, null=True)
+    trilha = models.ForeignKey(Trilha, on_delete=models.PROTECT, blank=True, null=True, related_name='cursos')
     periodo_avaliativo = models.BooleanField(default=False)
     eh_evento = models.BooleanField(default=False, verbose_name = ("É evento"))
     observacao = models.TextField(max_length=4000, blank=True, null=True, verbose_name = ("Observação"))
@@ -299,7 +300,10 @@ class Curadoria(models.Model):
     instituicao_promotora = models.ForeignKey(InstituicaoPromotora, on_delete=models.SET_NULL, blank=True, null=True)
     carga_horaria_total = models.IntegerField(blank=True, null=True)
     mes_competencia = models.DateField()
-    trilha = models.ForeignKey(Trilha, on_delete=models.SET_NULL, blank=True, null=True)
+    trilha = models.ForeignKey(Trilha, on_delete=models.SET_NULL, blank=True, null=True, related_name='curadorias')
+    permanente = models.BooleanField(default=False)
+
+
 
     def __str__(self):
         return self.nome_curso
