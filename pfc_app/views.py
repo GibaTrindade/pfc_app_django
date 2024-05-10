@@ -2040,8 +2040,10 @@ def gerar_curadoria(request, ano, mes):
                  Paragraph(curadoria.modalidade.nome, body_style), 
                  Paragraph("" if curadoria.instituicao_promotora is None else curadoria.instituicao_promotora.nome, body_style)],
             )
+    
+        if (len(data_pfc) + len(data)) <= 2:
+            continue
 
-            
         if len(data_pfc) > 1:
             table_pfc = Table(data_pfc, colWidths=[215, 50, 30, 80, 120])
 
@@ -2059,7 +2061,6 @@ def gerar_curadoria(request, ano, mes):
             ('GRID', (0,0), (-1,-1), 1, colors.white),
             ('FONTSIZE', (0,0), (-1,-1), 8)
         ])
-        print(y_table)
         
 
         if len(data_pfc) > 1:
