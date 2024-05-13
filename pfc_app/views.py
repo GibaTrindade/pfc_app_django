@@ -2003,7 +2003,7 @@ def gerar_curadoria(request, ano, mes):
                  Paragraph("Modalidade", header_style), 
                  Paragraph("Período", header_style)]
     
-    y_table = 750
+    y_table = 730
     # http://127.0.0.1:8000/curadoria
     for trilha in trilhas:
         data_pfc = [
@@ -2050,8 +2050,11 @@ def gerar_curadoria(request, ano, mes):
         if len(data) > 1:
             table = Table(data, colWidths=[215, 50, 30, 80, 120])
 
+        hex_color = trilha.cor_circulo
+        rgb_normalized = hex_to_rgb_normalizado(hex_color)
+
         table_style = TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.gray),
+            ('BACKGROUND', (0,0), (-1,0), rgb_normalized),
             ('TEXTCOLOR', (0,0), (-1,0), colors.white),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
@@ -2062,23 +2065,27 @@ def gerar_curadoria(request, ano, mes):
             ('FONTSIZE', (0,0), (-1,-1), 8)
         ])
         
-
+        h_pfc = 0
+        h = 0 
         if len(data_pfc) > 1:
             table_pfc.setStyle(table_style)
+            w_pfc, h_pfc = table_pfc.wrapOn(p, 0, 0)
 
         if len(data) > 1:
             table.setStyle(table_style)
+            w, h = table.wrapOn(p, 0, 0) 
 
-        hex_color = trilha.cor_circulo
-        rgb_normalized = hex_to_rgb_normalizado(hex_color)
-        # Posiciona a tabela em uma localização específica
-        p.setFillColorRGB(rgb_normalized[0], rgb_normalized[1], rgb_normalized[2])
-        p.circle(60, y_table + 20, 10, stroke=0, fill=1)
-        p.setFillColorRGB(0, 0, 0)
-        p.drawString(75, y_table + 15, trilha.nome)
+        
+        
+        if y_table-h_pfc > 40 and y_table-h > 40:
+            p.setFillColorRGB(rgb_normalized[0], rgb_normalized[1], rgb_normalized[2])
+            p.circle(60, y_table + 20, 10, stroke=0, fill=1)
+            p.setFillColorRGB(0, 0, 0)
+            p.drawString(75, y_table + 15, trilha.nome)
+
         if len(data_pfc) > 1:
-            w, h = table_pfc.wrapOn(p, 0, 0)
-            if y_table-h <= 40:
+            
+            if y_table-h_pfc <= 40:
                 draw_logos_curadoria(p, width, height)
                 p.setFont("Helvetica", 26)
                 mes_escolhido = MONTHS[int(mes)-1][1]
@@ -2090,11 +2097,17 @@ def gerar_curadoria(request, ano, mes):
                 text_title = f"Agenda de {mes_escolhido}"
                 p.drawCentredString(width / 2, height - 50, text_title)
                 draw_logos_curadoria(p, width, height)
-                y_table = 750  # Redefinir `y_table` para o topo da nova página  # Prepara a tabela para ser desenhada
-            table_pfc.drawOn(p, 50, y_table-h)
-            y_table -= h + 20
+                y_table = 730 
+                p.setFont("Helvetica", 13)
+                p.setFillColorRGB(rgb_normalized[0], rgb_normalized[1], rgb_normalized[2])
+                p.circle(60, y_table + 20, 10, stroke=0, fill=1)
+                p.setFillColorRGB(0, 0, 0)
+                p.drawString(75, y_table + 15, trilha.nome)
+                 # Redefinir `y_table` para o topo da nova página  # Prepara a tabela para ser desenhada
+            table_pfc.drawOn(p, 50, y_table-h_pfc)
+            y_table -= h_pfc + 10
         if len(data) > 1:
-            w, h = table.wrapOn(p, 0, 0)  # Prepara a tabela para ser desenhada
+            
             if y_table-h <= 40:
                 draw_logos_curadoria(p, width, height)
                 p.setFont("Helvetica", 26)
@@ -2107,7 +2120,13 @@ def gerar_curadoria(request, ano, mes):
                 text_title = f"Agenda de {mes_escolhido}"
                 p.drawCentredString(width / 2, height - 50, text_title)
                 draw_logos_curadoria(p, width, height)
-                y_table = 750  # Redefinir `y_table` para o topo da nova página  # Prepara a tabela para ser desenhada
+                y_table = 730
+                p.setFont("Helvetica", 13)
+                p.setFillColorRGB(rgb_normalized[0], rgb_normalized[1], rgb_normalized[2])
+                p.circle(60, y_table + 20, 10, stroke=0, fill=1)
+                p.setFillColorRGB(0, 0, 0)
+                p.drawString(75, y_table + 15, trilha.nome)
+                  # Redefinir `y_table` para o topo da nova página  # Prepara a tabela para ser desenhada
             table.drawOn(p, 50, y_table-h)
             y_table -= h + 60  # Desenha a tabela na posição x=50, y=500
         else:
