@@ -141,6 +141,9 @@ class CuradoriaAdmin(admin.ModelAdmin):
     list_display = ('nome_curso', 'mes_competencia', 'permanente',)
     list_editable = ('permanente',)
 
+class TrilhaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'cor_circulo', 'ordem_relatorio',)
+    list_editable = ('ordem_relatorio', 'cor_circulo')
 
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
@@ -156,7 +159,7 @@ admin.site.register(Validacao_CH, Validacao_CHAdmin)
 admin.site.register(Certificado)
 admin.site.register(RequerimentoCH)
 admin.site.register(Competencia)
-admin.site.register(Trilha)
+admin.site.register(Trilha, TrilhaAdmin)
 admin.site.register(InstituicaoCertificadora)
 admin.site.register(InstituicaoPromotora)
 admin.site.register(Carreira)

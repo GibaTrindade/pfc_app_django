@@ -94,6 +94,7 @@ class Trilha(models.Model):
     ativa = models.BooleanField(default=True, verbose_name = ("Está ativa"))
     competencias = models.ManyToManyField(Competencia)
     cor_circulo = models.CharField(max_length=7, default='#000000')
+    ordem_relatorio = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name = ("Ordem no relatório"))
 
     def __str__(self):
         return self.nome
