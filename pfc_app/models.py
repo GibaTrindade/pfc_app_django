@@ -95,6 +95,7 @@ class Trilha(models.Model):
     competencias = models.ManyToManyField(Competencia)
     cor_circulo = models.CharField(max_length=7, default='#000000')
     ordem_relatorio = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name = ("Ordem no relatório"))
+    fundo_tabela = models.CharField(max_length=7, default='#F3F3F3')
 
     def __str__(self):
         return self.nome

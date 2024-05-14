@@ -2052,6 +2052,8 @@ def gerar_curadoria(request, ano, mes):
 
         hex_color = trilha.cor_circulo
         rgb_normalized = hex_to_rgb_normalizado(hex_color)
+        hex_color_fundo = trilha.fundo_tabela
+        rgb_fundo_normalized = hex_to_rgb_normalizado(hex_color_fundo)
 
         table_style = TableStyle([
             ('BACKGROUND', (0,0), (-1,0), rgb_normalized),
@@ -2060,7 +2062,7 @@ def gerar_curadoria(request, ano, mes):
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0,0), (-1,0), 12),
-            ('BACKGROUND', (0,1), (-1,-1), colors.lightblue),
+            ('BACKGROUND', (0,1), (-1,-1), rgb_fundo_normalized),
             ('GRID', (0,0), (-1,-1), 1, colors.white),
             ('FONTSIZE', (0,0), (-1,-1), 8)
         ])

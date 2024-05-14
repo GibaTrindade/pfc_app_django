@@ -142,8 +142,8 @@ class CuradoriaAdmin(admin.ModelAdmin):
     list_editable = ('permanente',)
 
 class TrilhaAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'cor_circulo', 'ordem_relatorio',)
-    list_editable = ('ordem_relatorio', 'cor_circulo')
+    list_display = ('nome', 'cor_circulo', 'ordem_relatorio', 'fundo_tabela')
+    list_editable = ('ordem_relatorio', 'cor_circulo', 'fundo_tabela',)
 
 # Register your models here.
 admin.site.register(Curso, CursoAdmin)
