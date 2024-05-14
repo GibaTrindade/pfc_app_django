@@ -1952,7 +1952,7 @@ def gerar_curadoria(request, ano, mes):
     ultimo_dia = calendar.monthrange(ano, mes)[1]
     data_fim = date(ano, mes, ultimo_dia)
 
-    trilhas = Trilha.objects.all()
+    trilhas = Trilha.objects.all().order_by('ordem_relatorio')
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="agenda_pfc.pdf"'
