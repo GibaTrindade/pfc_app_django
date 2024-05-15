@@ -175,6 +175,7 @@ def cursos(request):
         .exclude(condicao_na_acao='DOCENTE')
         .exclude(status__nome='CANCELADA')
         .exclude(status__nome='EM FILA')
+        .exclude(status__nome='PENDENTE')
         .order_by('participante__nome')
         .values('curso')
         .annotate(nomes_concatenados=StringAgg('participante__nome', delimiter=', '))
@@ -194,7 +195,8 @@ def cursos(request):
         num_inscricoes=Count('inscricao', 
                              filter=~Q(inscricao__condicao_na_acao='DOCENTE') & 
                              ~Q(inscricao__status__nome='CANCELADA') &
-                             ~Q(inscricao__status__nome='EM FILA') 
+                             ~Q(inscricao__status__nome='EM FILA') & 
+                             ~Q(inscricao__status__nome='PENDENTE') 
                              ),
         usuario_inscrito=Exists(
            Inscricao.objects.filter(participante=request.user, curso=OuterRef('pk'))
@@ -2058,10 +2060,11 @@ def gerar_curadoria(request, ano, mes):
         table_style = TableStyle([
             ('BACKGROUND', (0,0), (-1,0), rgb_normalized),
             ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+            ('BOTTOMPADDING', (0,0), (-1,0), 6),
+            ('TOPPADDING', (0,0), (-1,0), 6),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('VALIGN', (0,0), (-1,-1), 'CENTER'),
             ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0,0), (-1,0), 12),
             ('BACKGROUND', (0,1), (-1,-1), rgb_fundo_normalized),
             ('GRID', (0,0), (-1,-1), 1, colors.white),
             ('FONTSIZE', (0,0), (-1,-1), 8)

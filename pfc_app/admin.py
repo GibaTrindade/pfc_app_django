@@ -88,6 +88,19 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
 
+    # def save_model(self, request, obj, form, change):
+    #     if User.objects.filter(username=obj.username).exists() and not change:
+    #         form.add_error('username', "Este nome de usuário já está em uso.")
+    #         return super().changeform_view(request, str(obj.pk), form_url='', extra_context={'form': form})
+    #     elif User.objects.filter(email=obj.email).exists() and not change:
+    #         form.add_error('email', "Este endereço de e-mail já está em uso.")
+    #         return super().changeform_view(request, str(obj.pk), form_url='', extra_context={'form': form})
+    #     elif User.objects.filter(email=obj.cpf).exists() and not change:
+    #         form.add_error('cpf', "Este CPF já está em uso.")
+    #         return super().changeform_view(request, str(obj.pk), form_url='', extra_context={'form': form})
+    #     else:
+    #         super().save_model(request, obj, form, change)
+
 class InscricaoAdmin(admin.ModelAdmin):
     list_display = ('curso', 'participante', 'participante_username', 'condicao_na_acao', 'ch_valida', 'status', 'concluido', )
     list_filter = ('participante', 'status', 'curso__nome_curso', 'condicao_na_acao',)
