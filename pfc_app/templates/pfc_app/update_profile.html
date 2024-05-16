@@ -2,27 +2,21 @@
 
 {% block content %}
 {% include 'parciais/_messages.html' %}
-  <div class="d-flex p-2 justify-content-center mb-2"><h1>ATUALIZAR PERFIL</h1></div>
-  <form method="post" class="needs-validation" novalidate>
-            {% csrf_token %}
-  <div class="row">
-  <!--
-    <div class="input-group input-group-md mb-3 mt-3">
-        <div class="col input-group-md">
-            <input type="file" class="form-control" id="inputGroupFile02" name="arquivo_pdf" accept=".png, .jpeg, .jpg" title="Escolha um Arquivo" required>
-        </div>
-        
-    </div>
-  </div>
-  -->
-    <div class="text-left mb-2">
+<div class="row my-3">
+    <div class="text-left mb-2 col-2">
         {% if user.avatar_base64 %}
-            <img src="data:image/png;base64,{{ user.avatar_base64 }}" class="rounded-circle img-thumbnail" alt="Avatar" style="width: 150px; height: 150px;">
+            <img src="data:image/png;base64,{{ user.avatar_base64 }}" class="rounded-circle img-thumbnail" alt="Avatar" style="width: 150px; height: 150px; object-fit: cover;">
         {% else %}
             <p>Nenhum avatar carregado</p>
         {% endif %}
     </div>
-    </div>
+    <div class="col-8 d-flex p-2 justify-content-center mb-2"><h1>MEU PERFIL</h1></div>
+    <div col-2></div>
+</div>
+  
+  <form method="post" class="needs-validation" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+    
   <div class="row">
     <div class="col-md-6 col-12">
         
@@ -65,7 +59,13 @@
                 <div class="error ">{{ form.telefone.errors }}</div>
             {% endif %}
             </div>
-
+            <div class="input-group input-group-md mb-3 mt-3">
+                <div class="col input-group-md">
+                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" title="Escolher foto">
+                    
+                </div>
+                
+            </div>
             <button class="input-group-text btn-primary" for="inputGroupFile02" type="submit">ATUALIZAR</button>
         
     </div>
@@ -74,7 +74,7 @@
         <p>CPF: {{ user.cpf }}</p>
         <p>Nome completo: {{ user.nome }}</p>
         <p>Cargo: {{ user.cargo }}</p>
-        <p>Grupo Ocupacional: {{ user.grupo_ocupacional }}</p>
+        <p>Grupo ocupacional: {{ user.grupo_ocupacional }}</p>
         <p>Lotação: {{ user.lotacao }}</p>
         <p>Lotação específica: {{ user.lotacao_especifica }}</p>
         <!-- adicione outros campos que não são editáveis aqui -->
