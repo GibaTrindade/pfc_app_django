@@ -162,7 +162,7 @@ def logout(request):
 @login_required
 def update_profile(request):
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=request.user)
+        form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, f'Perfil atualizado com sucesso!')

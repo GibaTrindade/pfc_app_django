@@ -47,6 +47,9 @@ class SubtemaForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'telefone']
+        fields = ['first_name', 'last_name', 'email', 'telefone', 'avatar']
+        widgets = {
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'})
+        }
 
     telefone = forms.CharField(required=False, max_length=40, label='Telefone')

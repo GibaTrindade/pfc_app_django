@@ -49,6 +49,7 @@ class User(AbstractUser):
         self.first_name = self.first_name.upper()
         self.last_name = self.last_name.upper()
         if self.avatar:
+            print("avatar")
             # Leia a imagem em bytes
             image_data = self.avatar.read()
             # Converta a imagem em base64
