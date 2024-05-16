@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'parciais/_messages.html' %}
+  <div class="d-flex p-2 justify-content-center mb-5"><h1>ATUALIZAR PERFIL</h1></div>
+  
+  <div class="row">
+    <div class="col-md-6 col-12">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div>
+                <div class=" form-floating mb-3">
+                    <input type="input" class="form-control" style="background-color: #f5f5f5;" value="{{ form.first_name.value }}" name="first_name" id="nome_primeiro_id" required>
+                    <label for="nome_primeiro_id" >Primeiro Nome</label>
+                </div>
+            {% if form.first_name.errors %}
+                <div class="error">{{ form.first_name.errors }}</div>
+            {% endif %}
+            </div>
+
+            <div>
+                <div class=" form-floating mb-3">
+                    <input type="input" class="form-control" style="background-color: #f5f5f5;" value="{{ form.last_name.value }}" name="last_name" id="ultimo_nome_id" required>
+                    <label for="ultimo_nome_id" >Último Nome</label>
+                </div>
+            {% if form.last_name.errors %}
+                <div class="error">{{ form.last_name.errors }}</div>
+            {% endif %}
+            </div>
+
+            <div>
+                <div class=" form-floating mb-3">
+                    <input type="input" class="form-control" style="background-color: #f5f5f5;" value="{{ form.email.value }}" name="email" id="email_id" required>
+                    <label for="email_id" >Email</label>
+                </div>
+            {% if form.email.errors %}
+                <div class="text-danger">{{ form.email.errors }}</div>
+            {% endif %}
+            </div>
+
+            <div>
+                <div class=" form-floating mb-3">
+                    <input type="input" class="form-control" style="background-color: #f5f5f5;" value="{{ form.telefone.value }}" name="telefone" id="telefone_id" required>
+                    <label for="telefone_id" >Telefone</label>
+                </div>
+            {% if form.telefone.errors %}
+                <div class="error ">{{ form.telefone.errors }}</div>
+            {% endif %}
+            </div>
+
+            <button class="input-group-text btn-primary" for="inputGroupFile02" type="submit">ATUALIZAR</button>
+        </form>
+    </div>
+    <div class="col-md-6 col-12">
+        <h3>Informações adicionais</h3>
+        <p>CPF: {{ user.cpf }}</p>
+        <p>Nome completo: {{ user.nome }}</p>
+        <p>Cargo: {{ user.cargo }}</p>
+        <p>Grupo Ocupacional: {{ user.grupo_ocupacional }}</p>
+        <!-- adicione outros campos que não são editáveis aqui -->
+    
+    </div>
+  </div>
+    <br/>
+  
+{% endblock %}

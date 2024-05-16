@@ -1,5 +1,5 @@
 from django import forms
-from .models import Avaliacao, Subtema  # Certifique-se de importar o modelo Avaliacao
+from .models import Avaliacao, Subtema, User  # Certifique-se de importar o modelo Avaliacao
 from django.forms import FileInput
 
 
@@ -43,3 +43,10 @@ class SubtemaForm(forms.ModelForm):
         widgets = {
             'cor': forms.TextInput(attrs={'type': 'color'}),
         }
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'telefone']
+
+    telefone = forms.CharField(required=False, max_length=40, label='Telefone')

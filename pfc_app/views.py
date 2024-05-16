@@ -20,7 +20,7 @@ from .models import Curso, Inscricao, StatusInscricao, Avaliacao, \
                     Validacao_CH, StatusValidacao, User, Certificado,\
                     Tema, Subtema, Carreira, Modalidade, Categoria, ItemRelatorio,\
                     PlanoCurso, Trilha, Curadoria
-from .forms import AvaliacaoForm, DateFilterForm
+from .forms import AvaliacaoForm, DateFilterForm, UserUpdateForm
 from django.db.models import Count, Q, Sum, F, \
                                 Avg, FloatField, When, BooleanField, \
                                 Exists, OuterRef, Value, Subquery, Min, Max
@@ -159,6 +159,25 @@ def logout(request):
     return redirect('login')
 
 
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Perfil atualizado com sucesso!')
+            return redirect('update_profile')
+        else:
+            messages.error(request, f'Corrija os erros abaixo')
+            #return redirect('update_profile')
+    else:
+        form = UserUpdateForm(instance=request.user)
+    
+    context = {
+        'form': form,
+        'user': request.user
+    }
+    return render(request, 'pfc_app/update_profile.html', context)
 
 
 @login_required
