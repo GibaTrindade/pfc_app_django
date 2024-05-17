@@ -245,17 +245,32 @@ def cursos(request):
 
 @login_required
 def usuarios_sem_ch(request):
-
+    inscricoes = Inscricao.objects.filter(
+            participante=OuterRef('pk'),
+            concluido=True,
+            curso__status__nome='FINALIZADO'
+        ).values('participante').annotate(
+            total_ch=Sum('ch_valida')
+        ).values('total_ch')[:1]
+    
+    validacoes = Validacao_CH.objects.filter(
+            usuario=OuterRef('pk'),
+            status__nome='DEFERIDA'
+        ).values('usuario').annotate(
+            total_ch=Sum('ch_confirmada')
+        ).values('total_ch')[:1]
+    
     # Filter users with a total load less than 60
     users = User.objects.annotate(
-        total_ch_inscricao=Coalesce(Sum('inscricao__ch_valida', filter=Q(inscricao__concluido=True, inscricao__curso__status__nome='FINALIZADO'), distinct=True), 0),
-        total_ch_validacao=Coalesce(Sum('requerente_validacao__ch_confirmada', filter=Q(requerente_validacao__status__nome='DEFERIDA'), distinct=True), 0)
+        total_ch_inscricao=Coalesce(Subquery(inscricoes), 0),
+        total_ch_validacao=Coalesce(Subquery(validacoes), 0)
     ).annotate(
         total_ch=F('total_ch_inscricao') + F('total_ch_validacao')
     ).filter(grupo_ocupacional='GGOV').order_by('nome')
 
     # Calculate remaining load needed to reach 60
-    users = users.annotate(ch_faltante=60 - F('total_ch'))
+    users = users.annotate(ch_faltante=60 - F('total_ch')).filter(
+                            total_ch__lt=60)
 
     # Select the fields you need for the table
     users = users.values('nome', 'email', 'lotacao', 'lotacao_especifica', 'total_ch', 'ch_faltante')

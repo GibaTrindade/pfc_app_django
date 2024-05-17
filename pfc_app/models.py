@@ -49,7 +49,6 @@ class User(AbstractUser):
         self.first_name = self.first_name.upper()
         self.last_name = self.last_name.upper()
         if self.avatar:
-            print("avatar")
             # Leia a imagem em bytes
             image_data = self.avatar.read()
             # Converta a imagem em base64
@@ -309,7 +308,13 @@ class Curadoria(models.Model):
 
 
     def __str__(self):
-        return self.nome_curso
+        nome_curso_abv = ''
+        if len(self.nome_curso) > 80:
+            nome_curso_abv = self.nome_curso[:35]+' ... '+self.nome_curso[-35:]
+        else:
+            nome_curso_abv = self.nome_curso
+
+        return str(self.mes_competencia) + ' - ' + nome_curso_abv
 
 class Validacao_CH(models.Model):
     CONDICAO_ACAO_CHOICES = [

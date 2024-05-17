@@ -133,6 +133,11 @@ class Validacao_CHAdmin(admin.ModelAdmin):
 
     get_caminho_arquivo.short_description = 'Caminho do Arquivo'
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "curadoria":
+            kwargs["queryset"] = Curadoria.objects.order_by('-mes_competencia')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     # def save_model(self, request, obj, form, change):
     #     if change:
     #         obj.responsavel_analise = request.user  # Define o usuário logado como responsável pela análise
