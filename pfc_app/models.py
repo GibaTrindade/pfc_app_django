@@ -329,7 +329,7 @@ class Validacao_CH(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requerente_validacao')
     arquivo_pdf = models.FileField(upload_to=user_directory_path)
     enviado_em = models.DateTimeField(auto_now_add=True)
-    nome_curso = models.CharField(max_length=100, default='')
+    nome_curso = models.CharField(max_length=400, default='')
     instituicao_promotora = models.CharField(max_length=200, default='')
     requerimento_ch  = models.ForeignKey("RequerimentoCH", on_delete=models.SET_NULL, blank=True, null=True)
     responsavel_analise = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='responsavel_validacao')
