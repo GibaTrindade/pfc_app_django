@@ -5,7 +5,10 @@
 
     <div class="d-flex p-2 justify-content-center mb-2"><h1>AGENDA PFC DE {{mes_escolhido}}</h1></div>
     {% for trilha, dados in trilhas_com_cursos.items %}
-        <h2 style="color: {{ dados.cor_circulo }}">{{ trilha.nome }}</h2>
+        <div class="d-flex align-items-center mb-2">
+            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: {{ dados.cor_circulo }}; margin-right: 10px;"></div>
+            <h2 style="color: {{ dados.cor_circulo }}">{{ trilha.nome }}</h2>
+        </div>
         <div class="content pb-5">
         {% if dados.curadorias %}
         <table style="width: 100%; border-collapse: collapse; border: 2px solid white;">
