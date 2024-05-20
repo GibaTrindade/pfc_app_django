@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'parciais/_messages.html' %}
+
+    <div class="d-flex p-2 justify-content-center mb-2"><h1>AGENDA PFC DE {{mes_escolhido}}</h1></div>
+    {% for trilha, dados in trilhas_com_cursos.items %}
+        <h2 style="color: {{ dados.cor_circulo }}">{{ trilha.nome }}</h2>
+        <div class="content pb-5">
+        {% if dados.curadorias %}
+        <table style="width: 100%; border-collapse: collapse; border: 2px solid white;">
+            <tr style="background-color: {{ dados.cor_circulo }};">
+                <th style="width: 55%; border: 2px solid white;">Curadoria</th>
+                <th style="width: 10%; border: 2px solid white;">Link</th>
+                <th style="width: 5%; border: 2px solid white;">CH</th>
+                <th style="width: 10%; border: 2px solid white;">Modalidade</th>
+                <th style="width: 20%; border: 2px solid white;">Promotor</th>
+            </tr>
+            {% for curadoria in dados.curadorias %}
+            <tr style="background-color: {{ dados.fundo_tabela }};">
+                <td style="border: 2px solid white;">{{ curadoria.nome_curso }}</td>
+                <td style="border: 2px solid white;"><a href="{{ curadoria.link_inscricao }}">Inscrição</a></td>
+                <td style="border: 2px solid white;">{{ curadoria.carga_horaria_total }}</td>
+                <td style="border: 2px solid white;">{{ curadoria.modalidade.nome }}</td>
+                {% if curadoria.instituicao_promotora %}
+                    <td>{{ curadoria.instituicao_promotora.nome }}</td>
+                {% else %}
+                    <td style="border: 2px solid white;">{{ '' }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if dados.cursos %}
+        <table style="width: 100%; border-collapse: collapse; border: 2px solid white;">
+            <tr style="background-color: {{ dados.cor_circulo }};">
+                <th style="width: 55%; border: 2px solid white;">PFC</th>
+                <th style="width: 10%; border: 2px solid white;">Link</th>
+                <th style="width: 5%; border: 2px solid white;">CH</th>
+                <th style="width: 10%; border: 2px solid white;">Modalidade</th>
+                <th style="width: 20%; border: 2px solid white;">Período</th>
+            </tr>
+            {% for curso in dados.cursos %}
+            <tr style="background-color: {{ dados.fundo_tabela }};">
+                <td style="border: 2px solid white;">{{ curso.nome_curso }}</td>
+                <td style="border: 2px solid white;"><a href="https://www.pfc.seplag.pe.gov.br/curso_detail/{{ curso.id }}">Inscrição</a></td>
+                <td style="border: 2px solid white;">{{ curso.ch_curso }}</td>
+                <td style="border: 2px solid white;">{{ curso.modalidade.nome }}</td>
+                <td style="border: 2px solid white;">de {{ curso.data_inicio|date:"d/m/Y" }} a {{ curso.data_termino|date:"d/m/Y" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

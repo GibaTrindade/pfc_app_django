@@ -2208,3 +2208,70 @@ def curadoria(request):
     
 
     return render(request, 'pfc_app/curadoria.html' ,context)
+
+
+def curadoria_html_show(request):
+    year_range = Curadoria.objects.aggregate(
+        min_year=Min(ExtractYear('mes_competencia')),
+        max_year=Max(ExtractYear('mes_competencia'))
+    )
+    min_year = year_range['min_year']
+    max_year = year_range['max_year']
+
+    # Gera uma lista de anos desde o ano mínimo até o ano máximo
+    available_years = list(range(min_year, max_year + 1))
+    
+    
+    context = {
+        'cursos': cursos,
+        'anos': available_years,
+        'meses': MONTHS,
+    }
+
+    if request.method == 'POST':
+    
+        ano = request.POST.get('ano')
+        mes = request.POST.get('mes') 
+        
+        return redirect('curadoria_html', ano, mes)
+    
+
+    return render(request, 'pfc_app/curadoria_show.html' ,context)
+
+def curadoria_html(request, ano, mes):
+
+    ano = int(ano)
+    mes = int(mes)
+
+    data_inicio = date(ano, mes, 1)
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    data_fim = date(ano, mes, ultimo_dia)
+
+    trilhas = Trilha.objects.all().order_by('ordem_relatorio')
+    trilhas_com_cursos = {}
+    for trilha in trilhas:
+        curadorias = trilha.curadorias.filter(
+            Q(mes_competencia__gte=data_inicio, mes_competencia__lte=data_fim) |
+            Q(permanente=True)
+        )
+        cursos = trilha.cursos.filter(data_inicio__gte=data_inicio, data_inicio__lte=data_fim)
+        
+        trilhas_com_cursos[trilha] = {
+            'curadorias': curadorias,
+            'cursos': cursos,
+            'cor_circulo': trilha.cor_circulo,
+            'fundo_tabela': trilha.fundo_tabela
+        }
+
+
+
+    mes_escolhido = MONTHS[int(mes)-1][1].upper()
+
+    context = {
+        'trilhas_com_cursos': trilhas_com_cursos,
+        # 'cursos': cursos,
+        # 'curadorias': curadorias,
+        'mes_escolhido': mes_escolhido
+    }
+
+    return render(request, 'pfc_app/agenda_pfc.html', context)
