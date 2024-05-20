@@ -10,22 +10,22 @@
         {% if dados.curadorias %}
         <table style="width: 100%; border-collapse: collapse; border: 2px solid white;">
             <tr style="background-color: {{ dados.cor_circulo }};">
-                <th style="width: 55%; border: 2px solid white;">Curadoria</th>
-                <th style="width: 10%; border: 2px solid white;">Link</th>
-                <th style="width: 5%; border: 2px solid white;">CH</th>
-                <th style="width: 10%; border: 2px solid white;">Modalidade</th>
-                <th style="width: 20%; border: 2px solid white;">Promotor</th>
+                <th style="width: 55%; border: 2px solid white; color: white; text-align: center;">Curadoria</th>
+                <th style="width: 10%; border: 2px solid white; color: white; text-align: center;">Link</th>
+                <th style="width: 5%; border: 2px solid white; color: white; text-align: center;">CH</th>
+                <th style="width: 10%; border: 2px solid white; color: white; text-align: center;">Modalidade</th>
+                <th style="width: 20%; border: 2px solid white; color: white; text-align: center;">Promotor</th>
             </tr>
             {% for curadoria in dados.curadorias %}
             <tr style="background-color: {{ dados.fundo_tabela }};">
-                <td style="border: 2px solid white;">{{ curadoria.nome_curso }}</td>
-                <td style="border: 2px solid white;"><a href="{{ curadoria.link_inscricao }}">Inscrição</a></td>
-                <td style="border: 2px solid white;">{{ curadoria.carga_horaria_total }}</td>
-                <td style="border: 2px solid white;">{{ curadoria.modalidade.nome }}</td>
+                <td style="border: 2px solid white; text-align: center;">{{ curadoria.nome_curso }}</td>
+                <td style="border: 2px solid white; text-align: center;"><a href="{{ curadoria.link_inscricao }}">Inscrição</a></td>
+                <td style="border: 2px solid white; text-align: center;">{{ curadoria.carga_horaria_total }}</td>
+                <td style="border: 2px solid white; text-align: center;">{{ curadoria.modalidade.nome }}</td>
                 {% if curadoria.instituicao_promotora %}
-                    <td>{{ curadoria.instituicao_promotora.nome }}</td>
+                    <td style="border: 2px solid white; text-align: center;">{{ curadoria.instituicao_promotora.nome }}</td>
                 {% else %}
-                    <td style="border: 2px solid white;">{{ '' }}</td>
+                    <td style="border: 2px solid white; text-align: center;">{{ '' }}</td>
                 {% endif %}
             </tr>
             {% endfor %}
@@ -35,19 +35,19 @@
         {% if dados.cursos %}
         <table style="width: 100%; border-collapse: collapse; border: 2px solid white;">
             <tr style="background-color: {{ dados.cor_circulo }};">
-                <th style="width: 55%; border: 2px solid white;">PFC</th>
-                <th style="width: 10%; border: 2px solid white;">Link</th>
-                <th style="width: 5%; border: 2px solid white;">CH</th>
-                <th style="width: 10%; border: 2px solid white;">Modalidade</th>
-                <th style="width: 20%; border: 2px solid white;">Período</th>
+                <th style="width: 55%; border: 2px solid white; color: white; text-align: center;">PFC</th>
+                <th style="width: 10%; border: 2px solid white; color: white; text-align: center;">Link</th>
+                <th style="width: 5%; border: 2px solid white; color: white; text-align: center;">CH</th>
+                <th style="width: 10%; border: 2px solid white; color: white; text-align: center;">Modalidade</th>
+                <th style="width: 20%; border: 2px solid white; color: white; text-align: center;">Período</th>
             </tr>
             {% for curso in dados.cursos %}
             <tr style="background-color: {{ dados.fundo_tabela }};">
-                <td style="border: 2px solid white;">{{ curso.nome_curso }}</td>
-                <td style="border: 2px solid white;"><a href="https://www.pfc.seplag.pe.gov.br/curso_detail/{{ curso.id }}">Inscrição</a></td>
-                <td style="border: 2px solid white;">{{ curso.ch_curso }}</td>
-                <td style="border: 2px solid white;">{{ curso.modalidade.nome }}</td>
-                <td style="border: 2px solid white;">de {{ curso.data_inicio|date:"d/m/Y" }} a {{ curso.data_termino|date:"d/m/Y" }}</td>
+                <td style="border: 2px solid white; text-align: center;">{{ curso.nome_curso }}</td>
+                <td style="border: 2px solid white; text-align: center;"><a href="https://www.pfc.seplag.pe.gov.br/curso_detail/{{ curso.id }}">Inscrição</a></td>
+                <td style="border: 2px solid white; text-align: center;">{{ curso.ch_curso }}</td>
+                <td style="border: 2px solid white; text-align: center;">{{ curso.modalidade.nome }}</td>
+                <td style="border: 2px solid white; text-align: center;">de {{ curso.data_inicio|date:"d/m/Y" }} a {{ curso.data_termino|date:"d/m/Y" }}</td>
             </tr>
             {% endfor %}
         </table>
