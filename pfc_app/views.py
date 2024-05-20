@@ -443,6 +443,7 @@ def inscrever(request, curso_id):
     inscricoes_validas = Inscricao.objects.filter(
         ~Q(status__nome='CANCELADA'),
         ~Q(status__nome='EM FILA'),
+        ~Q(status__nome='PENDENTE'),
         ~Q(condicao_na_acao='DOCENTE'),
         curso=curso
     ).count()
