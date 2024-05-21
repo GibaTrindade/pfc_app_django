@@ -64,6 +64,19 @@
                             <div class="smallFont textColor">Inscrições Abertas</div>
                         </a>
                     </li>
+                    
+                    <li class="nav-item iconChange  me-4 pt-2">
+                        <a class="nav-link text-center  p-0" href="{% url 'curadoria_show' %}"> 
+                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
+                                
+                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/journal-bookmark.svg' %}" alt="agenda">
+                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/journal-bookmark-fill.svg' %}"
+                                    alt="bar-chart-line-fill">
+                            </div>
+                            <div class="smallFont textColor">Agenda PFC</div> 
+                        </a>
+                    </li>
+                    
                     <li class="nav-item iconChange  me-4 pt-2">
                         <a class="nav-link text-center  p-0" href="{% url 'validar_ch' %}">
                             <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
@@ -101,17 +114,6 @@
                         </a>
                     </li>
 
-                    <li class="nav-item iconChange  me-4 pt-2">
-                        <a class="nav-link text-center  p-0" href="{% url 'curadoria_show' %}"> 
-                            <div class=" d-flex align-items-center overflow-hidden changeWidth mx-auto">
-                                
-                                <img class="one iconHeight mx-2" src="{% static 'pfc_app/icones/journal-bookmark.svg' %}" alt="agenda">
-                                <img class="two iconHeight mx-2" src="{% static 'pfc_app/icones/journal-bookmark-fill.svg' %}"
-                                    alt="bar-chart-line-fill">
-                            </div>
-                            <div class="smallFont textColor">Agenda PFC</div> 
-                        </a>
-                    </li>
     
                     <li class="nav-item dropdown iconChange  me-4 pt-2">
                         <a class="nav-link text-center  p-0 dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
