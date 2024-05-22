@@ -448,6 +448,10 @@ def inscrever(request, curso_id):
         curso=curso
     ).count()
     
+    if curso.status.nome != 'A INICIAR' :
+        messages.error(request, 'Curso não disponível!')
+        return redirect('lista_cursos')
+
     # Compara com o número de vagas
     # Caso seja maior ou igual redireciona
     if inscricoes_validas >= curso.vagas:
