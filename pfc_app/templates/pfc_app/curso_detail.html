@@ -53,12 +53,14 @@
             {% endfor %}
             <div class="row d-flex justify-content-center align-items-center mb-4">
                      {% if not usuario_inscrito %}
-                        {% if lotado %}
-                            <a href="/inscrever/{{curso.id}}/" 
-                            class="btn btn-warning "></i>ENTRAR NA FILA</a>
-                        {% else %}
-                            <a href="/inscrever/{{curso.id}}/" 
-                            class="btn btn-success "></i>INSCREVER-SE</a>
+                        {% if curso.status.nome == "A INICIAR" %}
+                            {% if lotado %}
+                                <a href="/inscrever/{{curso.id}}/" 
+                                class="btn btn-warning "></i>ENTRAR NA FILA</a>
+                            {% else %}
+                                <a href="/inscrever/{{curso.id}}/" 
+                                class="btn btn-success "></i>INSCREVER-SE</a>
+                            {% endif %}
                         {% endif %}
                         
                     {% endif %}
