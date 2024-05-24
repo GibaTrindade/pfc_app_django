@@ -1290,12 +1290,12 @@ def assinatura_ata(curso):
 
     # Obtém um estilo existente da folha de estilos e o personaliza para as assinaturas
     signature_style = styles['Normal'].clone('SignatureStyle')
-    signature_style.fontSize = 12  # Define o tamanho da fonte
+    signature_style.fontSize = 7  # Define o tamanho da fonte
     signature_style.alignment = 1  # Centraliza o texto (0 = esquerda, 1 = centro, 2 = direita)
     # Elementos para a primeira assinatura
     coordinator_elements = [
         [Paragraph(curso.coordenador.nome, signature_style)],
-        [Spacer(1, 20)],
+        [Spacer(1, 15)],
         [create_signature_line()],
         [Paragraph("Assinatura da Coordenação", signature_style)]
     ]
@@ -1310,7 +1310,7 @@ def assinatura_ata(curso):
         for i, docente in enumerate(docentes):
             instrutor_elements.append([
             Paragraph(docente.nome, signature_style),
-            Spacer(1, 30),
+            Spacer(1, 20),
             create_signature_line(),
             Paragraph("Assinatura Instrutoria", signature_style)
             ])
@@ -1375,8 +1375,8 @@ def gerar_ata(request, curso_id):
         data.append([str(i), participante.nome, ''])
         ordem = i
 
-    for j in range(1, 6):
-        data.append([str(ordem + j), '', ''])  # Adiciona 5 linhas em branco.
+    # for j in range(1, 6):
+    #     data.append([str(ordem + j), '', ''])  # Adiciona 5 linhas em branco.
 
     table = Table(data, colWidths=column_widths)
 
@@ -1386,7 +1386,8 @@ def gerar_ata(request, curso_id):
                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                       ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                       ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+                       ('TOPPADDING', (0, 0), (-1, 0), 6),
                        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
                        ('FONTSIZE', (0, 1), (-1, -1), 8),
                        ('GRID', (0, 0), (-1, -1), 1, colors.black),
