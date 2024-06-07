@@ -1674,8 +1674,10 @@ def gerar_relatorio(request, curso_id):
         percentual_baixas_tema = (avaliacoes_baixas_tema / total_avaliacoes_tema) * 100 if total_avaliacoes_tema > 0 else 0
         percentual_baixas_tema = round(percentual_baixas_tema, 2)
         
+        total_avaliacoes_zero = Avaliacao.objects.filter(subtema__tema_id=tema.id, nota='0').count()
+
         avaliacoes_altas_tema = Avaliacao.objects.filter(subtema__tema_id=tema.id, nota__in=['4', '5']).count()
-        percentual_altas_tema = (avaliacoes_altas_tema / total_avaliacoes_tema) * 100 if total_avaliacoes_tema > 0 else 0
+        percentual_altas_tema = (avaliacoes_altas_tema / (total_avaliacoes_tema-total_avaliacoes_zero)) * 100 if total_avaliacoes_tema > 0 else 0
         percentual_altas_tema = round(percentual_altas_tema, 2)
 
 
